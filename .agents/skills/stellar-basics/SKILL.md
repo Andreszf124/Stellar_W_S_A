@@ -86,5 +86,7 @@ USDC testnet issuer: `GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5`
 | `account not found`                          | account not created yet: fund it with Friendbot                                |
 | wallet "network mismatch"                    | wallet is on another network: switch to Testnet                                |
 
-Docs: https://developers.stellar.org/llms.txt (index; append `.md` to any docs
-URL for markdown).
+Live sources: the `stellar-raven` MCP (https://raven.stellar.org/mcp, official
+docs + ecosystem data; configured in this repo, needs a one-time sign-in) or the
+docs index https://developers.stellar.org/llms.txt (index; append `.md` to any
+docs URL for markdown).

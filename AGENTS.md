@@ -136,5 +136,7 @@ docs/AGENT-SETUP.md       per-agent setup and optional MCP servers
   (stellarscaffold.org documents config v2)
 - OpenZeppelin Stellar contracts:
   https://docs.openzeppelin.com/stellar-contracts
-- Optional MCP servers (docs search, contract wizard): see
-  `docs/AGENT-SETUP.md`.
+- Stellar Raven MCP (`stellar-raven`, https://raven.stellar.org/mcp): official
+  Stellar docs, ecosystem data and playbooks; already configured, needs a
+  one-time browser sign-in. Other optional MCP servers (Trustless Work docs,
+  OpenZeppelin contract wizard): see `docs/AGENT-SETUP.md`.

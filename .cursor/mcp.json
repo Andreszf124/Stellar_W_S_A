@@ -1,5 +1,9 @@
 {
 	"mcpServers": {
+		"stellar-raven": {
+			"type": "http",
+			"url": "https://raven.stellar.org/mcp"
+		},
 		"trustless-work": {
 			"type": "http",
 			"url": "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"

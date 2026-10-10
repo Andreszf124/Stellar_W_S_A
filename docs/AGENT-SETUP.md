@@ -48,17 +48,25 @@ siempre se usan copias.
 ## Servidores MCP (opcionales)
 
 No son necesarios: las skills ya contienen la información verificada. Sirven
-para consultar documentación actualizada y ninguno requiere API key.
+para consultar documentación actualizada. Ya vienen configurados para Claude
+Code, Codex, Cursor, VS Code/Copilot y Gemini CLI, y ninguno requiere API key.
 
-| Servidor               | URL                                                          | Uso                                                      |
-| ---------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| `trustless-work`       | `https://docs.trustlesswork.com/trustless-work/~gitbook/mcp` | Buscar en la documentación de Trustless Work             |
-| `openzeppelin-stellar` | `https://mcp.openzeppelin.com/contracts/stellar/mcp`         | Generar contratos OpenZeppelin (tokens, NFTs, governor…) |
+| Servidor               | URL                                                          | Uso                                                                      |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `stellar-raven`        | `https://raven.stellar.org/mcp`                              | Documentación oficial de Stellar, datos del ecosistema y guías prácticas |
+| `trustless-work`       | `https://docs.trustlesswork.com/trustless-work/~gitbook/mcp` | Buscar en la documentación de Trustless Work                             |
+| `openzeppelin-stellar` | `https://mcp.openzeppelin.com/contracts/stellar/mcp`         | Generar contratos OpenZeppelin (tokens, NFTs, governor…)                 |
 
-Otros servidores útiles, que requieren inicio de sesión o tienen límites:
-Stellar Raven, `https://raven.stellar.buzz/mcp` (OAuth; documentación y
-ecosistema de Stellar), y Context7, `https://mcp.context7.com/mcp` (límite
-anónimo bajo).
+[Stellar Raven](https://raven.stellar.org) requiere iniciar sesión en el
+navegador la primera vez (OAuth):
+
+- Claude Code: ejecuta `/mcp`, elige `stellar-raven` → **Authenticate**.
+- Codex: `codex mcp login stellar-raven`.
+- Cursor, VS Code y Gemini CLI: abren el inicio de sesión al usarlo por primera
+  vez.
+
+Otro servidor útil, con un límite anónimo bajo: Context7,
+`https://mcp.context7.com/mcp`.
 
 **OpenCode** (`opencode.json` en la raíz):
 
@@ -66,6 +74,10 @@ anónimo bajo).
 {
 	"$schema": "https://opencode.ai/config.json",
 	"mcp": {
+		"stellar-raven": {
+			"type": "remote",
+			"url": "https://raven.stellar.org/mcp"
+		},
 		"trustless-work": {
 			"type": "remote",
 			"url": "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"
@@ -79,6 +91,9 @@ anónimo bajo).
 ```json
 {
 	"mcpServers": {
+		"stellar-raven": {
+			"serverUrl": "https://raven.stellar.org/mcp"
+		},
 		"trustless-work": {
 			"serverUrl": "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"
 		}

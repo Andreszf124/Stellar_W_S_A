@@ -75,6 +75,7 @@ entre con su correo.
 | [Trustless Work](https://docs.trustlesswork.com) | Escrows listos para usar, para los casos en que el dinero debe esperar una condición: el USDC queda en un contrato y se libera cuando se aprueban los hitos. |
 | [Cavos](https://docs.cavos.xyz) | Wallets embebidas: los usuarios inician sesión con correo o Google y obtienen una cuenta Stellar sin instalar extensiones. La llave pertenece al usuario y se guarda en un entorno aislado al que ni la aplicación ni Cavos tienen acceso. |
 | Skills para agentes | Instrucciones verificadas en `AGENTS.md` y `.agents/skills/` para que cualquier agente construya sobre estas piezas sin inventar APIs. |
+| Servidores MCP | [Stellar Raven](https://raven.stellar.org) (documentación y ecosistema de Stellar), documentación de Trustless Work y el asistente de contratos de OpenZeppelin, ya configurados para los principales agentes. Stellar Raven pide iniciar sesión en el navegador la primera vez. |
 | Escrow Studio (`/escrows`) | Interfaz para crear, fondear, aprobar, liberar, disputar y resolver escrows, con una guía para preparar la cuenta. |
 | Contrato `reputation` | Contrato de ejemplo con reseñas on-chain ligadas a cada escrow: almacenamiento, permisos, errores, eventos y tests. |
 | Scripts | `setup:tools` (instala herramientas sin compilar), `doctor` (diagnóstico), `check` (tests, formato, tipos y lint), `tw:smoke` (prueba de escrows de punta a punta). |
