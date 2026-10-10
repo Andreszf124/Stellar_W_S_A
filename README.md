@@ -152,7 +152,7 @@ Hay más ideas, con y sin escrows, en [`ideas.md`](.agents/skills/build-dapp/ref
 | --- | --- |
 | `npm start` | Modo desarrollo: compila y despliega los contratos en testnet, genera sus clientes y levanta la app |
 | `npm run doctor` | Revisa herramientas, `app/.env`, la red y tus claves de Trustless Work y Cavos |
-| `npm run check` | Tests de los contratos + revisión de tipos + lint |
+| `npm run check` | Tests de los contratos + formato + revisión de tipos + lint |
 | `npm run contracts:build` | Compila, despliega y genera los clientes una sola vez |
 | `npm run tw:smoke` | Prueba real de un escrow de punta a punta, sin navegador |
 | `npm run build` | Build de producción de la app (`app/dist`) |

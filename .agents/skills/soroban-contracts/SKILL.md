@@ -143,8 +143,14 @@ after building it.)
 ## Errors, events, misc
 
 - Every `#[contracterror]` variant needs a `///` doc comment written for end
-  users: the TS client surfaces it as `tx.result.unwrapErr().message`
-  (verified). Without it users see an empty error.
+  users, in the app's language: the TS client surfaces it as
+  `tx.result.unwrapErr().message` (verified). Without it users see an empty
+  error.
+- Don't name a function argument `options`: it collides with the generated TS
+  client's own `options` parameter and the client won't build.
+- Events: a `#[contractevent] struct VoteCast` is published with the topic
+  `"vote_cast"` (snake_case) followed by its `#[topic]` fields; that's the
+  `topic` string `useSubscription` expects.
 - Return `Result<T, Error>` for expected failures; `panic!`/`unwrap` only for
   impossible states.
 - Events: `#[contractevent]` struct + `.publish(&env)` (`env.events().publish`

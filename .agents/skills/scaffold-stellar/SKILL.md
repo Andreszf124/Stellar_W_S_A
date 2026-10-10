@@ -104,6 +104,11 @@ import { useWallet } from "../hooks/useWallet"
 // READ: simulation only, free, no wallet needed. Value is in `.result`.
 const score = (await reputation.score_of({ subject })).result
 
+// READ of a fn returning Result<T, Error>: `.result` is a Result wrapper.
+const r = (await polls.get_poll({ id })).result
+if (r.isErr()) throw new Error(r.unwrapErr().message)
+const poll = r.unwrap()
+
 // WRITE: build with the user's publicKey, then sign + send with the wallet.
 const { address, signTransaction } = useWallet()
 const tx = await reputation.review(
@@ -165,6 +170,17 @@ can touch global identities with the same name.
 
 ## Must-knows
 
+- **Never name a contract function argument `options`.** Every generated TS
+  method already takes an `options` parameter, so the client build fails (TS2300
+  Duplicate identifier) and Scaffold only logs
+  `npm run build failed with status: Some(2)`. Use `choices`, `opts`, etc.
+  `npm run contracts:build` exits 1 when a client fails to generate; to see the
+  real TS error:
+  `stellar contract bindings typescript --wasm target/wasm32v1-none/release/<crate>.wasm --output-dir /tmp/x`
+  then `cd /tmp/x && npm install && npm run build`.
+- The generated `Errors` map in `app-lib/clients/<name>/src/index.ts` shows the
+  variant NAMES, but at runtime `unwrapErr().message` is the variant's `///` doc
+  comment (verified). Trust the runtime.
 - **Fresh clone**: `npm run typecheck`/`check`/`build` stop with "Contract
   clients aren't generated yet" (TS2307 on `@stellar-scaffold/app-lib/clients`)
   until the first `npm run contracts:build` or `npm start`. Not a code bug.

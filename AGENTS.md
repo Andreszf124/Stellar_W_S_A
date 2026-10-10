@@ -23,7 +23,8 @@ TypeScript clients). On top, two optional building blocks already wired in:
 a Soroban contract + pages: no escrow. Direct payments (tips, donations) don't
 need an escrow either. The `build-dapp` skill walks through this choice.
 
-Always reply in the user's language. Explain on-chain concepts in one or two
+Always reply in the user's language, and write the app's UI text (and contract
+error messages) in that language too. Explain on-chain concepts in one or two
 plain sentences when they matter, then keep building.
 
 ## Skills (read before working on that area)
@@ -79,10 +80,10 @@ verified, version-specific facts that differ from your training data.
 | `npm install`                        | install deps (+ syncs skill mirrors)                                                                                        |
 | `npm run doctor`                     | checks tools, `app/.env`, network, Trustless Work key; creates `app/.env` if missing                                        |
 | `npm start`                          | dev loop: `stellar scaffold watch --build-clients` (build → deploy to testnet → TS clients) + Vite on http://localhost:5173 |
-| `npm run contracts:build`            | one-off build + deploy + client generation                                                                                  |
+| `npm run contracts:build`            | one-off build + deploy + client generation (exits 1 if a client fails to generate)                                          |
 | `npm run contracts:test`             | `cargo test` for all contracts                                                                                              |
 | `npm run typecheck` / `npm run lint` | TypeScript / ESLint for the app                                                                                             |
-| `npm run check`                      | contracts:test + typecheck + lint (run before saying "done")                                                                |
+| `npm run check`                      | contracts:test + Rust/TS formatting + typecheck + lint (run before saying "done")                                           |
 | `npm run tw:smoke`                   | end-to-end Trustless Work test (deploy→fund→approve→release) signed by the local deployer key                               |
 
 Scaffold/Stellar CLI commands must run from `app/` (its `.env` sets a relative

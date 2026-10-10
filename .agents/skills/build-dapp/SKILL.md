@@ -26,9 +26,10 @@ app has no escrow.
 
 - Read `AGENTS.md` and skim `contracts/reputation` (the contract template every
   app can copy).
-- Run `npm run doctor`. If something is missing, fix or explain that first. The
-  Trustless Work key only matters if the app uses escrows; the Cavos App ID only
-  if it uses email/Google login.
+- Run `npm install` (if `node_modules` is missing) and `npm run doctor`. If
+  something is missing, fix or explain that first. The Trustless Work key only
+  matters if the app uses escrows; the Cavos App ID only if it uses email/Google
+  login.
 
 ## 1. Interview (max 3 questions, skip what's obvious)
 
@@ -92,16 +93,25 @@ and **this repo has no database yet** (adding one is real work).
   (`require_auth`), errors, events. See `references/architecture.md`.
 - **Escrow** (only if chosen): type (single/multi-release) and role mapping with
   real people of the story (`trustless-work` skill, `references/recipes.md`).
-- **Screens**: usually 1–3 pages. Replace the starter's Home with the app, and
-  remove nav links to demo pages the app doesn't use (e.g. "Escrow Studio" in a
-  voting app). Keep their code; just unlink them.
+- **Screens**: usually 1–3 pages. Replace the starter's Home with the app.
+  Remove what the app doesn't use from what users SEE: nav links (e.g. "Escrow
+  Studio" in a voting app), footer links and the page `<title>`. Keep the code,
+  routes, providers and the `reputation` contract (starter components import its
+  client); unused code is harmless.
+- **Language**: write all UI text in the user's language, including the
+  starter's shared components (`WalletButton`, `SetupChecklist`,
+  `FundAccountButton`) and the contract's error doc comments (they are the
+  messages users see).
 - **Onboarding**: for non-crypto users make "Sign in with email/Google" the main
   path (Cavos, `cavos` skill, behind `useWallet()`).
 - **Honest limits**: say what on-chain can't do for this idea (e.g. votes are
   public; one address ≠ one person).
 
-Share the plan in a few bullet points and start building unless the user
-objects.
+Share the plan in a few bullet points. If you asked trade-off questions (step
+2b), **wait for the answers** before building the parts they affect. If you
+asked nothing, or the user says "decide for me", or nobody can answer
+(non-interactive run), go ahead with your recommendations and say which ones you
+picked.
 
 ## 4. Build in this order (verify after each step)
 

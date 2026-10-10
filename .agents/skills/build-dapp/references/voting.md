@@ -17,14 +17,20 @@ frictionless for non-crypto people.
 - **Ask if relevant**: should anyone create polls, or only some people
   (allowlist / members holding a token)?
 
-## Contract `polls` (`contracts/polls`, no constructor needed)
+## Contract `polls` (`contracts/polls`)
 
 Copy `contracts/reputation` (Cargo.toml, storage/TTL/event/test patterns) and
-adapt:
+adapt. Give it `__constructor(admin)` + an admin-gated
+`upgrade(new_wasm_hash: BytesN<32>)` and register it with
+`constructor_args = "--admin me"`: then each save upgrades the contract in place
+and **existing polls survive** while you iterate (without it, every contract
+edit deploys a new, empty contract and shared links break).
 
 ```text
 Poll { id: u32, creator: Address, question: String, options: Vec<String>, ends_at: u64 }
+PollView { poll: Poll, tally: Vec<u32> }        // what list/get return: no N+1 reads
 
+DataKey::Admin                  instance   Address
 DataKey::Count                  instance   u32 (next poll id)
 DataKey::Poll(id)               persistent Poll
 DataKey::Tally(id)              persistent Vec<u32> (one counter per option)
@@ -33,50 +39,62 @@ DataKey::Voted(id, voter)       persistent u32 (the option chosen)
 
 Functions (sign = `require_auth` on that address):
 
-- `create_poll(creator, question, options, duration_secs) -> u32`: creator
-  signs. Validate 2–10 options, question ≤ 200 bytes, each option ≤ 64 bytes,
-  duration 60 s – 30 days. `ends_at = env.ledger().timestamp() + duration_secs`.
-  Tally starts as zeros. Emit `PollCreated { #[topic] creator, id }`.
+- `create_poll(creator, question, choices, duration_secs) -> u32`: creator
+  signs. **Name the argument `choices`, never `options`**: every generated TS
+  method already has an `options` parameter, so `options` breaks the client
+  build (TS2300 Duplicate identifier). Validate: 2–10 choices, none empty or
+  duplicated, question ≤ 200 bytes, each choice ≤ 64 bytes, duration 60 s – 30
+  days. `ends_at = env.ledger().timestamp() + duration_secs`. Tally starts as
+  zeros. Emit `PollCreated { #[topic] creator, id }`.
 - `vote(voter, poll_id, option: u32)`: voter signs. Errors if the poll doesn't
   exist, `timestamp >= ends_at`, `option >= options.len()`, or
   `Voted(id, voter)` exists. Increment the tally, store `Voted`. Emit
   `VoteCast { #[topic] poll_id, option }`.
-- Reads: `get_poll(id)`, `results(id) -> Vec<u32>`,
+- Reads: `get_poll(id) -> Result<PollView, Error>`,
   `vote_of(id, voter) -> Option<u32>`, `count()`,
-  `list_polls(start, limit) -> Vec<Poll>` (cap `limit` at 50, newest-first is
-  done in the UI).
-- `#[contracterror]` with a `///` user-facing message on each variant:
-  `PollNotFound`, `PollClosed`, `InvalidOption`, `AlreadyVoted`,
-  `TooFewOptions`, `TooManyOptions`, `TextTooLong`, `InvalidDuration`.
+  `list_polls(start, limit) -> Vec<PollView>` (cap `limit` at 50; newest-first
+  ordering is done in the UI).
+- `#[contracterror]` with a `///` user-facing message on each variant, written
+  in the app's language: `PollNotFound`, `PollClosed`, `InvalidOption`,
+  `AlreadyVoted`, `TooFewOptions`, `TooManyOptions`, `EmptyText`,
+  `DuplicateChoice`, `TextTooLong`, `InvalidDuration`.
 - TTL: extend `Poll`, `Tally` and `Voted` keys on every write to ~60 days
   (`17_280 * 60` ledgers) so they outlive the poll.
 
 Tests (`cargo test -p polls`): create + vote + results; second vote →
 `AlreadyVoted`; vote after `env.ledger().set_timestamp(ends_at)` → `PollClosed`;
-bad option; 1 and 11 options rejected; `env.auths()` shows the voter signed;
-`list_polls` respects the cap.
+bad option; 1 and 11 choices rejected; empty and duplicate choices rejected;
+`env.auths()` shows the voter signed; `list_polls` respects the cap.
 
-Register: `polls = { client = true }` in `[development.contracts]` (and
-staging). Import: `import { polls } from "@stellar-scaffold/app-lib/clients"`.
+Register: `polls = { client = true, constructor_args = "--admin me" }` in
+`[development.contracts]` (staging: `--admin testnet-user`). Import:
+`import { polls } from "@stellar-scaffold/app-lib/clients"`.
+`npm run contracts:build` fails loudly if the client couldn't be generated.
 
 ## Pages
 
 - **Polls** (`/` or `/polls`): list with question, time left, total votes,
-  leading option. "Create poll" button.
-- **Create** (`/polls/new`): question, 2–10 option inputs, duration select (1 h,
-  1 day, 1 week). After success, navigate to the poll.
+  leading option (all from `list_polls`). "Create poll" button.
+- **Create** (`/polls/new`): question, 2–10 choice inputs, duration select (1 h,
+  1 day, 1 week). Limits are in **bytes** (accents count 2): check with
+  `new TextEncoder().encode(text).length`, not `maxLength`. After success,
+  navigate to the poll.
 - **Poll** (`/polls/:id`): option buttons while open; result bars (CSS width =
   votes / total); "You voted: X" from `vote_of`; countdown from
-  `Number(ends_at) * 1000` (u64 is `bigint` in TS); share link. Refetch results
-  every ~10 s or subscribe to `VoteCast` with `useSubscription`.
+  `Number(ends_at) * 1000` (u64 is `bigint` in TS); share link. Live results:
+  `useSubscription(polls.options.contractId, "vote_cast", refetch)` (the event
+  name in snake_case), or refetch every ~10 s.
 
-Writes:
+Reads that return `Result`: `const r = (await polls.get_poll({ id })).result` →
+`if (r.isErr()) …` → `r.unwrap()`. Writes:
 `polls.vote({ voter: address, poll_id, option }, { publicKey: address })` →
 `if (tx.result.isErr()) …` → `signAndSend({ signTransaction })`. `vote_of`
 returns `null` (not `undefined`) when the user hasn't voted.
 
-Remove the "Escrow Studio" nav link (keep the code); the app doesn't use
-escrows.
+Clean up the starter for this app: replace the Home page, remove the "Escrow
+Studio" nav link, the Trustless Work footer link and the starter's page title.
+Keep the escrow code and the `reputation` contract (other starter components
+import its client).
 
 ## Honest limits (tell the user)
 
