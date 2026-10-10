@@ -21,3 +21,6 @@ playwright-report
 
 # vendored verbatim (see VENDORED.md)
 .agents/skills/trustless-work/references/official
+
+# README is hand-formatted (one line per paragraph); proseWrap would rewrap it
+README.md
