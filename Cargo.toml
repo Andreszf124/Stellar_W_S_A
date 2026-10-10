@@ -3,7 +3,7 @@ members = ["contracts/*"]
 resolver = "2"
 
 [workspace.package]
-authors = ["Scaffold Stellar Agentic contributors"]
+authors = ["The Aha Company", "Scaffold Pura Vida contributors"]
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/bitfalt/scaffold-stellar-agentic"

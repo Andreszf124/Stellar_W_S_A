@@ -2,6 +2,8 @@
 
 **De idea a dApp en Stellar, a punta de prompts.** 🤖✨
 
+> Construido sobre **[Scaffold Stellar](https://stellarscaffold.org)**, de [The Aha Company](https://theaha.co): la base de todo este repo.
+
 Este starter junta tres piezas que ya vienen conectadas entre sí, más instrucciones para que tu agente de código sepa usarlas:
 
 - 🏗️ **[Scaffold Stellar](https://developers.stellar.org/docs/tools/scaffold-stellar)**: contratos Soroban (Rust) + app React. Cada vez que guardás un contrato, se compila, se despliega en testnet y te genera un cliente TypeScript tipado.
@@ -12,6 +14,12 @@ Este starter junta tres piezas que ya vienen conectadas entre sí, más instrucc
 **No toda app necesita las tres piezas.** Una app de votaciones, por ejemplo, es solo un contrato Soroban con login por correo: no tiene escrows. Tu agente elige las piezas según tu idea.
 
 Todo corre en **testnet**: es plata de prueba, no hay nada que perder.
+
+## Hecho sobre Scaffold Stellar 🙏
+
+Este repo existe gracias a **[Scaffold Stellar](https://github.com/stellar-scaffold/cli)**, el proyecto open source de [The Aha Company](https://theaha.co) y su comunidad. De ahí viene la base de todo: la estructura del proyecto, la app en Vite + React, la conexión con wallets, la generación automática de clientes TypeScript para tus contratos y el flujo que los compila y despliega cada vez que guardás.
+
+Lo que este repo agrega encima: los escrows de Trustless Work, el login con Cavos, el contrato de reputación, los scripts de ayuda y las skills para agentes. Si te sirve, dale una ⭐ a [stellar-scaffold/cli](https://github.com/stellar-scaffold/cli) y mirá su [documentación](https://stellarscaffold.org).
 
 ## Cómo encaja todo
 
@@ -192,4 +200,4 @@ Compartilo en [Discussions → Show and tell](https://github.com/bitfalt/scaffol
 
 ## Créditos y licencias
 
-Basado en el template oficial de [Scaffold Stellar](https://github.com/stellar-scaffold/ui) (Apache-2.0). Incluye la [skill oficial de Trustless Work](https://github.com/Trustless-Work/trustlesswork-skill) (Apache-2.0) en `.agents/skills/trustless-work/references/official/`. Usa [`@cavos/kit`](https://docs.cavos.xyz) (MIT) y [`@trustless-work/escrow`](https://www.npmjs.com/package/@trustless-work/escrow). Este repo se distribuye bajo Apache-2.0.
+Basado en el template oficial de [Scaffold Stellar](https://github.com/stellar-scaffold/ui), de The Aha Company y sus contribuidores (Apache-2.0). El detalle de qué viene del template y qué se cambió está en [`NOTICE`](NOTICE). Incluye la [skill oficial de Trustless Work](https://github.com/Trustless-Work/trustlesswork-skill) (Apache-2.0) en `.agents/skills/trustless-work/references/official/`. Usa [`@cavos/kit`](https://docs.cavos.xyz) (MIT) y [`@trustless-work/escrow`](https://www.npmjs.com/package/@trustless-work/escrow). Este repo se distribuye bajo Apache-2.0.

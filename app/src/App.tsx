@@ -56,7 +56,7 @@ const AppLayout = () => (
 					target="_blank"
 					rel="noreferrer"
 				>
-					GitHub
+					Built on Scaffold Stellar
 				</a>
 				<a href="https://stellarscaffold.org" target="_blank" rel="noreferrer">
 					Scaffold docs
