@@ -20,9 +20,11 @@ const Home = () => {
 				<p>
 					This starter is <strong>Scaffold Stellar</strong> (Soroban smart
 					contracts + a React app that auto-generates typed clients for them)
-					wired up with <strong>Trustless Work</strong> escrows and a set of{" "}
-					<strong>agent skills</strong> so any coding agent (Claude Code, Codex,
-					Cursor, OpenCode, Copilot, Gemini…) knows how to build on it.
+					wired up with <strong>Trustless Work</strong> escrows,{" "}
+					<strong>Cavos</strong> wallets (sign in with email, no extension) and
+					a set of <strong>agent skills</strong> so any coding agent (Claude
+					Code, Codex, Cursor, OpenCode, Copilot, Gemini…) knows how to build on
+					it.
 				</p>
 			</section>
 

@@ -135,6 +135,22 @@ if (!twKey) {
 	}
 }
 
+// ── Cavos (optional) ────────────────────────────────────────────────────────
+if (env.PUBLIC_CAVOS_APP_ID) {
+	;["TESTNET", "PUBLIC"].includes(network)
+		? ok(
+				`Cavos App ID set (${env.PUBLIC_CAVOS_ENVIRONMENT || "development"}): email/Google sign-in enabled. Make sure http://localhost:5173 is an allowed web origin in the Cavos dashboard`,
+			)
+		: warn(
+				"Cavos only works on TESTNET or PUBLIC; it's disabled on this network",
+			)
+} else {
+	warn(
+		"No Cavos App ID (optional): users must connect a wallet extension",
+		"for email/Google sign-in without a wallet: https://cavos.xyz/dashboard → create app → PUBLIC_CAVOS_APP_ID in app/.env",
+	)
+}
+
 // ── Project state ───────────────────────────────────────────────────────────
 existsSync(resolve(app, ".config/stellar/identity/me.toml"))
 	? ok("Deployer identity `me` exists (app/.config/stellar)")

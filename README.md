@@ -8,6 +8,9 @@ Starter para construir dApps en **Stellar** _a punta de prompts_ 🤖✨
 - **[Trustless Work](https://docs.trustlesswork.com)**: escrows (fideicomisos)
   listos para usar. La plata (USDC) queda en un contrato y solo se libera cuando
   se aprueban los hitos.
+- **[Cavos](https://docs.cavos.xyz)**: wallets embebidas. Tus usuarios entran
+  con su correo o Google y ya tienen una cuenta Stellar: sin extensiones, sin
+  frases semilla (opcional; Freighter & co. siguen funcionando).
 - **Skills para agentes**: instrucciones verificadas en `.agents/skills/` +
   `AGENTS.md`, para que _cualquier_ agente (Claude Code, Codex, Cursor,
   OpenCode, Copilot, Gemini/Antigravity, Pi…) sepa construir sobre este repo sin
@@ -27,13 +30,15 @@ Todo corre en **testnet**: plata de mentira, cero riesgo.
 | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🏦 **Escrow Studio** (`/escrows`) | Crear, fondear, marcar hitos, aprobar, liberar, disputar y resolver escrows. Con checklist de setup (wallet → XLM → trustline USDC → USDC de prueba → API key) |
 | ⭐ **Contrato `reputation`**      | Contrato Soroban propio: reseñas on-chain ligadas a cada escrow. Ejemplo de storage, auth, errores, eventos y tests                                            |
-| 🧠 **5 skills**                   | `build-dapp`, `trustless-work`, `scaffold-stellar`, `soroban-contracts`, `stellar-basics`                                                                      |
+| 🔐 **Login sin wallet**           | "Sign in" con correo/Google vía Cavos, o "Use a wallet" (Freighter, xBull…). Todo el código usa un solo `useWallet()`                                          |
+| 🧠 **6 skills**                   | `build-dapp`, `trustless-work`, `cavos`, `scaffold-stellar`, `soroban-contracts`, `stellar-basics`                                                             |
 | 🩺 **Scripts**                    | `setup:tools` (instala CLIs sin compilar), `doctor` (diagnóstico), `tw:smoke` (prueba E2E de escrows), `check` (tests + tipos + lint)                          |
 
 ## Setup (15 min)
 
-**Necesitás:** Node 22+, [Rust con rustup](https://rustup.rs), git, el navegador
-con [Freighter](https://freighter.app) (wallet) y algún agente de código.
+**Necesitás:** Node 22+, [Rust con rustup](https://rustup.rs), git y algún
+agente de código. Wallet: [Freighter](https://freighter.app), o ninguna si usás
+el login con correo/Google (Cavos).
 
 **1.** En GitHub tocá **Use this template → Create a new repository** (o hacé
 fork) y clonalo:
@@ -70,9 +75,20 @@ Abrí http://localhost:5173. La primera vez tarda 1-2 min mientras despliega el
 contrato (si Vite muestra errores de `app-lib/clients` al inicio, esperá a que
 termine).
 
-**7. Wallet:** en Freighter cambiá la red a **Testnet**, conectate en la app, y
-en **Escrow Studio** seguí el checklist: Friendbot → _Add trustline_ → _Swap 100
-XLM → USDC_.
+**7. (Opcional, recomendado) Login con correo/Google con Cavos** (3 min):
+
+1. https://cavos.xyz/dashboard → creá una app y copiá su **App ID**.
+2. En la app → **Settings → allowed web origins**: agregá
+   `http://localhost:5173`. Para Google, agregá también `http://localhost:5173`
+   en **Callback URLs**.
+3. En `app/.env`: `PUBLIC_CAVOS_APP_ID="..."` y reiniciá `npm start`.
+
+Sin App ID, la app solo ofrece wallets de extensión.
+
+**8. Wallet:** tocá **Sign in** (correo/Google) o **Use a wallet** (Freighter en
+**Testnet**). En **Escrow Studio** seguí el checklist: Friendbot → _Add
+trustline_ → _Swap 100 XLM → USDC_. Con Cavos, hacé Friendbot primero: tu cuenta
+necesita un poco de XLM para pagar comisiones.
 
 > ¿Windows? Usá WSL2 (recomendado) o Git Bash. Si las skills en `.claude/skills`
 > aparecen como archivos de texto, corré `npm run agents:sync`.
@@ -152,6 +168,7 @@ o simplemente pegale el error a tu agente 😉.
   del CLI todavía no está publicada, así que `stellar scaffold init` falla hoy.
   Este repo ya viene generado, no hace falta `init`.
 - `@trustless-work/escrow` **3.0.5** (API V1, estable). La V2 está en beta.
+- `@cavos/kit` **0.2.5** (wallets embebidas, Stellar testnet/mainnet).
 - `soroban-sdk` **26.1**, OpenZeppelin `stellar-*` **0.7.2**.
 
 ## ¿Construiste algo?

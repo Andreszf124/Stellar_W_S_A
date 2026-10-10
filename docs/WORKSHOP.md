@@ -12,6 +12,11 @@ queda de tarea con el repo.
 - [ ] API key de Trustless Work en `app/.env` y **`npm run tw:smoke` en verde**
       (prueba real de deploy → fund → approve → release en testnet). Si falla,
       ahí mismo ves el error exacto.
+- [ ] **Cavos**: creá UNA app en https://cavos.xyz/dashboard, agregá
+      `http://localhost:5173` en _allowed web origins_ (y en _Callback URLs_ si
+      vas a usar Google). Como todos corren en `localhost:5173`, podés compartir
+      ese App ID con la sala (es público por diseño) y se ahorran ese paso.
+      Probá **Sign in** con tu correo → Friendbot → trustline → un escrow.
 - [ ] `npm start`, conectar Freighter (Testnet), completar el checklist del
       Escrow Studio y hacer un ciclo completo con la UI: crear → fondear → _Mark
       done_ → _Approve_ → _Release_ → reseña.
@@ -45,6 +50,10 @@ queda de tarea con el repo.
 - **Cuenta y wallet**: tu dirección `G…` es pública; la llave secreta `S…` la
   guarda la wallet (Freighter) y _nunca_ sale de ahí. La app pide firmar, no
   pide la llave.
+- **Wallets sin wallet (Cavos)**: para usuarios normales, instalar una extensión
+  es el punto donde se van. Con Cavos entran con correo o Google y obtienen una
+  cuenta `G…` normal; la llave vive en un iframe aislado (no en tu página ni en
+  Cavos) y firma con un modal propio. En el repo es un botón: **Sign in**.
 - **Trustline**: para recibir un token que no sea XLM, tu cuenta tiene que
   "aceptarlo" primero. Por eso el checklist tiene el paso _Add trustline_.
 - **Fees y reserva**: cada operación cuesta un poquito de XLM y las cuentas
@@ -100,9 +109,10 @@ queda de tarea con el repo.
 Preparado: app corriendo (`npm start`), Freighter en Testnet con USDC, agente
 abierto en el repo.
 
-1. **Escrow Studio a mano (4 min)**: crear un escrow multi-release de 2 hitos,
-   fondear, _Mark done_, _Approve_, _Release_. Abrir el link del viewer de
-   Trustless Work y el explorer.
+1. **Escrow Studio a mano (4 min)**: **Sign in** con correo (Cavos, sin
+   extensión) → Friendbot → trustline → swap. Crear un escrow multi-release de 2
+   hitos, fondear, _Mark done_, _Approve_, _Release_. Abrir el link del viewer
+   de Trustless Work y el explorer.
 2. **Prompt en vivo (9 min)**:
    ```text
    /build-dapp Quiero una bolsa de chambas: un cliente publica un trabajo con título, descripción
@@ -122,7 +132,8 @@ abierto en el repo.
 
 1. Fork / "Use this template" → clonar → `npm run setup:tools` → `npm install` →
    `npm run doctor`.
-2. API key de Trustless Work (pasos en el README) → `npm start`.
+2. API key de Trustless Work (pasos en el README) + el App ID de Cavos que
+   compartís en pantalla (`PUBLIC_CAVOS_APP_ID`) → `npm start`.
 3. Checklist del Escrow Studio con su wallet (Friendbot → trustline → swap a
    USDC).
 4. Elegir una idea (abajo) y arrancar con `/build-dapp` (o "lee AGENTS.md y la

@@ -18,19 +18,19 @@ get back to building.
 
 ## Core ideas
 
-| Concept         | Plain explanation                                              | Precise                                                                                                                   |
-| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Account         | Your "bank account" on Stellar, identified by a public address | `G…` public key; controlled by a secret `S…` key held by the wallet                                                       |
-| Wallet          | App that holds your secret key and signs for you               | Freighter (browser extension) is the easiest; this app uses Stellar Wallets Kit (Freighter, xBull, Lobstr, Albedo, Hana…) |
-| Contract        | A program living on the network                                | Soroban smart contract, address `C…`, written in Rust → Wasm                                                              |
-| XLM             | The network's own coin, pays fees                              | 1 XLM = 10,000,000 stroops. Fees are tiny (~0.00001–0.01 XLM)                                                             |
-| Minimum balance | Accounts must keep a little XLM locked                         | 1 XLM base + 0.5 XLM per trustline/entry (testnet XLM is free)                                                            |
-| Asset / token   | Any currency issued on Stellar (USDC, EURC…)                   | Identified by `CODE:ISSUER` (e.g. `USDC:GBBD47…`). All amounts have 7 decimals                                            |
-| Trustline       | "I agree to hold this token" switch on your account            | Required before receiving any non-XLM asset (`changeTrust` operation)                                                     |
-| SAC             | The smart-contract face of a classic asset                     | Stellar Asset Contract: lets Soroban contracts move XLM/USDC via the token interface                                      |
-| Transaction     | A signed instruction (pay, call a contract…)                   | Built → signed by the wallet → submitted. Confirms in ~5 seconds, final (no reorgs)                                       |
-| Testnet         | Practice network with fake money                               | Free XLM from Friendbot; reset every few months. Mainnet = real money                                                     |
-| Escrow          | A neutral vault that releases money when conditions are met    | Here: Trustless Work contracts with roles (approver, service provider…)                                                   |
+| Concept         | Plain explanation                                              | Precise                                                                                                                                                                                    |
+| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Account         | Your "bank account" on Stellar, identified by a public address | `G…` public key; controlled by a secret `S…` key held by the wallet                                                                                                                        |
+| Wallet          | App that holds your secret key and signs for you               | Two options here: **Cavos** (sign in with email/Google, the wallet lives in a secure iframe, no install) or an extension via Stellar Wallets Kit (Freighter, xBull, Lobstr, Albedo, Hana…) |
+| Contract        | A program living on the network                                | Soroban smart contract, address `C…`, written in Rust → Wasm                                                                                                                               |
+| XLM             | The network's own coin, pays fees                              | 1 XLM = 10,000,000 stroops. Fees are tiny (~0.00001–0.01 XLM)                                                                                                                              |
+| Minimum balance | Accounts must keep a little XLM locked                         | 1 XLM base + 0.5 XLM per trustline/entry (testnet XLM is free)                                                                                                                             |
+| Asset / token   | Any currency issued on Stellar (USDC, EURC…)                   | Identified by `CODE:ISSUER` (e.g. `USDC:GBBD47…`). All amounts have 7 decimals                                                                                                             |
+| Trustline       | "I agree to hold this token" switch on your account            | Required before receiving any non-XLM asset (`changeTrust` operation)                                                                                                                      |
+| SAC             | The smart-contract face of a classic asset                     | Stellar Asset Contract: lets Soroban contracts move XLM/USDC via the token interface                                                                                                       |
+| Transaction     | A signed instruction (pay, call a contract…)                   | Built → signed by the wallet → submitted. Confirms in ~5 seconds, final (no reorgs)                                                                                                        |
+| Testnet         | Practice network with fake money                               | Free XLM from Friendbot; reset every few months. Mainnet = real money                                                                                                                      |
+| Escrow          | A neutral vault that releases money when conditions are met    | Here: Trustless Work contracts with roles (approver, service provider…)                                                                                                                    |
 
 Golden rules to repeat often:
 

@@ -8,9 +8,9 @@ import {
 import {
 	horizonUrl,
 	networkPassphrase,
-	signTransaction,
 	stellarNetwork,
 } from "@stellar-scaffold/app-lib"
+import { type SignTransactionFn } from "../cavos/context"
 import { USDC } from "./config"
 
 /**
@@ -19,6 +19,9 @@ import { USDC } from "./config"
  * On Stellar, an account must opt in to hold a non-XLM asset by adding a
  * "trustline" (costs 0.5 XLM of reserve). Anyone who FUNDS or RECEIVES from an
  * escrow needs a USDC trustline.
+ *
+ * `sign` is `useWallet().signTransaction`, so these work with an extension
+ * wallet or a Cavos embedded wallet alike.
  */
 const horizon = new Horizon.Server(horizonUrl, {
 	allowHttp: stellarNetwork === "LOCAL",
@@ -27,6 +30,7 @@ const usdcAsset = new Asset(USDC.symbol, USDC.address)
 
 async function signAndSubmit(
 	address: string,
+	sign: SignTransactionFn,
 	build: (b: TransactionBuilder) => TransactionBuilder,
 ) {
 	const account = await horizon.loadAccount(address)
@@ -35,7 +39,7 @@ async function signAndSubmit(
 	)
 		.setTimeout(60)
 		.build()
-	const { signedTxXdr } = await signTransaction(tx.toXDR(), {
+	const { signedTxXdr } = await sign(tx.toXDR(), {
 		address,
 		networkPassphrase,
 	})
@@ -45,8 +49,8 @@ async function signAndSubmit(
 }
 
 /** Add a USDC trustline to the connected wallet. */
-export function addUsdcTrustline(address: string) {
-	return signAndSubmit(address, (b) =>
+export function addUsdcTrustline(address: string, sign: SignTransactionFn) {
+	return signAndSubmit(address, sign, (b) =>
 		b.addOperation(Operation.changeTrust({ asset: usdcAsset })),
 	)
 }
@@ -56,7 +60,11 @@ export function addUsdcTrustline(address: string) {
  * Friendbot gives 10,000 test XLM, so this is the fastest way to get test USDC
  * for a whole room (Circle's faucet only gives 20 USDC every 2 hours).
  */
-export async function swapXlmForUsdc(address: string, xlmAmount = "100") {
+export async function swapXlmForUsdc(
+	address: string,
+	sign: SignTransactionFn,
+	xlmAmount = "100",
+) {
 	if (stellarNetwork !== "TESTNET") throw new Error("Only available on testnet")
 	const { records } = await horizon
 		.strictSendPaths(Asset.native(), xlmAmount, [usdcAsset])
@@ -66,7 +74,7 @@ export async function swapXlmForUsdc(address: string, xlmAmount = "100") {
 		throw new Error("No XLM→USDC liquidity on the testnet DEX right now")
 	// Accept up to 5% slippage.
 	const destMin = (Number(best.destination_amount) * 0.95).toFixed(7)
-	return signAndSubmit(address, (b) =>
+	return signAndSubmit(address, sign, (b) =>
 		b.addOperation(
 			Operation.pathPaymentStrictSend({
 				sendAsset: Asset.native(),

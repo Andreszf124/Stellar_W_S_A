@@ -148,6 +148,10 @@ Every signer needs XLM (Friendbot). Funders and anyone who RECEIVES USDC
 trustline**. The `SetupChecklist` component handles: connect → Friendbot →
 trustline → swap XLM→USDC → API key.
 
+Any connected wallet works as a role: `useWallet().signTransaction` signs with
+an extension wallet or with a **Cavos** embedded wallet (email/Google login, see
+the `cavos` skill). Cavos users must use Friendbot before anything else.
+
 ## Linking escrows with your own Soroban contract
 
 The escrow is the payment rail; app state that must be shared and trustless goes

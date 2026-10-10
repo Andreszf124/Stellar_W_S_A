@@ -123,9 +123,12 @@ if (result.isErr()) throw new Error(result.unwrapErr().message) // contract erro
 - Contract events: `useSubscription(contractId, topic, cb)`
   (`app/src/hooks/useSubscription.ts`) polls RPC events. Contract id:
   `reputation.options.contractId`.
-- Wallet state: `useWallet()` → `address`, `balances` (`balances.xlm.balance`),
-  `signTransaction`, `updateBalances`, `networkPassphrase` (the wallet's
-  network: warn if it's not testnet).
+- Wallet state: `useWallet()` → `address`, `connector` (`"cavos"` email/Google
+  embedded wallet | `"extension"` Freighter & co.), `balances`
+  (`balances.xlm.balance`), `signTransaction` (same shape for both connectors),
+  `updateBalances`, `disconnect`, `networkPassphrase` (the wallet's network:
+  warn if it's not testnet). Never import the wallet SDKs directly in features
+  (see `cavos` skill).
 - Env in code:
   `import { stellarNetwork, rpcUrl, networkPassphrase, horizonUrl } from "@stellar-scaffold/app-lib"`.
   Frontend env vars must start with `PUBLIC_` (Vite `envPrefix`).

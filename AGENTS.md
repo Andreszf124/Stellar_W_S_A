@@ -11,8 +11,9 @@ see `README.md`.
 A workshop starter for building Stellar dApps **by prompting**: **Scaffold
 Stellar** (Soroban contracts in Rust + Vite/React app + auto-generated
 TypeScript clients) wired to **Trustless Work** escrows (USDC held in per-deal
-contracts, released by roles/milestones), on **testnet**. The people using it
-are often brand new to web3.
+contracts, released by roles/milestones) and **Cavos** embedded wallets (sign in
+with email/Google, no wallet extension), on **testnet**. The people using it are
+often brand new to web3.
 
 Always reply in the user's language. Explain on-chain concepts in one or two
 plain sentences when they matter, then keep building.
@@ -29,6 +30,7 @@ verified, version-specific facts that differ from your training data.
 | `build-dapp`        | The user describes an app idea or wants to build something. Start here.                                    |
 | `trustless-work`    | Anything about escrows, payments, milestones, roles, disputes, USDC                                        |
 | `scaffold-stellar`  | Adding/deploying contracts, `environments.toml`, `app/.env`, generated clients, dev server or build errors |
+| `cavos`             | Login with email/Google, "no wallet" onboarding, anything that signs transactions or touches `useWallet`   |
 | `soroban-contracts` | Writing/testing/reviewing Rust contracts in `contracts/`                                                   |
 | `stellar-basics`    | Explaining Stellar concepts, decoding transaction errors, test money                                       |
 
@@ -46,10 +48,13 @@ verified, version-specific facts that differ from your training data.
 6. Reuse the building blocks before writing new ones: `useEscrowTx` (every
    escrow write), `useMyEscrows`/`useEscrow`, `EscrowCard`, `CreateEscrowForm`,
    `SetupChecklist`, `ReputationPanel`, `contracts/reputation`.
-7. Work in small steps and verify each one (`cargo test`, `npm run typecheck`,
+7. **Every signature goes through `useWallet().signTransaction`** (works for
+   Cavos and extension wallets alike). Never import Stellar Wallets Kit or Cavos
+   directly in features.
+8. Work in small steps and verify each one (`cargo test`, `npm run typecheck`,
    `npm run check`). You can't click wallet popups: hand the user a short manual
    test script instead.
-8. Edit skills only in `.agents/skills/` (then `npm run agents:sync`), never in
+9. Edit skills only in `.agents/skills/` (then `npm run agents:sync`), never in
    `.claude/skills/`.
 
 ## Commands (repo root)
@@ -76,6 +81,8 @@ contracts/fungible-allowlist, nft-enumerable/   OpenZeppelin examples (not deplo
 environments.toml         contracts per environment (development = testnet)
 app/src/pages/            Home, Escrows (Escrow Studio), Debug (deployed contracts)
 app/src/trustless/        Trustless Work integration (config, provider, hooks, components)
+app/src/cavos/            Cavos embedded wallets (optional, PUBLIC_CAVOS_APP_ID)
+app/src/providers/        WalletProvider: one useWallet() for Cavos + extension wallets
 app/src/components/       shared UI (ReputationPanel, wallet buttons…)
 app/src/hooks/            useWallet, useNotification, useSubscription
 app-lib/                  network env, wallet kit, friendbot, events (shared TS lib)

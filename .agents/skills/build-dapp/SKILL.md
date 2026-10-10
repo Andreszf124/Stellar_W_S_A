@@ -53,6 +53,10 @@ have no idea yet.
   patterns. See `references/architecture.md`.
 - **Screens**: usually 1–3 pages (e.g. "Browse", "Create", "My deals"). Reuse
   `EscrowCard`.
+- **Onboarding**: if the end users aren't crypto people (buyers, tenants,
+  students…), make "Sign in with email/Google" the main path: Cavos embedded
+  wallets (`cavos` skill), already wired behind `useWallet()`. It only needs a
+  `PUBLIC_CAVOS_APP_ID`.
 
 Share the plan in a few bullet points and start building unless the user
 objects.
@@ -95,7 +99,8 @@ Create… 4. Fund…"), and ask them to paste any error they see. Use the
 - Testnet only unless the user explicitly asks for mainnet (then: security
   checklist + review).
 - Never ask for or handle secret keys/seed phrases. The wallet signs; the agent
-  never does.
+  never does. Every signature goes through `useWallet().signTransaction` (works
+  for Cavos and extension wallets).
 - Don't edit generated code (`app-lib/clients/*`) or the vendored skill under
   `references/official`.
 - Don't re-implement escrow logic in a custom contract: Trustless Work is the

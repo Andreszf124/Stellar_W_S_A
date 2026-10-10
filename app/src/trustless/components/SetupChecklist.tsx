@@ -4,6 +4,7 @@ import {
 	stellarNetwork,
 } from "@stellar-scaffold/app-lib"
 import { useState } from "react"
+import { useCavosState } from "../../cavos/context"
 import { useNotification } from "../../hooks/useNotification"
 import { useWallet } from "../../hooks/useWallet"
 import { errorMessage } from "../../lib/errors"
@@ -16,7 +17,8 @@ import { addUsdcTrustline, swapXlmForUsdc } from "../usdc"
  * wallet → test XLM → USDC trustline → test USDC → Trustless Work API key.
  */
 export const SetupChecklist = () => {
-	const { address, balances, updateBalances } = useWallet()
+	const { address, balances, updateBalances, signTransaction } = useWallet()
+	const cavos = useCavosState()
 	const { addNotification } = useNotification()
 	const [busy, setBusy] = useState<string | null>(null)
 
@@ -40,9 +42,16 @@ export const SetupChecklist = () => {
 	const steps = [
 		{
 			done: Boolean(address),
-			label: "Connect a Stellar wallet (Freighter works great) set to Testnet",
+			label: cavos
+				? "Sign in with email/Google (wallet created for you) or connect a Stellar wallet on Testnet"
+				: "Connect a Stellar wallet (Freighter works great) set to Testnet",
 			action: !address && (
-				<button onClick={() => void connectWallet()}>Connect</button>
+				<>
+					{cavos && <button onClick={cavos.signIn}>Sign in</button>}
+					<button onClick={() => void connectWallet()}>
+						{cavos ? "Use a wallet" : "Connect"}
+					</button>
+				</>
 			),
 		},
 		{
@@ -69,7 +78,9 @@ export const SetupChecklist = () => {
 				<button
 					disabled={!!busy}
 					onClick={() =>
-						void act("Add USDC trustline", () => addUsdcTrustline(address))
+						void act("Add USDC trustline", () =>
+							addUsdcTrustline(address, signTransaction),
+						)
 					}
 				>
 					Add trustline
@@ -85,7 +96,7 @@ export const SetupChecklist = () => {
 						disabled={!!busy}
 						onClick={() =>
 							void act("Swap 100 XLM → USDC", () =>
-								swapXlmForUsdc(address, "100"),
+								swapXlmForUsdc(address, signTransaction, "100"),
 							)
 						}
 					>
