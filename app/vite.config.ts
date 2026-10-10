@@ -26,6 +26,10 @@ export default defineConfig({
 	},
 	envPrefix: "PUBLIC_",
 	server: {
+		// Fixed port: Cavos only allows the origins registered in its dashboard
+		// (http://localhost:5173), so fail loudly instead of moving to 5174.
+		port: 5173,
+		strictPort: true,
 		proxy: {
 			"/friendbot": {
 				target: "http://localhost:8000/friendbot",

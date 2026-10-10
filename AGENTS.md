@@ -52,8 +52,10 @@ verified, version-specific facts that differ from your training data.
 3. **Don't assume everything goes on-chain.** Decide per piece of data; when
    it's a real choice (privacy, cost, effort), explain the trade-off to the user
    and ask (`build-dapp` skill, step 2b). Personal data never goes on-chain.
-4. **Never** ask for, print, store or commit secret keys (`S…`), seed phrases or
-   `app/.env`. Users sign with their wallet; the agent never signs for them.
+4. **Never** ask for, print, store or commit secret keys (`S…`) or seed phrases.
+   Users sign with their wallet; the agent never signs for them. `app/.env` is
+   different: it only holds public config (`PUBLIC_*` values are public by
+   design), so you may read and edit it, but never commit it.
 5. Don't edit generated code: `app-lib/clients/*` (Scaffold regenerates it) and
    `.agents/skills/trustless-work/references/official/` (vendored).
 6. Scaffold config is **v1** (`environments.toml`). Don't migrate to
@@ -72,6 +74,10 @@ verified, version-specific facts that differ from your training data.
     manual test script instead.
 11. Edit skills only in `.agents/skills/` (then `npm run agents:sync`), never in
     `.claude/skills/`.
+
+12. Ignore `npm audit` warnings from `npm install` and **never** run
+    `npm audit fix --force`: it upgrades pinned SDKs (`@trustless-work/escrow`,
+    `@cavos/kit`) and breaks the app.
 
 ## Commands (repo root)
 

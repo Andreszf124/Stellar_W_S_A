@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // `npm run doctor`: checks everything this workshop needs and says how to fix it.
 import { execSync } from "node:child_process"
+import net from "node:net"
 import { copyFileSync, existsSync, readFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -150,6 +151,29 @@ if (env.PUBLIC_CAVOS_APP_ID) {
 		"for email/Google sign-in without a wallet: https://cavos.xyz/dashboard → create app → PUBLIC_CAVOS_APP_ID in app/.env",
 	)
 }
+
+// ── Port ────────────────────────────────────────────────────────────────────
+const probe = (host) =>
+	new Promise((done) => {
+		const sock = net.connect({ port: 5173, host })
+		sock.once("connect", () => {
+			sock.destroy()
+			done(true)
+		})
+		sock.once("error", () => done(false))
+		sock.setTimeout(800, () => {
+			sock.destroy()
+			done(false)
+		})
+	})
+// Vite binds "localhost", which is ::1 on macOS and 127.0.0.1 elsewhere.
+const portInUse = (await probe("127.0.0.1")) || (await probe("::1"))
+portInUse
+	? warn(
+			"Port 5173 is already in use (another dev server?)",
+			"npm start needs exactly http://localhost:5173 (Cavos allows only registered origins). Stop the other server first, unless it is this project already running",
+		)
+	: ok("Port 5173 is free for npm start")
 
 // ── Project state ───────────────────────────────────────────────────────────
 existsSync(resolve(app, ".config/stellar/identity/me.toml"))

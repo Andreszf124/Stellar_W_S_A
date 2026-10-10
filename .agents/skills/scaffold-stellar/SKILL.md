@@ -44,8 +44,11 @@ app/src/trustless/            Trustless Work escrow integration (see trustless-w
 npm start            # from repo root: `stellar scaffold watch --build-clients` + `vite` (http://localhost:5173)
 ```
 
-- `development` targets **testnet** (no Docker). On first run it creates + funds
-  the `me` deployer account, compiles every contract, deploys the ones listed in
+- `development` targets **testnet** (no Docker). Ignore Scaffold's "Starting
+  local Stellar Docker container…" log line: it's cosmetic in CLI 0.0.27. The
+  app always runs on **http://localhost:5173** (`strictPort`); if the port is
+  busy, stop the other server. On first run it creates + funds the `me` deployer
+  account, compiles every contract, deploys the ones listed in
   `environments.toml`, generates clients into `app-lib/clients/`. First run:
   ~1–2 min. Vite may show "Failed to resolve import
   @stellar-scaffold/app-lib/clients" until that finishes: wait.

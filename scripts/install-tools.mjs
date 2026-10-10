@@ -103,19 +103,20 @@ else {
 
 if (has("rustup --version")) {
 	execSync("rustup target add wasm32v1-none", { stdio: "inherit" })
+} else if (has("cargo --version")) {
+	console.log(
+		"ℹ️  Rust found without rustup (Homebrew/Nix/distro). That works if it has the wasm32v1-none target and a wasm linker (lld); `npm run contracts:build` will tell you. No need to install rustup otherwise.",
+	)
 } else {
 	console.log(
-		"⚠️  rustup not found: install Rust from https://rustup.rs, then run this again.",
+		"⚠️  Rust not found: install it from https://rustup.rs, then run this again.",
 	)
 }
 
-if (
-	!process.env.PATH?.split(process.platform === "win32" ? ";" : ":").some(
-		(p) => p === binDir,
-	)
-) {
+// Only complain about PATH when the tools we just installed can't be found.
+if (!has("stellar --version") || !has("stellar scaffold --version")) {
 	console.log(
-		`⚠️  ${binDir} is not on your PATH. Add it (rustup normally does) and open a new terminal.`,
+		`⚠️  The tools were installed in ${binDir}, which is not on your PATH. Add it (rustup normally does) and open a new terminal.`,
 	)
 }
 console.log("\nNext: npm run doctor")

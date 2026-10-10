@@ -20,14 +20,14 @@ pregúntame solo cuando necesites una decisión o una clave.
      `gh` está autenticado, pregúntame el nombre y la visibilidad y ejecuta:
      `gh repo create <nombre> --template bitfalt/scaffold-stellar-agentic --private --clone`
      (o `--public`). Si no, clona https://github.com/bitfalt/scaffold-stellar-agentic.git
-     en una carpeta nueva.
+     dentro de la carpeta actual (en `scaffold-stellar-agentic/`).
    - Entra a la carpeta del proyecto, lee `AGENTS.md` y sigue sus reglas durante toda la
      sesión.
 2. Herramientas: ejecuta `npm run setup:tools` (Stellar CLI y plugin de Scaffold, con
    binarios precompilados) y luego `npm install`. Si una descarga falla por la red,
-   vuelve a intentarlo fuera del sandbox. En Windows, recomiéndame usar WSL2. Si
-   `.claude/skills` contiene archivos de texto en lugar de carpetas, ejecuta
-   `npm run agents:sync`.
+   vuelve a intentarlo fuera del sandbox. Ignora las advertencias de `npm audit`. En
+   Windows, recomiéndame usar WSL2. Si eres Claude Code y `.claude/skills` contiene
+   archivos de texto en lugar de carpetas, ejecuta `npm run agents:sync`.
 3. Diagnóstico: ejecuta `npm run doctor` y corrige cada error antes de continuar. Las
    advertencias son opcionales.
 4. Claves en `app/.env`. Pídemelas; nunca me pidas llaves secretas ni frases semilla. Si
@@ -40,11 +40,14 @@ pregúntame solo cuando necesites una decisión o una clave.
      Testnet.
 5. Contratos: ejecuta `npm run contracts:build` (compila, despliega en testnet y genera
    los clientes TypeScript) y después `npm run check`. Ambos deben terminar sin errores.
-6. Aplicación: inicia `npm start` en segundo plano y confirma que http://localhost:5173
-   responde.
-7. Explícame el proyecto en mi idioma, en no más de ocho líneas: qué aportan Scaffold
+6. Aplicación: inicia `npm start` en segundo plano, espera a que el log diga
+   `Successfully generated client` y confirma que http://localhost:5173 responde. El
+   puerto es fijo: si está ocupado, Vite se detiene con un mensaje y debes pedirme que
+   cierre el otro servidor. Dime cómo detener la aplicación cuando termine.
+7. Explícame el proyecto en mi idioma, en no más de diez líneas: qué aportan Scaffold
    Stellar, Trustless Work y Cavos, cómo se conectan, qué puedo probar ahora en el
-   navegador y qué skills hay en `.agents/skills`.
+   navegador (con Freighter en Testnet o con Cavos) y qué skills hay en
+   `.agents/skills`.
 8. Pregúntame qué quiero construir y usa la skill `build-dapp` para hacerlo.
 ```
 
@@ -164,7 +167,7 @@ Ambas se guardan en `app/.env` y son opcionales según lo que use tu aplicación
 npm start
 ```
 
-Abre [localhost:5173](http://localhost:5173). La primera ejecución tarda uno o dos minutos mientras se despliega el contrato en testnet. Si al inicio aparecen errores de `app-lib/clients`, espera a que termine.
+Abre [localhost:5173](http://localhost:5173). La primera ejecución tarda uno o dos minutos mientras se despliega el contrato en testnet. Si al inicio aparecen errores de `app-lib/clients`, espera a que termine. El puerto 5173 es fijo (Cavos solo acepta los orígenes registrados): si está ocupado, cierra el otro servidor.
 
 ### 5. Preparar tu cuenta
 
@@ -226,7 +229,7 @@ app/src/providers/      WalletProvider: un único useWallet() para Cavos y exten
 app/src/trustless/      escrows de Trustless Work (configuración, hooks, componentes)
 app-lib/                red, wallets de extensión, friendbot y eventos
 app-lib/clients/        clientes generados de tus contratos (no se editan)
-scripts/                setup-tools, doctor, contracts-build, tw-smoke, agents-sync
+scripts/                install-tools, doctor, contracts-build, tw-smoke, agents-sync, ...
 docs/AGENT-SETUP.md     configuración por agente y servidores MCP opcionales
 ```
 
