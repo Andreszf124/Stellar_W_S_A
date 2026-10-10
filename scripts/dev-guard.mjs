@@ -60,7 +60,7 @@ if (!existsSync(envFile)) {
 const env = readFileSync(envFile, "utf8")
 if (!/^PUBLIC_TRUSTLESS_WORK_API_KEY=["']?[^"'\s#]+/m.test(env)) {
 	console.warn(
-		"\n⚠️  No Trustless Work API key yet: escrows won't work until you add\n" +
-			"   PUBLIC_TRUSTLESS_WORK_API_KEY to app/.env (get one at https://dapp.trustlesswork.com)\n",
+		"\nℹ️  No Trustless Work API key: only needed if your app uses escrows.\n" +
+			"   Add PUBLIC_TRUSTLESS_WORK_API_KEY to app/.env (https://dapp.trustlesswork.com)\n",
 	)
 }

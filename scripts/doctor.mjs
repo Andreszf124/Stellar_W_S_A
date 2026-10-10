@@ -113,7 +113,7 @@ const twUrl =
 		: "https://dev.api.trustlesswork.com"
 if (!twKey) {
 	warn(
-		"No Trustless Work API key (escrows won't work)",
+		"No Trustless Work API key (only needed if your app uses escrows)",
 		"https://dapp.trustlesswork.com → connect wallet → Settings (fill 'Use case') → API Keys → Testnet → put it in app/.env as PUBLIC_TRUSTLESS_WORK_API_KEY",
 	)
 } else {

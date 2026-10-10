@@ -8,12 +8,20 @@ see `README.md`.
 
 ## What this is
 
-A workshop starter for building Stellar dApps **by prompting**: **Scaffold
+A starter for building **any** Stellar dApp **by prompting**, on **testnet**.
+The people using it are often brand new to web3. The base is **Scaffold
 Stellar** (Soroban contracts in Rust + Vite/React app + auto-generated
-TypeScript clients) wired to **Trustless Work** escrows (USDC held in per-deal
-contracts, released by roles/milestones) and **Cavos** embedded wallets (sign in
-with email/Google, no wallet extension), on **testnet**. The people using it are
-often brand new to web3.
+TypeScript clients). On top, two optional building blocks already wired in:
+
+- **Trustless Work** escrows: USDC held in a per-deal contract and released by
+  roles/milestones. Only for apps where money must **wait for a condition**
+  (deliveries, milestones, deposits, bounties).
+- **Cavos** embedded wallets: sign in with email/Google, no wallet extension.
+  Useful for any app with non-crypto users.
+
+**Pick building blocks by need.** A poll, registry, guestbook or NFT app is just
+a Soroban contract + pages: no escrow. Direct payments (tips, donations) don't
+need an escrow either. The `build-dapp` skill walks through this choice.
 
 Always reply in the user's language. Explain on-chain concepts in one or two
 plain sentences when they matter, then keep building.
@@ -27,8 +35,8 @@ verified, version-specific facts that differ from your training data.
 
 | Skill               | Read it when                                                                                               |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `build-dapp`        | The user describes an app idea or wants to build something. Start here.                                    |
-| `trustless-work`    | Anything about escrows, payments, milestones, roles, disputes, USDC                                        |
+| `build-dapp`        | The user describes an app idea or wants to build something (any kind). Start here.                         |
+| `trustless-work`    | Only when funds must be held until a condition: escrows, milestones, deposits, disputes                    |
 | `scaffold-stellar`  | Adding/deploying contracts, `environments.toml`, `app/.env`, generated clients, dev server or build errors |
 | `cavos`             | Login with email/Google, "no wallet" onboarding, anything that signs transactions or touches `useWallet`   |
 | `soroban-contracts` | Writing/testing/reviewing Rust contracts in `contracts/`                                                   |
@@ -37,25 +45,32 @@ verified, version-specific facts that differ from your training data.
 ## Golden rules
 
 1. **Testnet only** unless the user explicitly asks for mainnet.
-2. **Never** ask for, print, store or commit secret keys (`S…`), seed phrases or
+2. **Use only the building blocks the idea needs.** No Trustless Work escrow (or
+   its API key) unless money must wait for a condition. Remove nav links to demo
+   pages the app doesn't use.
+3. **Don't assume everything goes on-chain.** Decide per piece of data; when
+   it's a real choice (privacy, cost, effort), explain the trade-off to the user
+   and ask (`build-dapp` skill, step 2b). Personal data never goes on-chain.
+4. **Never** ask for, print, store or commit secret keys (`S…`), seed phrases or
    `app/.env`. Users sign with their wallet; the agent never signs for them.
-3. Don't edit generated code: `app-lib/clients/*` (Scaffold regenerates it) and
+5. Don't edit generated code: `app-lib/clients/*` (Scaffold regenerates it) and
    `.agents/skills/trustless-work/references/official/` (vendored).
-4. Scaffold config is **v1** (`environments.toml`). Don't migrate to
+6. Scaffold config is **v1** (`environments.toml`). Don't migrate to
    `scaffold.yml` v2.
-5. Trustless Work is **API V1** with `@trustless-work/escrow@3.0.5`. Don't
+7. Trustless Work is **API V1** with `@trustless-work/escrow@3.0.5`. Don't
    upgrade to the 5.x beta or mix V2 payloads.
-6. Reuse the building blocks before writing new ones: `useEscrowTx` (every
-   escrow write), `useMyEscrows`/`useEscrow`, `EscrowCard`, `CreateEscrowForm`,
-   `SetupChecklist`, `ReputationPanel`, `contracts/reputation`.
-7. **Every signature goes through `useWallet().signTransaction`** (works for
+8. Reuse what exists before writing new code: `contracts/reputation` (contract
+   template), `ReputationPanel` (contract reads/writes from React), and, only
+   for escrow apps, `useEscrowTx` (every escrow write), `useMyEscrows`/
+   `useEscrow`, `EscrowCard`, `CreateEscrowForm`, `SetupChecklist`.
+9. **Every signature goes through `useWallet().signTransaction`** (works for
    Cavos and extension wallets alike). Never import Stellar Wallets Kit or Cavos
    directly in features.
-8. Work in small steps and verify each one (`cargo test`, `npm run typecheck`,
-   `npm run check`). You can't click wallet popups: hand the user a short manual
-   test script instead.
-9. Edit skills only in `.agents/skills/` (then `npm run agents:sync`), never in
-   `.claude/skills/`.
+10. Work in small steps and verify each one (`cargo test`, `npm run typecheck`,
+    `npm run check`). You can't click wallet popups: hand the user a short
+    manual test script instead.
+11. Edit skills only in `.agents/skills/` (then `npm run agents:sync`), never in
+    `.claude/skills/`.
 
 ## Commands (repo root)
 

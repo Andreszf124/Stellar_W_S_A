@@ -4,6 +4,7 @@ import { useWallet } from "../hooks/useWallet"
 import styles from "./Home.module.css"
 
 const PROMPTS = [
+	"Build a voting app for my community: anyone creates a poll, each person votes once, live results. No escrows needed.",
 	"Build a freelance gig board: clients post a job, a freelancer accepts it, and the payment goes into a multi-release escrow per milestone.",
 	"Make a rental deposit app: the tenant funds a single-release escrow, and the landlord approves the refund at the end of the lease.",
 	"Create a hackathon bounty page: each bounty is a milestone with its own receiver, and judges approve and release prizes.",

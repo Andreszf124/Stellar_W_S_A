@@ -5,9 +5,11 @@
 Este starter junta tres piezas que ya vienen conectadas entre sí, más instrucciones para que tu agente de código sepa usarlas:
 
 - 🏗️ **[Scaffold Stellar](https://developers.stellar.org/docs/tools/scaffold-stellar)**: contratos Soroban (Rust) + app React. Cada vez que guardás un contrato, se compila, se despliega en testnet y te genera un cliente TypeScript tipado.
-- 🏦 **[Trustless Work](https://docs.trustlesswork.com)**: escrows (fideicomisos) listos para usar. La plata (USDC) queda guardada en un contrato y solo se libera cuando se aprueban los hitos.
+- 🏦 **[Trustless Work](https://docs.trustlesswork.com)**: escrows (fideicomisos) listos para usar, para cuando la plata tiene que esperar una condición. La plata (USDC) queda guardada en un contrato y solo se libera cuando se aprueban los hitos.
 - 🔐 **[Cavos](https://docs.cavos.xyz)**: wallets embebidas. Tus usuarios entran con su **correo o Google** y ya tienen una cuenta Stellar, sin instalar extensiones ni anotar frases semilla. La llave es del usuario y vive en un espacio aislado: ni tu página ni los servidores de Cavos pueden leerla.
 - 🧠 **Skills para agentes**: instrucciones verificadas en `AGENTS.md` y `.agents/skills/` para que cualquier agente (Claude Code, Codex, Cursor, OpenCode, Copilot, Gemini, Pi…) construya sobre estas piezas sin inventarse APIs.
+
+**No toda app necesita las tres piezas.** Una app de votaciones, por ejemplo, es solo un contrato Soroban con login por correo: no tiene escrows. Tu agente elige las piezas según tu idea.
 
 Todo corre en **testnet**: es plata de prueba, no hay nada que perder.
 
@@ -33,7 +35,7 @@ Todo corre en **testnet**: es plata de prueba, no hay nada que perder.
        (escrows)               (Scaffold Stellar)
 ```
 
-Como toda la app firma a través de `useWallet()`, todo funciona igual, ya sea que entres con correo o con una extensión: crear y fondear escrows, aprobar hitos, dejar reseñas on-chain o agregar la trustline de USDC.
+Tu app puede usar tus propios contratos, escrows o ambos. Como toda la app firma a través de `useWallet()`, todo funciona igual, ya sea que entres con correo o con una extensión: votar en un contrato, crear y fondear escrows, dejar reseñas on-chain o agregar la trustline de USDC.
 
 ## Qué trae
 
@@ -72,18 +74,18 @@ npm install           # dependencias del proyecto
 npm run doctor        # crea app/.env y te dice qué falta
 ```
 
-### 3. Conseguí tus dos claves (gratis, ~5 min)
+### 3. Conseguí tus claves (gratis, ~5 min)
 
-Las dos van en el archivo `app/.env`.
+Las dos van en el archivo `app/.env` y dependen de lo que use tu app.
 
-**Trustless Work** (para los escrows):
+**Trustless Work** (solo si tu app usa escrows, y para probar el Escrow Studio):
 
 1. Entrá a [dapp.trustlesswork.com](https://dapp.trustlesswork.com) y conectá una wallet.
 2. Tocá tu dirección (abajo a la izquierda) → **Settings** y llená tu perfil. El campo _Use case_ es obligatorio.
 3. Andá a **API Keys** → pestaña **Testnet** → **Request API Key** y copiala, porque se muestra una sola vez.
 4. Pegala en `app/.env` como `PUBLIC_TRUSTLESS_WORK_API_KEY="..."`.
 
-**Cavos** (para entrar con correo o Google):
+**Cavos** (para que tus usuarios entren con correo o Google):
 
 1. En el [dashboard de Cavos](https://cavos.xyz/dashboard) creá una app y copiá su **App ID**.
 2. En **Settings → allowed web origins** agregá `http://localhost:5173`. Si querés login con Google, agregalo también en **Callback URLs**.
@@ -101,15 +103,17 @@ Abrí [localhost:5173](http://localhost:5173). La primera vez tarda 1 o 2 minuto
 
 ### 5. Entrá y prepará tu cuenta
 
-Tocá **Sign in** (correo o Google) o **Use a wallet** (Freighter en **Testnet**). Después, en **Escrow Studio**, seguí el checklist: **Friendbot** → **Add trustline** → **Swap 100 XLM → USDC**.
+Tocá **Sign in** (correo o Google) o **Use a wallet** (Freighter en **Testnet**) y después **Fund Account** para recibir XLM de prueba con Friendbot. Con eso ya podés usar cualquier contrato.
 
-> **Si entraste con Cavos, hacé Friendbot primero:** tu cuenta nueva necesita un poco de XLM de prueba para pagar las comisiones. Cuando hagas acciones de escrow, Cavos te va a mostrar su propia ventana para aprobarlas.
+Para probar escrows, andá a **Escrow Studio** y seguí el checklist: **Add trustline** → **Swap 100 XLM → USDC**.
+
+> **Si entraste con Cavos, hacé Friendbot primero:** tu cuenta nueva necesita un poco de XLM de prueba para pagar las comisiones. Cuando firmes acciones en contratos o escrows, Cavos te va a mostrar su propia ventana para aprobarlas.
 
 > **¿Windows?** Usá WSL2 (recomendado) o Git Bash. Si las skills de `.claude/skills` aparecen como archivos de texto, corré `npm run agents:sync`.
 
 ## Construir con prompts
 
-Abrí el repo con tu agente y contale tu idea. El agente lee `AGENTS.md` y las skills, propone un plan y lo construye paso a paso.
+Abrí el repo con tu agente y contale tu idea. El agente lee `AGENTS.md` y las skills, elige solo las piezas que tu idea necesita, propone un plan y lo construye paso a paso. Antes de empezar te va a preguntar qué datos conviene guardar on-chain y cuáles no, explicándote las ventajas y desventajas de cada opción (por ejemplo: on-chain nadie puede alterarlo, pero es público para siempre).
 
 ```text
 /build-dapp Quiero una bolsa de chambas: los clientes publican trabajos, los freelancers
@@ -130,6 +134,8 @@ Más detalles por herramienta y servidores MCP opcionales en [`docs/AGENT-SETUP.
 
 **Más ideas para pedirle:**
 
+- _"Quiero una app de votaciones para mi comunidad: cualquiera crea una encuesta y cada persona vota una vez."_ (sin escrows)
+- _"Hacé un libro de visitas para mi evento donde la gente entre con su correo y deje un mensaje."_ (sin escrows)
 - _"Quiero una app para vender distintos artículos usando escrows. Los compradores entran con su correo."_
 - _"Hacé una app de depósitos de alquiler: el inquilino deposita en un escrow y el dueño aprueba la devolución al final del contrato."_
 - _"Creá una página de bounties de hackathon: cada premio es un hito con su ganador; los jueces aprueban y liberan."_
@@ -138,7 +144,7 @@ Más detalles por herramienta y servidores MCP opcionales en [`docs/AGENT-SETUP.
 - _"Explicame qué pasa on-chain cuando le doy Fund a un escrow."_
 - _"Revisá mi contrato con el checklist de seguridad."_
 
-Hay más ideas, con los roles del escrow ya pensados, en [`ideas.md`](.agents/skills/build-dapp/references/ideas.md).
+Hay más ideas, con y sin escrows, en [`ideas.md`](.agents/skills/build-dapp/references/ideas.md).
 
 ## Comandos
 

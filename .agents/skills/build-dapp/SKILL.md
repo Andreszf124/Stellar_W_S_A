@@ -1,12 +1,13 @@
 ---
 name: build-dapp
 description:
-  End-to-end workflow to turn a dApp idea into a working app in this repo
-  (Scaffold Stellar + Trustless Work escrows + optional Soroban contract) -
-  short interview, design (escrow type, roles, on-chain vs off-chain data),
-  build in small verified steps, and a demo checklist. Use when the user
-  describes an app idea, says "build/make/create an app/dApp", "I want an app
-  where…", asks what to build, or invokes /build-dapp.
+  End-to-end workflow to turn ANY dApp idea into a working app in this repo -
+  polls/voting, registries, NFTs/badges, tokens, tips, marketplaces, freelance,
+  deposits… Short interview, pick only the building blocks the idea needs
+  (Soroban contract, direct payments, Trustless Work escrow, Cavos login), build
+  in small verified steps, demo checklist. Use when the user describes an app
+  idea, says "build/make/create an app/dApp", "I want an app where…", asks what
+  to build, or invokes /build-dapp.
 license: Apache-2.0
 ---
 
@@ -17,51 +18,92 @@ week. Your job: get them from idea → working testnet demo fast, explaining jus
 enough as you go. Speak the user's language. Keep momentum: small steps, each
 one verified.
 
+**This repo ships several building blocks. Use only the ones the idea needs.**
+Escrows are one of them, not the default: a poll, a guestbook or an NFT badge
+app has no escrow.
+
 ## 0. Ground yourself (once per session)
 
-- Read `AGENTS.md`. Skim `app/src/pages/Escrows.tsx` and `app/src/trustless/`
-  (the escrow building blocks you will reuse) and `contracts/reputation`
-  (contract template).
-- Run `npm run doctor`. If something is missing, fix or explain that first.
+- Read `AGENTS.md` and skim `contracts/reputation` (the contract template every
+  app can copy).
+- Run `npm run doctor`. If something is missing, fix or explain that first. The
+  Trustless Work key only matters if the app uses escrows; the Cavos App ID only
+  if it uses email/Google login.
 
 ## 1. Interview (max 3 questions, skip what's obvious)
 
 Pin down, in plain words:
 
-1. **Who pays whom, for what?** (the two sides + the thing exchanged)
-2. **When should money move, and who decides?** (milestones/deliverables, who
-   approves, what happens if they disagree)
-3. **What else must be public/tamper-proof?** (listings, profiles, votes,
-   reputation, badges) vs. what can live just in the UI.
+1. **Who uses it and what do they do?** (create a poll, vote, list an item, hire
+   someone, collect a badge…)
+2. **Does money or value move? If so, does it go straight to someone, or must it
+   WAIT until something happens** (a delivery, an approval, a deadline)?
+3. **Which data must be tamper-proof and verifiable by anyone, and which is
+   private, big or changes often?** Don't assume everything goes on-chain: see
+   step 2b.
 
 If the user is vague, propose a concrete version ("I'll build X with Y and Z,
-ok?") instead of asking more. Use `references/ideas.md` for inspiration if they
-have no idea yet.
+ok?") instead of asking more. Use `references/ideas.md` for inspiration.
 
-## 2. Design (write it down in 5–10 lines before coding)
+## 2. Pick the building blocks (decide explicitly, say why)
 
-- **Escrow type**: per-milestone payouts → multi-release; one payout at the end
-  → single-release.
-- **Role mapping**: fill the table (approver, serviceProvider, releaseSigner,
-  disputeResolver, platformAddress, receiver) with real people of the story. See
-  `trustless-work` skill `references/recipes.md`. For a solo demo, the connected
-  wallet can play every role.
-- **Data**: Escrow title/description/`engagementId` + Trustless Work indexer can
-  be the whole "database" for simple apps. Add a Soroban contract only for state
-  that must be shared and trustless (listings others can browse, profiles,
-  votes, reputation, NFTs). Prefer extending or reusing `contracts/reputation`
-  patterns. See `references/architecture.md`.
-- **Screens**: usually 1–3 pages (e.g. "Browse", "Create", "My deals"). Reuse
-  `EscrowCard`.
-- **Onboarding**: if the end users aren't crypto people (buyers, tenants,
-  students…), make "Sign in with email/Google" the main path: Cavos embedded
-  wallets (`cavos` skill), already wired behind `useWallet()`. It only needs a
-  `PUBLIC_CAVOS_APP_ID`.
+| The idea needs…                                                                                                                                          | Use                                                                                                           | Skill                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Shared state/rules anyone can verify: votes, polls, registries, guestbooks, profiles, attestations, game state                                           | **Your own Soroban contract** (Scaffold deploys it + generates the TS client)                                 | `soroban-contracts`, `scaffold-stellar` |
+| Tokens or NFTs: points, membership, badges, certificates, governance tokens                                                                              | **OpenZeppelin contracts** via Scaffold (`contracts/fungible-allowlist`, `nft-enumerable` are ready examples) | `soroban-contracts`, `scaffold-stellar` |
+| Money that goes straight to someone: tips, donations, pay-to-enter, splitting a payment                                                                  | **Direct transfers**: a classic payment, or `TokenClient::transfer` inside your contract. No escrow           | `soroban-contracts`, `stellar-basics`   |
+| Money that must be **held until a condition** between people who don't fully trust each other: deliveries, milestones, deposits, bounties, with disputes | **Trustless Work escrow**                                                                                     | `trustless-work`                        |
+| Users who aren't crypto people                                                                                                                           | **Cavos** "Sign in" with email/Google (already wired)                                                         | `cavos`                                 |
+
+Rules:
+
+- **No escrow unless funds must wait for a condition.** If nobody holds money,
+  or it goes directly to the recipient, don't use Trustless Work (and don't ask
+  for its API key).
+- Most apps are **one small contract + 1–3 pages**. Combine blocks only when the
+  idea really has both parts (e.g. a marketplace = listings contract + escrow
+  per purchase).
+- Blueprints: **voting/polls** → `references/voting.md` (contract only);
+  **multi-item marketplace** → `trustless-work` skill, `references/recipes.md`
+  (contract + escrow, validated end to end).
+
+## 2b. Decide on-chain vs off-chain, per piece of data
+
+List the data the app handles and place each piece using
+`references/data-placement.md`. On-chain means tamper-proof and verifiable by
+anyone, but public forever, small, a fee per write and no deleting. Off-chain
+means private, editable and unlimited, but people must trust whoever runs it,
+and **this repo has no database yet** (adding one is real work).
+
+- Obvious cases: decide and state them in the plan (personal data → off-chain,
+  never on-chain; the votes of a voting app → on-chain; images → URL).
+- **Genuine choices** (a comment wall, profiles, descriptions, anything where
+  privacy, cost or effort matter): **ask the user**, explaining the trade-off in
+  2–3 plain sentences with your recommendation (template in
+  `references/data-placement.md`). Ask these together with your plan, not one by
+  one.
+
+## 3. Design (write it down in 5–10 lines before coding)
+
+- **Building blocks** chosen (table above) and why the others aren't needed.
+- **Data placement**: what is on-chain, what is off-chain (and where), and the
+  user's answers to any trade-off you asked about.
+- **Contract** (if any): stored data, functions, who must sign each
+  (`require_auth`), errors, events. See `references/architecture.md`.
+- **Escrow** (only if chosen): type (single/multi-release) and role mapping with
+  real people of the story (`trustless-work` skill, `references/recipes.md`).
+- **Screens**: usually 1–3 pages. Replace the starter's Home with the app, and
+  remove nav links to demo pages the app doesn't use (e.g. "Escrow Studio" in a
+  voting app). Keep their code; just unlink them.
+- **Onboarding**: for non-crypto users make "Sign in with email/Google" the main
+  path (Cavos, `cavos` skill, behind `useWallet()`).
+- **Honest limits**: say what on-chain can't do for this idea (e.g. votes are
+  public; one address ≠ one person).
 
 Share the plan in a few bullet points and start building unless the user
 objects.
 
-## 3. Build in this order (verify after each step)
+## 4. Build in this order (verify after each step)
 
 1. **Contract** (if any): write tests first, then code (`soroban-contracts`
    skill). ✅ `cargo test -p <crate>`
@@ -69,39 +111,38 @@ objects.
    skill). With `npm start` running it deploys automatically; otherwise
    `npm run contracts:build`. ✅ the logs say
    `Successfully generated client for: <name>`
-3. **UI**: new page in `app/src/pages/`, route in `app/src/App.tsx`, nav link in
-   the header. Escrow writes go through `useEscrowTx().run(...)`; contract
-   writes through `client.method(args, { publicKey: address })` +
-   `signAndSend({ signTransaction })`. Reads through React Query. ✅
-   `npm run typecheck` and `npm run lint`
-4. **Copy + polish**: clear labels for each role/action, amounts with units,
-   empty states, loading states ("confirm in your wallet…"), links to the escrow
-   viewer/explorer.
+3. **UI**: new page(s) in `app/src/pages/`, routes in `app/src/App.tsx`, nav
+   links in the header. Contract writes: `client.method(args, { publicKey })`,
+   check `tx.result.isErr()`, then `signAndSend({ signTransaction })`. Escrow
+   writes (only if used): `useEscrowTx().run(...)`. Reads through React Query.
+   ✅ `npm run typecheck` and `npm run lint`
+4. **Copy + polish**: clear labels, amounts with units, empty states, loading
+   states ("confirm in your wallet…"), explorer links.
 5. **Full check**: ✅ `npm run check`
 
-Multi-step flows that mix a contract and an escrow: put the step that moves
-money LAST (e.g. deploy escrow → reserve in your contract → fund), and give
-abandoned flows a way out (e.g. `cancel_reservation` while the escrow is empty).
-In multi-user apps the platform/dispute resolver is the builder, not the
-customer: use `platformOr(address)` (`trustless-work` skill).
+If the app mixes a contract and an escrow: put the step that moves money LAST
+(e.g. deploy escrow → reserve in your contract → fund), and give abandoned flows
+a way out. In multi-user escrow apps the platform/dispute resolver is the
+builder, not the customer: `platformOr(address)` (`trustless-work` skill).
 
 On a fresh clone, run `npm run contracts:build` once before `npm run typecheck`
 (the generated clients don't exist yet; the script tells you so).
 
 You cannot click the wallet popup. After building, give the user a short manual
-test script (e.g. "1. Connect Freighter on Testnet 2. Setup checklist 3.
-Create… 4. Fund…"), and ask them to paste any error they see. Use the
-`stellar-basics` error decoder to interpret it.
+test script (e.g. "1. Sign in 2. Fund Account 3. Create a poll 4. Vote…"), and
+ask them to paste any error they see. Use the `stellar-basics` error decoder.
 
-## 4. Demo checklist
+## 5. Demo checklist
 
 - [ ] `npm run check` passes.
-- [ ] Happy path works end-to-end on testnet: one wallet for all roles, or two
-      identities in one browser for two-party flows (Cavos "Sign in" + a
-      Freighter account), or demo data seeded as `me` from the CLI.
+- [ ] Happy path works end-to-end on testnet: one wallet, or two identities in
+      one browser for two-party flows (Cavos "Sign in" + a Freighter account),
+      or demo data seeded as `me` from the CLI.
 - [ ] Each page explains in one sentence what's happening on-chain.
+- [ ] Nav shows only what the app uses.
 - [ ] No secrets committed (`git status`: `.env` must not appear).
-- [ ] README section "What I built" with the idea, roles, and how to try it.
+- [ ] README section "What I built" with the idea, the building blocks and how
+      to try it.
 - [ ] (Optional) Deployed frontend: `scaffold-stellar` skill
       `references/deploy.md`.
 
@@ -114,8 +155,8 @@ Create… 4. Fund…"), and ask them to paste any error they see. Use the
   for Cavos and extension wallets).
 - Don't edit generated code (`app-lib/clients/*`) or the vendored skill under
   `references/official`.
-- Don't re-implement escrow logic in a custom contract: Trustless Work is the
-  payment rail.
+- Don't re-implement escrow logic in a custom contract: when funds must be held
+  conditionally, Trustless Work is the payment rail.
 - Keep diffs small and explain each step in 1–2 sentences. If a step fails
   twice, stop and show the user the error with your diagnosis instead of
   thrashing.

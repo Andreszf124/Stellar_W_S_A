@@ -1,12 +1,35 @@
 # Architecture patterns
 
+Pick the smallest pattern that fits:
+
+| Pattern                           | When                                                                           | Escrow? |
+| --------------------------------- | ------------------------------------------------------------------------------ | ------- |
+| **0. Contract only**              | shared state and rules: polls, registries, guestbooks, profiles, badges, games | no      |
+| **1. Contract + direct payments** | money goes straight to someone: tips, donations, pay-to-enter                  | no      |
+| **A. Escrow only**                | the app is just conditional payments: deposits, simple freelance               | yes     |
+| **B. Escrow + registry contract** | people browse things, then a deal holds money: marketplaces, gig boards        | yes     |
+| **C. Contract as a role holder**  | advanced, unsupported by Trustless Work                                        | yes     |
+
+## Pattern 0: contract only (most non-payment apps)
+
+Your Soroban contract holds the state and enforces the rules; the frontend reads
+it through the generated client and users sign writes with `useWallet()`. No
+Trustless Work, no API key. Example: `references/voting.md`.
+
+## Pattern 1: contract + direct payments
+
+When value moves immediately, transfer it directly: a classic payment built with
+`@stellar/stellar-sdk` (see `app/src/trustless/usdc.ts` for the
+build-sign-submit pattern) or `TokenClient::transfer(from, to, amount)` inside
+your contract (the payer `require_auth`s). An escrow would only add steps.
+
 ```
  Browser (app/)                     Stellar testnet
  ┌───────────────────────┐          ┌───────────────────────────────┐
  │ React page            │  sign    │ Your Soroban contract (C…)    │  ← Scaffold deploys,
  │  ├ generated client ──┼─────────▶│  listings / profiles / reviews│    TS client generated
  │  ├ useEscrowTx ───┐   │          │                               │
- │  └ wallet (SWK)   │   │          │ Trustless Work escrow (C…)    │  ← one per deal, deployed
+ │  └ useWallet()    │   │          │ Trustless Work escrow (C…)    │  ← one per deal, deployed
  └───────────────────┼───┘          │  holds USDC, enforces roles   │    via TW API
                      │ build/send   └───────────────────────────────┘
                      ▼                          ▲
@@ -14,7 +37,7 @@
            (dev.api.trustlesswork.com)              indexes escrows for queries)
 ```
 
-## Pattern A: escrow-only (fastest, start here)
+## Pattern A: escrow-only
 
 All state = escrows. Encode your app's object in `title`, `description`,
 `engagementId` (e.g. `"job-<uuid>"`) and milestone
@@ -41,6 +64,9 @@ indexed automatically. Only for experienced builders; prefer having a human
 wallet act on the contract's decision.
 
 ## Where data goes
+
+Short version below; full trade-offs and how to ask the user in
+`data-placement.md`.
 
 | Data                                                                          | Put it in                                              |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------ |

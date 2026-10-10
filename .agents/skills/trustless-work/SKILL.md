@@ -7,7 +7,9 @@ description:
   freelance/marketplace/bounty/rental-deposit/crowdfunding/grant flows;
   disputes; USDC; or mentions escrow, fideicomiso, depósito en garantía, or
   Trustless Work. Covers the build→sign→send pattern, roles, payloads, reading
-  escrows, USDC trustlines and the verified gotchas.
+  escrows, USDC trustlines and the verified gotchas. NOT for apps where money
+  doesn't wait for a condition (polls/voting, registries, NFTs, direct tips or
+  donations): those don't need an escrow.
 license: Apache-2.0
 metadata:
   sdk: "@trustless-work/escrow@3.0.5"
