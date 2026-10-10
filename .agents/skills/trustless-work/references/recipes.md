@@ -100,3 +100,42 @@ const hire = (freelancer: string, job: Job) =>
 		),
 	)
 ```
+
+## Blueprint: multi-item marketplace (validated by an agent run)
+
+"I want an app to sell different items using escrows" → this design built and
+passed `npm run check` from that single sentence. Escrow = single-release per
+purchase; a small Soroban contract holds the listings (never money).
+
+**Contract `marketplace`** (`contracts/marketplace`, constructor `--admin me`):
+
+- `Item { id: u32, seller: Address, title: String, description: String, image_url: String, price: i128 /* 7 decimals */, status: Status, buyer: Option<Address>, escrow: Option<Address> }`,
+  `enum Status { Listed, Reserved, Delisted }` (make it a `#[contracttype]`
+  enum).
+- `list_item(seller, …)` (seller auth), `reserve(buyer, id, escrow)` (buyer
+  auth, first buyer wins, `buyer != seller`), `cancel_reservation(caller, id)`
+  (buyer or seller, back to Listed), `delist(seller, id)`, `get_item(id)`,
+  `count()`, `list_items(start, limit)` (cap `limit` at 50), admin `upgrade`.
+- Doc comment on every error (they're the UI messages), caps on text lengths,
+  TTL extension on writes, tests for auth failures.
+
+**Buy flow (3 signatures, in this order)**:
+
+1. `deployEscrow` single-release: `amount = Number(item.price) / 1e7`,
+   `engagementId = "market-<contractId first 8>-<itemId>"`, one milestone
+   `"Deliver <title> to the buyer"`, roles: buyer = `approver` +
+   `releaseSigner`; seller = `serviceProvider` + `receiver`; `platformOr(buyer)`
+   = `platformAddress` + `disputeResolver`.
+2. `reserve(buyer, id, escrowId)` on the contract.
+3. `fundEscrow` (last, so a buyer who loses the reservation race never moved
+   money).
+
+**Orders page**: list items where you are buyer or seller, each with
+`<EscrowCard escrow={…} doneStatus="shipped" doneLabel="Mark shipped" evidencePlaceholder="Tracking number" />`.
+Offer "Cancel reservation" only while the escrow balance is 0 (abandoned
+purchase). Released escrow = sold; show `ReputationPanel` for the counterpart.
+
+**Testing it alone**: a seller can't buy their own item, so use two identities
+in the same browser (Cavos "Sign in" + Freighter "Use a wallet") or seed demo
+listings as `me` from the CLI (see `scaffold-stellar` skill, CLI one-liners) and
+give `me` a USDC trustline so it can be paid.

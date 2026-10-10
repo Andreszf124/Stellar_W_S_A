@@ -19,13 +19,11 @@ Scaffold Stellar = Soroban contracts (Rust) + a Vite/React app, glued by a CLI
 plugin (`stellar scaffold`) that **builds → deploys → generates a typed TS
 client** for each contract every time you save.
 
-> ⚠️ Version: this repo uses the released CLI **0.0.27** with **config v1**
-> (`environments.toml`
->
-> - `scaffold.yml` `version: 1`). The upstream docs/skill at stellarscaffold.org
->   now describe config **v2** (`networks:`/`contracts:` in scaffold.yml). Do
->   NOT convert this repo to v2 or follow v2 examples unless the user explicitly
->   asks to migrate.
+> ⚠️ Version: this repo uses the released CLI **0.0.27** with **config v1**:
+> `environments.toml`, and `scaffold.yml` with `version: 1`. The upstream
+> docs/skill at stellarscaffold.org now describe config **v2** (`networks:` and
+> `contracts:` in scaffold.yml). Do NOT convert this repo to v2 or follow v2
+> examples unless the user explicitly asks to migrate.
 
 ## Map
 
@@ -75,8 +73,10 @@ build+deploy+clients), `npm run contracts:test` (`cargo test`), `npm run check`
    my_contract = { client = true, constructor_args = "--admin me" } # __constructor(admin: Address)
    ```
    The key MUST be the crate name with `-` → `_` (`my-contract` →
-   `my_contract`). `me` is the deployer identity.
-   `after_deploy = """\nfn_name --arg value\n"""` runs invocations after deploy.
+   `my_contract`). `me` is the deployer identity in `development`; in
+   `[staging.contracts]` use the staging account instead
+   (`--admin testnet-user`). `after_deploy = """\nfn_name --arg value\n"""` runs
+   invocations after deploy.
 3. Save / keep `npm start` running (or `npm run contracts:build`). Watch the
    "stellar" logs.
 4. Import the generated client (camelCase of the key):
@@ -110,14 +110,24 @@ const tx = await reputation.review(
 	{ reviewer: address!, subject, escrow, rating: 5, comment: "great" },
 	{ publicKey: address },
 )
-const { result } = await tx.signAndSend({ signTransaction })
-if (result.isErr()) throw new Error(result.unwrapErr().message) // contract errors (#[contracterror])
+// Contract errors (#[contracterror]) appear in the SIMULATION, before signing.
+// Check them here: `signAndSend` would throw `Error(Contract, #N)` instead, after
+// a pointless wallet popup. The message is the variant's `///` doc comment.
+if (tx.result.isErr()) throw new Error(tx.result.unwrapErr().message)
+await tx.signAndSend({ signTransaction })
 ```
 
 - Argument names = Rust parameter names (snake_case). Types: `Address` →
   `string` (G…/C…), `i128/u64` → `bigint`, `u32/i32` → `number`, `String/Symbol`
-  → `string`, `Option<T>` → `T | undefined`, `Vec<T>` → `T[]`, structs →
-  objects, `Result<T, E>` → `Result` with `isOk()/unwrap()/isErr()`.
+  → `string`, `Option<T>` → typed `T | undefined` but **`null` at runtime**
+  (check with `== null`, not `=== undefined`), `Vec<T>` → `T[]`, structs →
+  objects, `Result<T, E>` → `Result` with `isOk()/unwrap()/isErr()`. Prices as
+  `i128` with 7 decimals: `Number(price) / 1e7` for display and for the
+  Trustless Work API (human units); `BigInt(Math.round(usdc * 1e7))` back.
+- Generated struct/enum types aren't exported from `…/clients`. Derive them from
+  the client instead of importing the package (it pins another stellar-sdk):
+  `type Item = Awaited<ReturnType<typeof marketplace.get_item>>["result"]` (for
+  `Vec` results add `[number]`). Copy small enums by hand.
 - Wrap reads in React Query (`useQuery({ queryKey: [...], queryFn })`) as
   `ReputationPanel.tsx` does, and `invalidateQueries` after writes.
 - Contract events: `useSubscription(contractId, topic, cb)`
@@ -140,12 +150,31 @@ stellar contract invoke --id reputation --source me --network testnet -- score_o
 stellar contract invoke --id reputation --source me --network testnet -- --help                   # list functions
 stellar keys address me              # deployer address
 stellar scaffold build --build-clients   # one-off (same as npm run contracts:build)
+
+# Seed demo data as `me` (e.g. listings, so ONE browser wallet can test buying):
+stellar contract invoke --id marketplace --source me --network testnet --send=yes -- list_item --seller $(stellar keys address me) --title "Bike" --price 50000000
+# Let `me` receive USDC (needed if `me` is a seller/receiver in a demo escrow):
+stellar tx new change-trust --line USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5 --source-account me --network testnet
 ```
+
+`me` is a CLI key: it can seed data and sign from the terminal, but it can't
+sign in the browser, so never make it a role someone must click with.
 
 Avoid `stellar scaffold clean` unless asked: it wipes deployments/identities and
 can touch global identities with the same name.
 
 ## Must-knows
+
+- **Fresh clone**: `npm run typecheck`/`check`/`build` stop with "Contract
+  clients aren't generated yet" (TS2307 on `@stellar-scaffold/app-lib/clients`)
+  until the first `npm run contracts:build` or `npm start`. Not a code bug.
+- `package-lock.json` changes when clients are (re)generated, because
+  `app-lib/clients/*` are npm workspaces. Harmless; commit it with your change.
+- **Upgrade in place** keeps on-chain state across saves only if the contract
+  has `pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>)` (admin-gated) and
+  you keep the storage layout compatible (same keys/types; add, don't change).
+  If you change a stored struct, delete
+  `app/.config/stellar/contract-ids/<name>.json` to get a fresh deploy instead.
 
 - Scaffold tries to deploy **every crate in `contracts/`**. Crates you don't
   want deployed (references, WIP) must be listed with `client = false` (see the

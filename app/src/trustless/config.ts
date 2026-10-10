@@ -23,6 +23,24 @@ export const trustlessWorkApiKey: string =
 export const isTrustlessWorkConfigured = trustlessWorkApiKey.length > 0
 
 /**
+ * The app operator's address (YOUR wallet as the builder): receives the
+ * platform fee and resolves disputes in multi-user apps (marketplaces, gig
+ * boards…) where the person creating the escrow is a buyer/client, not you.
+ * Set PUBLIC_PLATFORM_ADDRESS in app/.env to your Freighter or Cavos address.
+ * Never use the CLI deployer `me`: it can't sign in a browser.
+ */
+export const platformAddress: string | undefined =
+	(import.meta.env.PUBLIC_PLATFORM_ADDRESS as string | undefined)?.trim() ||
+	undefined
+
+/**
+ * Platform/arbiter for a new escrow: PUBLIC_PLATFORM_ADDRESS, or (demo mode)
+ * the connected wallet. In demo mode a buyer could resolve their own dispute:
+ * show a warning in the UI when `platformAddress` is undefined.
+ */
+export const platformOr = (connected: string) => platformAddress ?? connected
+
+/**
  * The asset escrows hold. Trustless Work expects the CLASSIC asset issuer (G...)
  * plus the symbol, not the Soroban contract (C...) of the asset.
  */

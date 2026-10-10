@@ -71,7 +71,8 @@ verified, version-specific facts that differ from your training data.
 | `npm run tw:smoke`                   | end-to-end Trustless Work test (deploy→fund→approve→release) signed by the local deployer key                               |
 
 Scaffold/Stellar CLI commands must run from `app/` (its `.env` sets a relative
-config dir).
+config dir). On a fresh clone, run `npm run contracts:build` once before
+`typecheck`/`check`/`build`: the app imports the generated contract clients.
 
 ## Layout
 

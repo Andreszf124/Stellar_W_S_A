@@ -50,8 +50,11 @@ export const ReputationPanel = ({
 				{ reviewer: address, subject, escrow: escrowId, rating, comment },
 				{ publicKey: address },
 			)
-			const { result } = await tx.signAndSend({ signTransaction })
-			if (result.isErr()) throw new Error(result.unwrapErr().message)
+			// Contract errors (#[contracterror]) show up in the simulation: check
+			// them BEFORE asking the wallet to sign. The message is the variant's
+			// `///` doc comment in the Rust source.
+			if (tx.result.isErr()) throw new Error(tx.result.unwrapErr().message)
+			await tx.signAndSend({ signTransaction })
 			addNotification("Review saved on-chain ⭐", "success")
 			setComment("")
 			await queryClient.invalidateQueries({ queryKey: ["reputation", subject] })

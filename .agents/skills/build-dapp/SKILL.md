@@ -79,6 +79,15 @@ objects.
    viewer/explorer.
 5. **Full check**: ✅ `npm run check`
 
+Multi-step flows that mix a contract and an escrow: put the step that moves
+money LAST (e.g. deploy escrow → reserve in your contract → fund), and give
+abandoned flows a way out (e.g. `cancel_reservation` while the escrow is empty).
+In multi-user apps the platform/dispute resolver is the builder, not the
+customer: use `platformOr(address)` (`trustless-work` skill).
+
+On a fresh clone, run `npm run contracts:build` once before `npm run typecheck`
+(the generated clients don't exist yet; the script tells you so).
+
 You cannot click the wallet popup. After building, give the user a short manual
 test script (e.g. "1. Connect Freighter on Testnet 2. Setup checklist 3.
 Create… 4. Fund…"), and ask them to paste any error they see. Use the
@@ -87,7 +96,9 @@ Create… 4. Fund…"), and ask them to paste any error they see. Use the
 ## 4. Demo checklist
 
 - [ ] `npm run check` passes.
-- [ ] Happy path works end-to-end with one wallet (all roles) on testnet.
+- [ ] Happy path works end-to-end on testnet: one wallet for all roles, or two
+      identities in one browser for two-party flows (Cavos "Sign in" + a
+      Freighter account), or demo data seeded as `me` from the CLI.
 - [ ] Each page explains in one sentence what's happening on-chain.
 - [ ] No secrets committed (`git status`: `.env` must not appear).
 - [ ] README section "What I built" with the idea, roles, and how to try it.

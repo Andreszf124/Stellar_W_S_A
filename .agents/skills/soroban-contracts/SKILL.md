@@ -32,7 +32,12 @@ use soroban_sdk::{contract, contracterror, contractevent, contractimpl, contract
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
-pub enum Error { NotFound = 1, Unauthorized = 2 }          // surfaces in TS as Errors[1]...
+pub enum Error {
+    /// No job with this id.          <- REQUIRED: this doc comment is the error
+    NotFound = 1,                  //    message users see in the frontend
+    /// Only the job owner can do this.
+    Unauthorized = 2,
+}
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -137,6 +142,9 @@ after building it.)
 
 ## Errors, events, misc
 
+- Every `#[contracterror]` variant needs a `///` doc comment written for end
+  users: the TS client surfaces it as `tx.result.unwrapErr().message`
+  (verified). Without it users see an empty error.
 - Return `Result<T, Error>` for expected failures; `panic!`/`unwrap` only for
   impossible states.
 - Events: `#[contractevent]` struct + `.publish(&env)` (`env.events().publish`
@@ -152,7 +160,9 @@ after building it.)
   `pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>)` calling
   `env.deployer().update_current_contract_wasm(new_wasm_hash)` lets Scaffold
   upgrade in place (keeps state) instead of redeploying a fresh contract on
-  every save.
+  every save. The name and signature must be exactly that. Keep the storage
+  layout compatible across upgrades (only add keys/fields); if you change a
+  stored type, force a fresh deploy (see `scaffold-stellar` must-knows).
 
 ## Tests (`src/test.rs`, run `cargo test -p <crate>`)
 

@@ -27,7 +27,8 @@ first project.
    contract.
 8. **P2P marketplace (secondhand items)**: buyer funds, seller ships with
    tracking evidence, buyer approves on delivery. · single-release · contract:
-   listings.
+   listings. Full tested blueprint: `trustless-work` skill,
+   `references/recipes.md` → "Blueprint: multi-item marketplace".
 9. **Tutoring / classes pack**: student prepays 10 classes, teacher marks each
    class done, student approves → paid per class. · multi-release (10
    milestones).

@@ -25,7 +25,20 @@ type Distribution = SingleReleaseResolveDisputePayload["distributions"]
  * Buttons only appear for the role that can sign them — the contract would
  * reject anyone else anyway.
  */
-export const EscrowCard = ({ escrow }: { escrow: Escrow }) => {
+export const EscrowCard = ({
+	escrow,
+	doneStatus = "completed",
+	doneLabel = "Mark done",
+	evidencePlaceholder = "Evidence (link, note…)",
+}: {
+	escrow: Escrow
+	/** Status the service provider sets on a milestone, e.g. "shipped", "delivered". */
+	doneStatus?: string
+	/** Button label for that action, e.g. "Mark shipped". */
+	doneLabel?: string
+	/** Hint for the evidence field, e.g. "Tracking number". */
+	evidencePlaceholder?: string
+}) => {
 	const { address } = useWallet()
 	const { run, pending } = useEscrowTx()
 	const { fundEscrow } = useFundEscrow()
@@ -162,7 +175,7 @@ export const EscrowCard = ({ escrow }: { escrow: Escrow }) => {
 								{is("serviceProvider") && !done && !released && (
 									<>
 										<input
-											placeholder="Evidence (link, note…)"
+											placeholder={evidencePlaceholder}
 											value={evidence}
 											onChange={(e) => setEvidence(e.target.value)}
 										/>
@@ -174,7 +187,7 @@ export const EscrowCard = ({ escrow }: { escrow: Escrow }) => {
 														{
 															contractId,
 															milestoneIndex: idx(i),
-															newStatus: "completed",
+															newStatus: doneStatus,
 															newEvidence: evidence || undefined,
 															serviceProvider: me,
 														},
@@ -183,7 +196,7 @@ export const EscrowCard = ({ escrow }: { escrow: Escrow }) => {
 												)
 											}
 										>
-											Mark done
+											{doneLabel}
 										</button>
 									</>
 								)}

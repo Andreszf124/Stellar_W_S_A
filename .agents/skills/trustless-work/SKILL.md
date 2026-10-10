@@ -40,10 +40,11 @@ API, which returns an **unsigned transaction** that the user's wallet signs.
 | `app/src/pages/Escrows.tsx`                   | The Escrow Studio page (`/escrows`)                                                      |
 | `scripts/tw-smoke.mjs`                        | Headless end-to-end test with a real API key (`npm run tw:smoke`)                        |
 
-Reuse these. A new app usually = a new page + `CreateEscrowForm`-like form with
-fixed roles
-
-- `EscrowCard` (or a custom card) + maybe a Soroban contract for app data.
+Reuse these. A new app is usually: a new page, a `CreateEscrowForm`-like form
+with fixed roles, `EscrowCard` (or a custom card), and maybe a Soroban contract
+for app data. `EscrowCard` takes `doneStatus`, `doneLabel` and
+`evidencePlaceholder` (e.g. `"shipped"`, `"Mark shipped"`, `"Tracking number"`)
+so you don't need to edit it.
 
 ## The one pattern for every write
 
@@ -88,6 +89,15 @@ re-implement this flow.
 Anyone can **fund**. One address may hold several roles (great for demos: the
 Studio defaults every role to the connected wallet). The wallet that signs MUST
 equal the role address in the payload, or the contract rejects it.
+
+**Platform / dispute resolver in multi-user apps**: when a buyer or client
+creates the escrow, use `platformOr(address)` from `app/src/trustless/config.ts`
+for `platformAddress` and `disputeResolver`. It returns
+`PUBLIC_PLATFORM_ADDRESS` (the builder's own Freighter/Cavos address, set in
+`app/.env`) or, in demo mode, the connected wallet. Show a "demo mode" warning
+when `platformAddress` is undefined, because then the buyer could resolve their
+own dispute. Never use the CLI deployer `me` for a role: it can't sign in the
+browser.
 
 ## Payload cheat sheet (V1)
 

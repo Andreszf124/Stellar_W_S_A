@@ -173,6 +173,6 @@ skills !== null
 console.log(
 	failed
 		? "\nFix the ❌ items above, then run `npm run doctor` again.\n"
-		: "\nAll set. Run `npm start` and open http://localhost:5173 🚀\n",
+		: "\nReady to `npm start` (http://localhost:5173) 🚀  ⚠️ items are optional or get created on the first start.\n",
 )
 process.exit(failed ? 1 : 0)
