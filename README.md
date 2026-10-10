@@ -1,27 +1,92 @@
 # Scaffold Stellar × Trustless Work × Cavos
 
-**De idea a dApp en Stellar, a punta de prompts.** 🤖✨
+Plantilla para construir aplicaciones descentralizadas (dApps) en Stellar con la ayuda de un agente de código.
 
-> Construido sobre **[Scaffold Stellar](https://stellarscaffold.org)**, de [The Aha Company](https://theaha.co): la base de todo este repo.
+Construida sobre [Scaffold Stellar](https://stellarscaffold.org), de [The Aha Company](https://theaha.co).
 
-Este starter junta tres piezas que ya vienen conectadas entre sí, más instrucciones para que tu agente de código sepa usarlas:
+## Configuración con tu agente
 
-- 🏗️ **[Scaffold Stellar](https://developers.stellar.org/docs/tools/scaffold-stellar)**: contratos Soroban (Rust) + app React. Cada vez que guardás un contrato, se compila, se despliega en testnet y te genera un cliente TypeScript tipado.
-- 🏦 **[Trustless Work](https://docs.trustlesswork.com)**: escrows (fideicomisos) listos para usar, para cuando la plata tiene que esperar una condición. La plata (USDC) queda guardada en un contrato y solo se libera cuando se aprueban los hitos.
-- 🔐 **[Cavos](https://docs.cavos.xyz)**: wallets embebidas. Tus usuarios entran con su **correo o Google** y ya tienen una cuenta Stellar, sin instalar extensiones ni anotar frases semilla. La llave es del usuario y vive en un espacio aislado: ni tu página ni los servidores de Cavos pueden leerla.
-- 🧠 **Skills para agentes**: instrucciones verificadas en `AGENTS.md` y `.agents/skills/` para que cualquier agente (Claude Code, Codex, Cursor, OpenCode, Copilot, Gemini, Pi…) construya sobre estas piezas sin inventarse APIs.
+Copia este prompt en tu agente de código (Claude Code, Codex, Cursor, OpenCode, Copilot u otro), desde una carpeta vacía o desde tu copia de este repositorio. El agente instala lo necesario, despliega los contratos en testnet, levanta la aplicación y te explica cómo está organizado el proyecto.
 
-**No toda app necesita las tres piezas.** Una app de votaciones, por ejemplo, es solo un contrato Soroban con login por correo: no tiene escrows. Tu agente elige las piezas según tu idea.
+```markdown
+# Configuración de scaffold-stellar-agentic
 
-Todo corre en **testnet**: es plata de prueba, no hay nada que perder.
+Configura este proyecto de Stellar y explícamelo. Ejecuta los comandos tú mismo;
+pregúntame solo cuando necesites una decisión o una clave.
 
-## Hecho sobre Scaffold Stellar 🙏
+1. Proyecto
+   - Si la carpeta actual contiene `AGENTS.md`, trabaja aquí.
+   - Si no, pregúntame si quiero mi propio repositorio en GitHub. Si respondo que sí y
+     `gh` está autenticado, pregúntame el nombre y la visibilidad y ejecuta:
+     `gh repo create <nombre> --template bitfalt/scaffold-stellar-agentic --private --clone`
+     (o `--public`). Si no, clona https://github.com/bitfalt/scaffold-stellar-agentic.git
+     en una carpeta nueva.
+   - Entra a la carpeta del proyecto, lee `AGENTS.md` y sigue sus reglas durante toda la
+     sesión.
+2. Herramientas: ejecuta `npm run setup:tools` (Stellar CLI y plugin de Scaffold, con
+   binarios precompilados) y luego `npm install`. Si una descarga falla por la red,
+   vuelve a intentarlo fuera del sandbox. En Windows, recomiéndame usar WSL2. Si
+   `.claude/skills` contiene archivos de texto en lugar de carpetas, ejecuta
+   `npm run agents:sync`.
+3. Diagnóstico: ejecuta `npm run doctor` y corrige cada error antes de continuar. Las
+   advertencias son opcionales.
+4. Claves en `app/.env`. Pídemelas; nunca me pidas llaves secretas ni frases semilla. Si
+   no tengo alguna, continúa sin ella.
+   - `PUBLIC_CAVOS_APP_ID` (opcional): permite iniciar sesión con correo o Google. Se
+     crea una app en https://cavos.xyz/dashboard, se copia su App ID y se agrega
+     `http://localhost:5173` en "allowed web origins".
+   - `PUBLIC_TRUSTLESS_WORK_API_KEY` (solo si voy a usar escrows): en
+     https://dapp.trustlesswork.com, Settings (completar "Use case"), API Keys, pestaña
+     Testnet.
+5. Contratos: ejecuta `npm run contracts:build` (compila, despliega en testnet y genera
+   los clientes TypeScript) y después `npm run check`. Ambos deben terminar sin errores.
+6. Aplicación: inicia `npm start` en segundo plano y confirma que http://localhost:5173
+   responde.
+7. Explícame el proyecto en mi idioma, en no más de ocho líneas: qué aportan Scaffold
+   Stellar, Trustless Work y Cavos, cómo se conectan, qué puedo probar ahora en el
+   navegador y qué skills hay en `.agents/skills`.
+8. Pregúntame qué quiero construir y usa la skill `build-dapp` para hacerlo.
+```
 
-Este repo existe gracias a **[Scaffold Stellar](https://github.com/stellar-scaffold/cli)**, el proyecto open source de [The Aha Company](https://theaha.co) y su comunidad. De ahí viene la base de todo: la estructura del proyecto, la app en Vite + React, la conexión con wallets, la generación automática de clientes TypeScript para tus contratos y el flujo que los compila y despliega cada vez que guardás.
+Funciona con cualquier modelo y cualquier agente: las instrucciones viven en `AGENTS.md` y `.agents/skills`, que todos pueden leer.
 
-Lo que este repo agrega encima: los escrows de Trustless Work, el login con Cavos, el contrato de reputación, los scripts de ayuda y las skills para agentes. Si te sirve, dale una ⭐ a [stellar-scaffold/cli](https://github.com/stellar-scaffold/cli) y mirá su [documentación](https://stellarscaffold.org).
+**Empezar un proyecto nuevo:** en GitHub, **Use this template → Create a new repository**, o desde la terminal:
 
-## Cómo encaja todo
+```bash
+gh repo create mi-dapp --template bitfalt/scaffold-stellar-agentic --private --clone
+```
+
+**Construir algo:** con el proyecto listo, describe tu idea:
+
+```text
+/build-dapp Quiero una app de votaciones para mi comunidad: cualquiera crea una
+encuesta, cada persona vota una vez y se ven los resultados en vivo. Que la gente
+entre con su correo.
+```
+
+## Qué incluye
+
+| Componente | Descripción |
+| --- | --- |
+| [Scaffold Stellar](https://developers.stellar.org/docs/tools/scaffold-stellar) | Contratos Soroban (Rust) y una aplicación React. Cada vez que guardas un contrato, se compila, se despliega en testnet y se genera un cliente TypeScript tipado. |
+| [Trustless Work](https://docs.trustlesswork.com) | Escrows listos para usar, para los casos en que el dinero debe esperar una condición: el USDC queda en un contrato y se libera cuando se aprueban los hitos. |
+| [Cavos](https://docs.cavos.xyz) | Wallets embebidas: los usuarios inician sesión con correo o Google y obtienen una cuenta Stellar sin instalar extensiones. La llave pertenece al usuario y se guarda en un entorno aislado al que ni la aplicación ni Cavos tienen acceso. |
+| Skills para agentes | Instrucciones verificadas en `AGENTS.md` y `.agents/skills/` para que cualquier agente construya sobre estas piezas sin inventar APIs. |
+| Escrow Studio (`/escrows`) | Interfaz para crear, fondear, aprobar, liberar, disputar y resolver escrows, con una guía para preparar la cuenta. |
+| Contrato `reputation` | Contrato de ejemplo con reseñas on-chain ligadas a cada escrow: almacenamiento, permisos, errores, eventos y tests. |
+| Scripts | `setup:tools` (instala herramientas sin compilar), `doctor` (diagnóstico), `check` (tests, formato, tipos y lint), `tw:smoke` (prueba de escrows de punta a punta). |
+
+No todas las aplicaciones necesitan los tres componentes. Una aplicación de votaciones, por ejemplo, es un contrato Soroban con inicio de sesión por correo y no usa escrows. El agente elige los componentes según la idea.
+
+Todo funciona en **testnet**, la red de pruebas de Stellar: los fondos no tienen valor real.
+
+## Construido sobre Scaffold Stellar
+
+Este proyecto existe gracias a [Scaffold Stellar](https://github.com/stellar-scaffold/cli), el proyecto open source de [The Aha Company](https://theaha.co) y su comunidad. De Scaffold Stellar provienen la estructura del proyecto, la aplicación en Vite y React, la conexión con wallets, la generación automática de clientes TypeScript y el flujo que compila y despliega los contratos en cada cambio.
+
+Este repositorio agrega los escrows de Trustless Work, el inicio de sesión con Cavos, el contrato de reputación, los scripts de apoyo y las skills para agentes. Si te resulta útil, considera dar una estrella a [stellar-scaffold/cli](https://github.com/stellar-scaffold/cli) y consulta su [documentación](https://stellarscaffold.org).
+
+## Arquitectura
 
 ```
                      Tu usuario
@@ -43,161 +108,143 @@ Lo que este repo agrega encima: los escrows de Trustless Work, el login con Cavo
        (escrows)               (Scaffold Stellar)
 ```
 
-Tu app puede usar tus propios contratos, escrows o ambos. Como toda la app firma a través de `useWallet()`, todo funciona igual, ya sea que entres con correo o con una extensión: votar en un contrato, crear y fondear escrows, dejar reseñas on-chain o agregar la trustline de USDC.
+Toda la aplicación firma a través de `useWallet()`, por lo que funciona igual con inicio de sesión por correo o con una extensión: votar en un contrato, crear y fondear escrows, dejar reseñas on-chain o agregar la trustline de USDC. Cada aplicación puede usar sus propios contratos, escrows o ambos.
 
-## Qué trae
+## Configuración manual
 
-| Pieza | Qué hace |
-| --- | --- |
-| 🔐 **Login sin wallet** | Botón **Sign in** (correo o Google con Cavos) que le crea la cuenta Stellar al usuario, y **Use a wallet** para quien ya usa Freighter u otra extensión. |
-| 🏦 **Escrow Studio** (`/escrows`) | Crear, fondear, marcar hitos, aprobar, liberar, disputar y resolver escrows, con un checklist que te guía para preparar tu cuenta. |
-| ⭐ **Contrato `reputation`** | Contrato Soroban propio con reseñas on-chain ligadas a cada escrow. Sirve de ejemplo de storage, permisos, errores, eventos y tests. |
-| 🧠 **6 skills** | `build-dapp`, `trustless-work`, `cavos`, `scaffold-stellar`, `soroban-contracts`, `stellar-basics`. |
-| 🩺 **Scripts** | `setup:tools` (instala las herramientas sin compilar), `doctor` (diagnóstico), `check` (tests + tipos + lint), `tw:smoke` (prueba de escrows de punta a punta). |
+### Requisitos
 
-## Empezar (15 min)
-
-### Lo que necesitás
-
-- [Node.js](https://nodejs.org) 22 o más nuevo
+- [Node.js](https://nodejs.org) 22 o superior
 - [Rust con rustup](https://rustup.rs)
 - git
-- Un agente de código (Claude Code, Codex, Cursor, OpenCode, Copilot…)
-- Wallet: ninguna si entrás con correo o Google, o [Freighter](https://freighter.app) si preferís una extensión
+- Un agente de código (Claude Code, Codex, Cursor, OpenCode, Copilot u otro)
+- Wallet: ninguna si usas el inicio de sesión con correo o Google, o [Freighter](https://freighter.app) si prefieres una extensión
 
-### 1. Creá tu copia
+En Windows se recomienda WSL2.
 
-En GitHub tocá **Use this template → Create a new repository** (o hacé un fork) y cloná tu copia:
+### 1. Crear tu copia
+
+En GitHub, selecciona **Use this template → Create a new repository** (o haz un fork) y clona tu copia:
 
 ```bash
 git clone https://github.com/<tu-usuario>/<tu-repo>.git
 cd <tu-repo>
 ```
 
-### 2. Instalá las herramientas
+### 2. Instalar las herramientas
 
 ```bash
-npm run setup:tools   # Stellar CLI + plugin de Scaffold (binarios listos, ~1 min)
+npm run setup:tools   # Stellar CLI y plugin de Scaffold (binarios precompilados)
 npm install           # dependencias del proyecto
-npm run doctor        # crea app/.env y te dice qué falta
+npm run doctor        # crea app/.env e indica qué falta
 ```
 
-### 3. Conseguí tus claves (gratis, ~5 min)
+### 3. Configurar las claves
 
-Las dos van en el archivo `app/.env` y dependen de lo que use tu app.
+Ambas se guardan en `app/.env` y son opcionales según lo que use tu aplicación.
 
-**Trustless Work** (solo si tu app usa escrows, y para probar el Escrow Studio):
+**Trustless Work** (solo si tu aplicación usa escrows, y para probar el Escrow Studio):
 
-1. Entrá a [dapp.trustlesswork.com](https://dapp.trustlesswork.com) y conectá una wallet.
-2. Tocá tu dirección (abajo a la izquierda) → **Settings** y llená tu perfil. El campo _Use case_ es obligatorio.
-3. Andá a **API Keys** → pestaña **Testnet** → **Request API Key** y copiala, porque se muestra una sola vez.
-4. Pegala en `app/.env` como `PUBLIC_TRUSTLESS_WORK_API_KEY="..."`.
+1. Entra a [dapp.trustlesswork.com](https://dapp.trustlesswork.com) y conecta una wallet.
+2. Abre tu dirección (abajo a la izquierda) → **Settings** y completa tu perfil. El campo _Use case_ es obligatorio.
+3. Ve a **API Keys** → pestaña **Testnet** → **Request API Key** y cópiala; se muestra una sola vez.
+4. Agrégala como `PUBLIC_TRUSTLESS_WORK_API_KEY="..."`.
 
-**Cavos** (para que tus usuarios entren con correo o Google):
+**Cavos** (inicio de sesión con correo o Google):
 
-1. En el [dashboard de Cavos](https://cavos.xyz/dashboard) creá una app y copiá su **App ID**.
-2. En **Settings → allowed web origins** agregá `http://localhost:5173`. Si querés login con Google, agregalo también en **Callback URLs**.
-3. Pegalo en `app/.env` como `PUBLIC_CAVOS_APP_ID="..."`.
+1. En el [dashboard de Cavos](https://cavos.xyz/dashboard), crea una aplicación y copia su **App ID**.
+2. En **Settings → allowed web origins**, agrega `http://localhost:5173`. Para iniciar sesión con Google, agrégalo también en **Callback URLs**.
+3. Agrégalo como `PUBLIC_CAVOS_APP_ID="..."`.
 
-> El App ID de Cavos es público por diseño, no es un secreto: si alguien ya te compartió uno, podés usarlo y saltarte estos pasos. Sin App ID la app igual funciona, pero solo con wallets de extensión.
+> El App ID de Cavos es público por diseño y no es un secreto: si alguien ya te compartió uno, puedes usarlo. Sin App ID, la aplicación funciona solo con wallets de extensión.
 
-### 4. Levantá la app
+### 4. Iniciar la aplicación
 
 ```bash
 npm start
 ```
 
-Abrí [localhost:5173](http://localhost:5173). La primera vez tarda 1 o 2 minutos mientras se despliega el contrato en testnet. Si al inicio ves errores de `app-lib/clients`, esperá a que termine.
+Abre [localhost:5173](http://localhost:5173). La primera ejecución tarda uno o dos minutos mientras se despliega el contrato en testnet. Si al inicio aparecen errores de `app-lib/clients`, espera a que termine.
 
-### 5. Entrá y prepará tu cuenta
+### 5. Preparar tu cuenta
 
-Tocá **Sign in** (correo o Google) o **Use a wallet** (Freighter en **Testnet**) y después **Fund Account** para recibir XLM de prueba con Friendbot. Con eso ya podés usar cualquier contrato.
+Selecciona **Sign in** (correo o Google) o **Use a wallet** (Freighter en **Testnet**) y luego **Fund Account** para recibir XLM de prueba mediante Friendbot. Con eso puedes usar cualquier contrato.
 
-Para probar escrows, andá a **Escrow Studio** y seguí el checklist: **Add trustline** → **Swap 100 XLM → USDC**.
+Para probar escrows, abre **Escrow Studio** y sigue la guía: **Add trustline** → **Swap 100 XLM → USDC**.
 
-> **Si entraste con Cavos, hacé Friendbot primero:** tu cuenta nueva necesita un poco de XLM de prueba para pagar las comisiones. Cuando firmes acciones en contratos o escrows, Cavos te va a mostrar su propia ventana para aprobarlas.
-
-> **¿Windows?** Usá WSL2 (recomendado) o Git Bash. Si las skills de `.claude/skills` aparecen como archivos de texto, corré `npm run agents:sync`.
+> Si iniciaste sesión con Cavos, usa Friendbot antes que cualquier otra acción: la cuenta nueva necesita XLM de prueba para pagar las comisiones. Al firmar acciones en contratos o escrows, Cavos muestra su propia ventana de aprobación.
 
 ## Construir con prompts
 
-Abrí el repo con tu agente y contale tu idea. El agente lee `AGENTS.md` y las skills, elige solo las piezas que tu idea necesita, propone un plan y lo construye paso a paso. Antes de empezar te va a preguntar qué datos conviene guardar on-chain y cuáles no, explicándote las ventajas y desventajas de cada opción (por ejemplo: on-chain nadie puede alterarlo, pero es público para siempre).
+Abre el repositorio con tu agente y describe tu idea. El agente lee `AGENTS.md` y las skills, elige solo los componentes que la idea necesita, propone un plan y lo construye paso a paso. Antes de empezar, pregunta qué datos conviene guardar on-chain y cuáles no, y explica las ventajas y desventajas de cada opción (por ejemplo: on-chain nadie puede alterar un dato, pero es público de forma permanente).
 
-```text
-/build-dapp Quiero una bolsa de chambas: los clientes publican trabajos, los freelancers
-aplican y el pago va en un escrow con un hito por entregable. Que la gente entre con su
-correo, sin wallet. Al final se dejan reseñas.
-```
-
-| Agente | Cómo usa este repo |
+| Agente | Cómo usa este repositorio |
 | --- | --- |
-| Claude Code | Lee `CLAUDE.md` (que importa `AGENTS.md`). Las skills aparecen como `/build-dapp`, `/cavos`, `/trustless-work`… |
-| Codex CLI | Lee `AGENTS.md` y `.agents/skills` (usá `$build-dapp`) |
-| Cursor | Lee `AGENTS.md` y `.agents/skills` (usá `/build-dapp`) |
-| GitHub Copilot | Lee `AGENTS.md` y `.agents/skills` |
-| Gemini CLI / Antigravity | Carga `AGENTS.md` (vía `.gemini/settings.json`) y `.agents/skills` |
-| OpenCode, Pi, Windsurf, Aider y otros | Leen `AGENTS.md`, que les indica qué `SKILL.md` abrir para cada tarea |
+| Claude Code | Lee `CLAUDE.md`, que importa `AGENTS.md`. Las skills están disponibles como `/build-dapp`, `/cavos`, `/trustless-work`, etc. |
+| Codex CLI | Lee `AGENTS.md` y `.agents/skills` (`$build-dapp`). |
+| Cursor | Lee `AGENTS.md` y `.agents/skills` (`/build-dapp`). |
+| GitHub Copilot | Lee `AGENTS.md` y `.agents/skills`. |
+| Gemini CLI / Antigravity | Carga `AGENTS.md` (mediante `.gemini/settings.json`) y `.agents/skills`. |
+| OpenCode, Pi, Windsurf, Aider y otros | Leen `AGENTS.md`, que indica qué `SKILL.md` abrir para cada tarea. |
 
 Más detalles por herramienta y servidores MCP opcionales en [`docs/AGENT-SETUP.md`](docs/AGENT-SETUP.md).
 
-**Más ideas para pedirle:**
+Ejemplos de ideas:
 
 - _"Quiero una app de votaciones para mi comunidad: cualquiera crea una encuesta y cada persona vota una vez."_ (sin escrows)
-- _"Hacé un libro de visitas para mi evento donde la gente entre con su correo y deje un mensaje."_ (sin escrows)
-- _"Quiero una app para vender distintos artículos usando escrows. Los compradores entran con su correo."_
-- _"Hacé una app de depósitos de alquiler: el inquilino deposita en un escrow y el dueño aprueba la devolución al final del contrato."_
-- _"Creá una página de bounties de hackathon: cada premio es un hito con su ganador; los jueces aprueban y liberan."_
-- _"Después del primer escrow, ofrecele al usuario agregar un passkey para que pueda entrar desde otro dispositivo."_
-- _"Agregá un contrato Soroban de perfiles públicos (nombre, skills, links) y mostrá la reputación junto a cada escrow."_
-- _"Explicame qué pasa on-chain cuando le doy Fund a un escrow."_
-- _"Revisá mi contrato con el checklist de seguridad."_
+- _"Haz un libro de visitas para mi evento donde la gente inicie sesión con su correo y deje un mensaje."_ (sin escrows)
+- _"Quiero una app para vender distintos artículos usando escrows. Los compradores inician sesión con su correo."_
+- _"Haz una app de depósitos de alquiler: el inquilino deposita en un escrow y el propietario aprueba la devolución al final del contrato."_
+- _"Crea una página de bounties de hackathon: cada premio es un hito con su ganador; los jueces aprueban y liberan."_
+- _"Agrega un contrato Soroban de perfiles públicos (nombre, habilidades, enlaces) y muestra la reputación junto a cada escrow."_
+- _"Explícame qué ocurre on-chain cuando fondeo un escrow."_
 
-Hay más ideas, con y sin escrows, en [`ideas.md`](.agents/skills/build-dapp/references/ideas.md).
+Más ideas, con y sin escrows, en [`ideas.md`](.agents/skills/build-dapp/references/ideas.md).
 
 ## Comandos
 
-| Comando | Qué hace |
+| Comando | Descripción |
 | --- | --- |
-| `npm start` | Modo desarrollo: compila y despliega los contratos en testnet, genera sus clientes y levanta la app |
-| `npm run doctor` | Revisa herramientas, `app/.env`, la red y tus claves de Trustless Work y Cavos |
-| `npm run check` | Tests de los contratos + formato + revisión de tipos + lint |
-| `npm run contracts:build` | Compila, despliega y genera los clientes una sola vez |
-| `npm run tw:smoke` | Prueba real de un escrow de punta a punta, sin navegador |
-| `npm run build` | Build de producción de la app (`app/dist`) |
-| `npm run agents:sync` | Vuelve a sincronizar las skills hacia `.claude/skills` |
+| `npm start` | Modo desarrollo: compila y despliega los contratos en testnet, genera sus clientes e inicia la aplicación. |
+| `npm run doctor` | Revisa herramientas, `app/.env`, la red y las claves de Trustless Work y Cavos. |
+| `npm run check` | Tests de los contratos, formato, revisión de tipos y lint. |
+| `npm run contracts:build` | Compila, despliega y genera los clientes una sola vez. |
+| `npm run tw:smoke` | Prueba real de un escrow de punta a punta, sin navegador. |
+| `npm run build` | Build de producción de la aplicación (`app/dist`). |
+| `npm run agents:sync` | Sincroniza las skills hacia `.claude/skills`. |
 
 ## Estructura
 
 ```
 AGENTS.md               instrucciones para cualquier agente (CLAUDE.md lo importa)
-.agents/skills/         las skills (fuente de verdad; .claude/skills apunta acá)
-contracts/reputation/   contrato Soroban de ejemplo + tests
+.agents/skills/         skills (fuente de verdad; .claude/skills apunta aquí)
+contracts/reputation/   contrato Soroban de ejemplo y sus tests
 environments.toml       qué contratos se despliegan y dónde (development = testnet)
 app/src/pages/          páginas: Home, Escrows (Escrow Studio), contratos desplegados
-app/src/cavos/          login con correo/Google y wallet embebida (Cavos)
-app/src/providers/      WalletProvider: un solo useWallet() para Cavos y extensiones
+app/src/cavos/          inicio de sesión con correo o Google y wallet embebida (Cavos)
+app/src/providers/      WalletProvider: un único useWallet() para Cavos y extensiones
 app/src/trustless/      escrows de Trustless Work (configuración, hooks, componentes)
-app-lib/                red, wallets de extensión, friendbot, eventos
+app-lib/                red, wallets de extensión, friendbot y eventos
 app-lib/clients/        clientes generados de tus contratos (no se editan)
-scripts/                setup-tools, doctor, tw-smoke, agents-sync
-docs/AGENT-SETUP.md     setup por agente y servidores MCP opcionales
+scripts/                setup-tools, doctor, contracts-build, tw-smoke, agents-sync
+docs/AGENT-SETUP.md     configuración por agente y servidores MCP opcionales
 ```
 
-## Si algo falla
+## Solución de problemas
 
-Corré `npm run doctor`, revisá la [guía de problemas comunes](.agents/skills/scaffold-stellar/references/troubleshooting.md) y la [skill de Cavos](.agents/skills/cavos/SKILL.md), o simplemente pegale el error a tu agente. 😉
+Ejecuta `npm run doctor` y consulta la [guía de problemas comunes](.agents/skills/scaffold-stellar/references/troubleshooting.md) y la [skill de Cavos](.agents/skills/cavos/SKILL.md). También puedes pegarle el error a tu agente: las skills incluyen un decodificador de errores.
 
 ## Versiones
 
-- `stellar-scaffold-cli` **0.0.27** con la configuración **v1** (`environments.toml`). El template oficial de Scaffold ya usa un formato nuevo (v2) que esta versión del CLI no soporta, así que este repo viene generado: no hace falta correr `stellar scaffold init`.
-- `@trustless-work/escrow` **3.0.5** (API V1, la estable).
+- `stellar-scaffold-cli` **0.0.27** con la configuración **v1** (`environments.toml`). El template oficial de Scaffold ya usa un formato nuevo (v2) que esta versión del CLI no soporta, por eso este repositorio se distribuye ya generado y no es necesario ejecutar `stellar scaffold init`.
+- `@trustless-work/escrow` **3.0.5** (API V1, estable).
 - `@cavos/kit` **0.2.5**.
 - `soroban-sdk` **26.1** y OpenZeppelin `stellar-*` **0.7.2**.
 
-## ¿Construiste algo?
+## Comparte tu proyecto
 
-Compartilo en [Discussions → Show and tell](https://github.com/bitfalt/scaffold-stellar-agentic/discussions/categories/show-and-tell) con el link a tu repo y una captura. 🙌
+Publica tu repositorio en [Discussions → Show and tell](https://github.com/bitfalt/scaffold-stellar-agentic/discussions/categories/show-and-tell) con una captura de lo que construiste.
 
 ## Créditos y licencias
 
-Basado en el template oficial de [Scaffold Stellar](https://github.com/stellar-scaffold/ui), de The Aha Company y sus contribuidores (Apache-2.0). El detalle de qué viene del template y qué se cambió está en [`NOTICE`](NOTICE). Incluye la [skill oficial de Trustless Work](https://github.com/Trustless-Work/trustlesswork-skill) (Apache-2.0) en `.agents/skills/trustless-work/references/official/`. Usa [`@cavos/kit`](https://docs.cavos.xyz) (MIT) y [`@trustless-work/escrow`](https://www.npmjs.com/package/@trustless-work/escrow). Este repo se distribuye bajo Apache-2.0.
+Basado en el template oficial de [Scaffold Stellar](https://github.com/stellar-scaffold/ui), de The Aha Company y sus contribuidores (Apache-2.0). El detalle de qué proviene del template y qué se modificó está en [`NOTICE`](NOTICE). Incluye la [skill oficial de Trustless Work](https://github.com/Trustless-Work/trustlesswork-skill) (Apache-2.0) en `.agents/skills/trustless-work/references/official/`. Usa [`@cavos/kit`](https://docs.cavos.xyz) (MIT) y [`@trustless-work/escrow`](https://www.npmjs.com/package/@trustless-work/escrow). Este repositorio se distribuye bajo la licencia Apache-2.0.
