@@ -33,5 +33,5 @@
   },
   "prettier": "@theahaco/ts-config/prettier",
   "packageManager": "npm@11.17.0",
-  "description": "Prompt-to-dApp starter: Scaffold Stellar + Trustless Work escrows + agent skills for any coding agent"
+  "description": "Prompt-to-dApp starter: Scaffold Stellar + Trustless Work escrows + Cavos email/Google wallets + agent skills for any coding agent"
 }

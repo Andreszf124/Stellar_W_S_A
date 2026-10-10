@@ -30,7 +30,15 @@ const Home = () => {
 
 			<section className={styles.cards}>
 				<div className="card">
-					<h2>1 · Escrows</h2>
+					<h2>1 · Sign in without a wallet</h2>
+					<p>
+						With <strong>Cavos</strong>, people sign in with their email or
+						Google and get their own Stellar account: no extension, no seed
+						phrase. Prefer Freighter? &quot;Use a wallet&quot; still works.
+					</p>
+				</div>
+				<div className="card">
+					<h2>2 · Escrows</h2>
 					<p>
 						Lock USDC in a contract and release it per milestone. Create, fund,
 						approve, release and dispute in the{" "}
@@ -38,7 +46,7 @@ const Home = () => {
 					</p>
 				</div>
 				<div className="card">
-					<h2>2 · Your own contract</h2>
+					<h2>3 · Your own contract</h2>
 					<p>
 						<code>contracts/reputation</code> is a Soroban contract deployed by
 						Scaffold on every save. Try it in the{" "}
@@ -47,7 +55,7 @@ const Home = () => {
 					</p>
 				</div>
 				<div className="card">
-					<h2>3 · Your agent</h2>
+					<h2>4 · Your agent</h2>
 					<p>
 						Open this repo in your coding agent and describe your idea. It reads{" "}
 						<code>AGENTS.md</code> and the skills in <code>.agents/skills</code>{" "}
