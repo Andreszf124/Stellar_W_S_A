@@ -104,7 +104,7 @@ app/src/hooks/            useWallet, useNotification, useSubscription
 app-lib/                  network env, wallet kit, friendbot, events (shared TS lib)
 app-lib/clients/          GENERATED contract clients (gitignored)
 scripts/                  doctor, tw-smoke, agents-sync, dev-guard
-docs/                     workshop guide, agent setup per tool
+docs/AGENT-SETUP.md       per-agent setup and optional MCP servers
 ```
 
 ## Code conventions
