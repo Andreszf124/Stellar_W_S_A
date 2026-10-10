@@ -35,10 +35,12 @@ Todo corre en **testnet**: plata de mentira, cero riesgo.
 **Necesitás:** Node 22+, [Rust con rustup](https://rustup.rs), git, el navegador
 con [Freighter](https://freighter.app) (wallet) y algún agente de código.
 
+**1.** En GitHub tocá **Use this template → Create a new repository** (o hacé
+fork) y clonalo:
+
 ```bash
-# 1. Forkeá este repo en GitHub y clonalo
-git clone https://github.com/<tu-usuario>/scaffold-stellar-agentic.git
-cd scaffold-stellar-agentic
+git clone https://github.com/<tu-usuario>/<tu-repo>.git
+cd <tu-repo>
 
 # 2. Herramientas de Stellar (binarios precompilados, ~1 min) + target wasm de Rust
 npm run setup:tools
@@ -151,6 +153,12 @@ o simplemente pegale el error a tu agente 😉.
   Este repo ya viene generado, no hace falta `init`.
 - `@trustless-work/escrow` **3.0.5** (API V1, estable). La V2 está en beta.
 - `soroban-sdk` **26.1**, OpenZeppelin `stellar-*` **0.7.2**.
+
+## ¿Construiste algo?
+
+Compartilo en
+[Discussions → Show and tell](https://github.com/bitfalt/scaffold-stellar-agentic/discussions/categories/show-and-tell)
+con el link a tu repo y una captura. 🙌
 
 ## Créditos y licencias
 

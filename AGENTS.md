@@ -1,5 +1,7 @@
 # AGENTS.md
 
+<!-- template: bitfalt/scaffold-stellar-agentic (keep this line: it lets the template author count projects built from it) -->
+
 Instructions for any AI coding agent working in this repo (Claude Code, Codex,
 Cursor, OpenCode, Copilot, Gemini/Antigravity, Pi, Windsurf, Aider…). Humans:
 see `README.md`.

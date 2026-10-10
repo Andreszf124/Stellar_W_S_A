@@ -6,7 +6,7 @@ resolver = "2"
 authors = ["Scaffold Stellar Agentic contributors"]
 edition = "2024"
 license = "Apache-2.0"
-repository = "https://github.com/stellar-scaffold/cli"
+repository = "https://github.com/bitfalt/scaffold-stellar-agentic"
 version = "0.0.2"
 
 [workspace.dependencies]
