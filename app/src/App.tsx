@@ -23,7 +23,7 @@ const AppLayout = () => (
 	<div className={styles.AppLayout}>
 		<header className={styles.header}>
 			<NavLink to="/" className={styles.logo}>
-				Scaffold × Escrows
+				Scaffold Pura Vida
 			</NavLink>
 			<nav className={styles.headerNav}>
 				<NavLink

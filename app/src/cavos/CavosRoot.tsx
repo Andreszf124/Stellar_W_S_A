@@ -33,7 +33,7 @@ export const CavosRoot = ({ children }: { children: ReactNode }) => {
 				redirectUri: window.location.origin,
 			}}
 			modal={{
-				appName: "Scaffold × Escrows",
+				appName: "Scaffold Pura Vida",
 				providers: ["email", "google"],
 				emailMode: "otp",
 				primaryColor: "#7b61ff",
