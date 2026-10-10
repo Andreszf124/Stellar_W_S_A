@@ -1,0 +1,12 @@
+{
+	"servers": {
+		"trustless-work": {
+			"type": "http",
+			"url": "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"
+		},
+		"openzeppelin-stellar": {
+			"type": "http",
+			"url": "https://mcp.openzeppelin.com/contracts/stellar/mcp"
+		}
+	}
+}

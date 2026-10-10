@@ -1,0 +1,7 @@
+# Codex project config (loaded for trusted projects). Optional docs MCP servers.
+# Codex reads AGENTS.md and .agents/skills natively.
+[mcp_servers.trustless-work]
+url = "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"
+
+[mcp_servers.openzeppelin-stellar]
+url = "https://mcp.openzeppelin.com/contracts/stellar/mcp"

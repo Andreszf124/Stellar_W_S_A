@@ -1,0 +1,13 @@
+{
+	"context": {
+		"fileName": ["AGENTS.md", "GEMINI.md"]
+	},
+	"mcpServers": {
+		"trustlessWork": {
+			"httpUrl": "https://docs.trustlesswork.com/trustless-work/~gitbook/mcp"
+		},
+		"openzeppelinStellar": {
+			"httpUrl": "https://mcp.openzeppelin.com/contracts/stellar/mcp"
+		}
+	}
+}

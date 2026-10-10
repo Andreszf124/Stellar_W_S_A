@@ -3,6 +3,7 @@ import { NavLink, Outlet, Route, Routes } from "react-router-dom"
 import styles from "./App.module.css"
 import ConnectAccount from "./components/ConnectAccount"
 import Debug from "./pages/Debug"
+import Escrows from "./pages/Escrows"
 import Home from "./pages/Home"
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
 		<Routes>
 			<Route element={<AppLayout />}>
 				<Route path="/" element={<Home />} />
+				<Route path="/escrows" element={<Escrows />} />
 				<Route path="/debug" element={<Debug />} />
 				<Route path="/debug/:contractName" element={<Debug />} />
 			</Route>
@@ -20,13 +22,21 @@ function App() {
 const AppLayout = () => (
 	<div className={styles.AppLayout}>
 		<header className={styles.header}>
-			<span className={styles.logo}>Scaffold</span>
+			<NavLink to="/" className={styles.logo}>
+				Scaffold × Escrows
+			</NavLink>
 			<nav className={styles.headerNav}>
+				<NavLink
+					to="/escrows"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Escrow Studio
+				</NavLink>
 				<NavLink
 					to="/debug"
 					className={({ isActive }) => (isActive ? styles.active : "")}
 				>
-					Contract Explorer
+					Contracts
 				</NavLink>
 				<a href={labPrefix()} target="_blank" rel="noreferrer">
 					Transaction Explorer
@@ -48,15 +58,22 @@ const AppLayout = () => (
 				>
 					GitHub
 				</a>
+				<a href="https://stellarscaffold.org" target="_blank" rel="noreferrer">
+					Scaffold docs
+				</a>
 				<a
-					href="https://www.youtube.com/watch?v=0syGaIn3ULk&list=PLmr3tp_7-7Gjj6gn5-bBn-QTMyaWzwOU5"
+					href="https://docs.trustlesswork.com"
 					target="_blank"
 					rel="noreferrer"
 				>
-					Tutorial
+					Trustless Work docs
 				</a>
-				<a href="https://scaffoldstellar.org" target="_blank" rel="noreferrer">
-					View docs
+				<a
+					href="https://developers.stellar.org"
+					target="_blank"
+					rel="noreferrer"
+				>
+					Stellar docs
 				</a>
 			</nav>
 		</footer>

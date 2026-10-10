@@ -39,8 +39,9 @@ lerna-debug.log*
 app-lib/clients/*
 !app-lib/clients/.gitkeep
 
-# Agent/editor scratch
-.claude/
+# Agent harness local-only state (skills and shared config ARE committed)
+.claude/settings.local.json
+.claude/worktrees/
 
 # TypeScript incremental build info
 *.tsbuildinfo

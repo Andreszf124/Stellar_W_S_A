@@ -6,6 +6,7 @@ import "@stellar-scaffold/app-lib/styles.css"
 import App from "./App.tsx"
 import { NotificationProvider } from "./providers/NotificationProvider.tsx"
 import { WalletProvider } from "./providers/WalletProvider.tsx"
+import { TrustlessWorkProvider } from "./trustless/TrustlessWorkProvider.tsx"
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -19,13 +20,16 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root") as HTMLElement).render(
 	<StrictMode>
 		<NotificationProvider>
-			<QueryClientProvider client={queryClient}>
-				<WalletProvider>
-					<BrowserRouter>
-						<App />
-					</BrowserRouter>
-				</WalletProvider>
-			</QueryClientProvider>
+			{/* Trustless Work escrow API client for the SDK hooks (src/trustless) */}
+			<TrustlessWorkProvider>
+				<QueryClientProvider client={queryClient}>
+					<WalletProvider>
+						<BrowserRouter>
+							<App />
+						</BrowserRouter>
+					</WalletProvider>
+				</QueryClientProvider>
+			</TrustlessWorkProvider>
 		</NotificationProvider>
 	</StrictMode>,
 )
