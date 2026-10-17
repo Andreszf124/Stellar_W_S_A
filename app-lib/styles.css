@@ -234,3 +234,15 @@ dialog code {
 	border-color: var(--color-error);
 	color: var(--color-error);
 }
+
+.wallet-primary {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+	color: white;
+	font-weight: 600;
+}
+
+.wallet-primary:hover:not(:disabled) {
+	background: var(--color-accent);
+	filter: brightness(1.1);
+}

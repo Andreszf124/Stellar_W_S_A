@@ -28,6 +28,7 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
+!.env.production
 
 # easy way to create temporary local-only files and folders
 *.local.*
@@ -38,14 +39,17 @@ lerna-debug.log*
 # generated contract bindings + clients (Binding packages and flattened index.ts)
 app-lib/clients/*
 !app-lib/clients/.gitkeep
-# The deployed contract's client is versioned so a fresh clone compiles without
-# redeploying (scaffold regenerates it with the same content).
+# The deployed contracts' clients are versioned so a fresh clone (or Vercel) builds
+# without redeploying. Scaffold regenerates them with the same content.
 !app-lib/clients/index.ts
-!app-lib/clients/grano-de-origen/
-!app-lib/clients/grano-de-origen/dist/
+!app-lib/clients/closet/
+!app-lib/clients/closet/dist/
+!app-lib/clients/reputation/
+!app-lib/clients/reputation/dist/
 
-# Agent/editor scratch
-.claude/
+# Agent harness local-only state (skills and shared config ARE committed)
+.claude/settings.local.json
+.claude/worktrees/
 
 # TypeScript incremental build info
 *.tsbuildinfo

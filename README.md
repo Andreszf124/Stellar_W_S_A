@@ -1,170 +1,145 @@
-# Grano de Origen
+# Mascota Digital
 
-Trazabilidad de café costarricense en Stellar. El productor registra un lote
-(finca, cosecha y proceso) en un contrato Soroban, cualquiera consulta su origen
-escaneando un QR y el lote se transfiere on-chain al comprador.
+Cuando alguien compra ropa o muebles físicos en una tienda, reclama la versión digital (prenda, accesorio o mueble) como un ítem en la red Stellar. Con esos ítems viste a su avatar y decora su hogar digital, y con tareas sube de nivel.
 
-Proyecto del reto "Grano de Origen" del TicoChallenge (Universidad Fidélitas),
-creado sobre [Scaffold Stellar](https://github.com/stellar-scaffold/cli).
+El marketplace es solo de vestimenta y muebles. Por ahora no hay comida.
 
-- Contrato en Testnet: `CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`
-- Explorador: `https://lab.stellar.org/r/testnet/contract/CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`
-- Frontend desplegado: `<URL_FRONTEND>`
-- Guion de la demo: [docs/DEMO.md](docs/DEMO.md)
+- Repositorio: https://github.com/Andreszf124/Stellar_W_S_A (rama `mascota`)
+- Sitio: https://stellar-w-s-a.vercel.app
+- Red: Stellar Testnet (dinero de prueba, sin valor real)
+- Equipo: Wilson, Keylin y Andrés
 
-## Problema y usuario
+Es una versión beta. Lea la sección "Estado actual" para saber qué funciona y qué falta.
 
-El café de especialidad se vende por su origen, pero la información de finca,
-cosecha y proceso viaja en papeles, mensajes o la palabra del vendedor. El
-comprador no puede verificarla y el productor no puede probar de dónde viene su
-grano ni cuándo cambió de manos.
+## Cómo funciona
 
-- **Usuario principal:** el pequeño y mediano productor de café (Tarrazú,
-  Naranjo, Tres Ríos y otras regiones) que quiere demostrar el origen de su lote.
-- **Usuarios secundarios:** compradores (tostadores, exportadores) que reciben
-  el lote, y el consumidor final que escanea el QR.
+1. La tienda registra una unidad de un producto. La app genera un código de un solo uso (por ejemplo `K7QM-2XWD-9PTA`) y en la red solo se guarda su huella sha256. El código nunca se guarda en la red.
+2. La tienda entrega al comprador el número del ítem y el código, junto con el producto físico.
+3. El comprador reclama revelando el código. Si coincide con la huella, el ítem queda a su nombre. Un ítem solo se puede reclamar una vez.
+4. En su clóset ve los ítems que posee. Equipa prendas y accesorios a su avatar, y los muebles aparecen en su hogar digital.
+5. Las tareas se marcan solas según lo que el usuario posee y lo que tiene equipado. Cada 50 puntos sube un nivel.
 
-## Qué hace
+Tareas actuales: reclamar el primer ítem (50 puntos), equipar una prenda o accesorio (30), reclamar un mueble (40) y reunir 3 ítems (60).
 
-1. **Registrar un lote:** el productor conecta su wallet y guarda finca,
-   cosecha y proceso. El contrato asigna un id y la fecha de creación.
-2. **Consulta pública por QR:** el QR apunta a la página del lote. La lectura
-   no requiere wallet ni fondos.
-3. **Transferir el lote:** el dueño actual lo cede a la dirección del comprador;
-   solo el dueño puede hacerlo.
+Qué se guarda y dónde:
 
-## Cómo usa Stellar
+| Dato | Dónde |
+| --- | --- |
+| Ítems, dueño, categoría, huella del código | Contrato `closet` en Testnet |
+| Qué tiene equipado el avatar | `localStorage` del navegador (no viaja entre dispositivos) |
+| Puntos y nivel | Se calculan al momento con lo que el usuario posee y equipa |
+| Arte de cada modelo | Catálogo fijo en `app/src/closet/catalog.ts` |
 
-- **Soroban:** el contrato inteligente es la única fuente de verdad. Expone
-  `register_lot`, `get_lot`, `transfer_lot` y `lot_count`.
-- **Scaffold Stellar:** compila el contrato, lo despliega según `scaffold.yml`,
-  genera el cliente TypeScript en `app-lib/clients` y recarga el frontend
-  (`stellar scaffold watch --build-clients`).
-- **Wallet:** productor y comprador firman registro y transferencia con su
-  wallet (Stellar Wallets Kit, dependencia ya presente en `app-lib`). Las
-  lecturas son simulaciones sin firma.
-- **Testnet:** el contrato y las cuentas de la demo viven en Testnet; las
-  cuentas se fondean con Friendbot.
+El catálogo de modelos es fijo porque el contrato guarda solo el nombre y la categoría del ítem. La app busca el dibujo comparando ese nombre con la lista (14 modelos: ropa, accesorios y muebles).
 
-## Arquitectura
+## Estado actual
 
-No hay backend propio: el contrato es el único backend.
+| Existe hoy | Aún no |
+| --- | --- |
+| Contrato `closet` desplegado en Testnet | Marketplace con varias tiendas aliadas (solo existe la página `/tienda` para registrar unidades) |
+| Registro de unidades con huella del código | Pago retenido con escrow (la plantilla trae Escrow Studio, pero requiere una clave de Trustless Work y no se usa) |
+| Reclamo con código de un solo uso | Panel de administrador |
+| Clóset, avatar humanoide y hogar digital | Base de datos (Supabase) |
+| Equipar y quitar prendas | Inicio de sesión con correo (Cavos) |
+| Tareas, puntos y niveles automáticos | Arte de mascota animal (hoy es un avatar humanoide) |
+| Conexión con la billetera Freighter | Interfaz para transferir ítems (el contrato ya lo soporta) |
+
+El contrato `reputation` (ID `CB5VHRXKO6CPFKSELKIHN3JJXMLQUDRCEBKDCCVRMZW7A534YLYIRK45`) viene de la plantilla y está desplegado, pero no forma parte del flujo de la mascota.
+
+## Contrato `closet`
+
+Código en `contracts/closet/`. Desplegado en Testnet:
 
 ```
-contracts/grano-de-origen/src/
-  types.rs     estructura Lot y claves de datos
-  error.rs     errores del contrato (LotNotFound, NotOwner, ...)
-  storage.rs   lectura y escritura del estado
-  lib.rs       funciones públicas del contrato
-
-app/src/
-  services/    lotService: adaptador entre la UI y el cliente generado
-  pages/       pantallas (registro, consulta del lote, transferencia)
-  components/  piezas de UI reutilizables
-  providers/   wallet y notificaciones
+CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO
 ```
 
-La UI depende solo de la interfaz `LotService`; el cliente generado
-(`@stellar-scaffold/app-lib/clients`) se usa únicamente desde `services/`.
+| Función | Quién firma | Qué hace |
+| --- | --- | --- |
+| `register_item(store, name, category, claim_hash)` | La tienda | Registra una unidad y devuelve su número (empieza en 1). El nombre no puede estar vacío. |
+| `claim_item(id, code, claimer)` | El comprador | Verifica que el sha256 del código coincida con la huella y asigna el ítem al comprador. |
+| `transfer_item(id, new_owner)` | El dueño actual | Pasa un ítem ya reclamado a otra dirección. |
+| `get_item(id)` | Nadie (lectura) | Devuelve el ítem. |
+| `items_of(owner)` | Nadie (lectura) | Números de los ítems reclamados por una dirección. |
+| `item_count()` | Nadie (lectura) | Total de unidades registradas. |
 
-## Requisitos (Windows)
+Categorías: `Clothing`, `Accessory`, `Furniture`.
 
-- **Rust** con el target `wasm32v1-none`. `rust-toolchain.toml` fija el canal
-  1.93.0 y ese target; `rustup` los instala al compilar.
-- **Stellar CLI** (`cargo install --locked stellar-cli`) y el plugin
-  **Stellar Scaffold CLI** (`cargo install --locked stellar-scaffold-cli`).
-  `npm start` verifica ambos y muestra cómo instalarlos si faltan.
-- **Docker Desktop**, solo para la red `local` (contenedor Stellar Quickstart).
-  Para Testnet no se necesita.
-- **Node.js** v22 o superior y npm.
-- **Git Bash** y **Strawberry Perl**: algunas dependencias Rust compilan OpenSSL
-  desde fuente en Windows y necesitan `perl` y un shell POSIX en el PATH.
-  Compila desde Git Bash.
+Errores: `ItemNotFound` (1), `EmptyField` (2), `AlreadyClaimed` (3), `InvalidCode` (4), `NotClaimed` (5), `SameOwner` (6).
 
-## Correr en local
+El ítem n.º 1 es de una prueba de integración, no de un producto real.
+
+## Cómo probar la demo
+
+Necesita la extensión Freighter instalada, configurada en Testnet y con una cuenta con XLM de prueba (se obtiene con Friendbot desde el propio Freighter o desde Stellar Lab). La app no maneja claves: toda firma pasa por Freighter.
+
+1. Abra el sitio y conecte Freighter con el botón de la esquina superior derecha.
+2. **Tienda** (`/tienda`): elija un producto del catálogo y pulse "Registrar unidad". Firme en Freighter. La pantalla muestra el número del ítem y el código. Cópielo: no se vuelve a mostrar.
+3. **Reclamar** (`/reclamar`): escriba el número y el código y pulse "Reclamar ítem". Firme en Freighter. Para ver el reclamo como otro comprador, cambie de cuenta en Freighter antes de reclamar.
+4. **Mi clóset** (`/closet`): el ítem aparece en la lista. Pulse "Equipar" en una prenda o accesorio para verlo en el avatar. Un mueble aparece solo en el hogar digital.
+5. **Tareas** (`/tareas`): las tareas completadas se marcan solas y suben el nivel.
+
+Casos que la app informa con un mensaje: código incorrecto, ítem ya reclamado y firma cancelada en la billetera.
+
+## Arquitectura breve
+
+```
+contracts/closet/       Contrato Soroban (Rust): lib.rs, types.rs, error.rs, storage.rs, test.rs
+contracts/reputation/   Contrato de la plantilla (no se usa en el flujo)
+app/src/closet/         Catálogo, tareas, servicio del contrato, hook useCloset, avatar y hogar
+app/src/pages/          Home, Closet, Claim, Tasks, Store (más Escrows y Debug de la plantilla)
+app-lib/                Utilidades de red y billetera (Scaffold Stellar)
+app-lib/clients/        Clientes TypeScript generados de los contratos, versionados en el repo
+environments.toml       Contratos por entorno (desarrollo y staging apuntan a Testnet)
+```
+
+Rutas de la app:
+
+| Ruta | Página |
+| --- | --- |
+| `/` | Inicio |
+| `/closet` | Mi clóset y hogar |
+| `/reclamar` | Reclamar un ítem |
+| `/tareas` | Tareas y nivel |
+| `/tienda` | Registrar unidades |
+| `/escrows`, `/debug` | De la plantilla (Escrow Studio y explorador de contratos) |
+
+App: React y Vite con Scaffold Stellar. Los clientes generados del contrato están en `app-lib/clients` y `app/.env.production` trae los valores públicos de Testnet (sin secretos). Por eso un clon compila y Vercel construye sin configurar nada.
+
+## Cómo correrlo
+
+Requisitos: Node 22 o superior, Rust (la versión se fija en `rust-toolchain.toml`) y Stellar CLI.
 
 ```bash
-git clone https://github.com/Andreszf124/Stellar_W_S_A.git
-cd Stellar_W_S_A
-cp app/.env.example .env        # ver "Variables de entorno"
-cp .env app/.env
-npm install
+npm install --ignore-scripts
 cd app
 npx vite
 ```
 
-`npx vite` solo levanta la interfaz y usa el contrato ya desplegado en Testnet
-(ver el ID arriba). El cliente del contrato se genera con el build de Scaffold
-(ver "Despliegue a Testnet") y no se versiona; un clon nuevo debe generarlo
-antes de que la app compile.
+Abra http://localhost:5173. Se usa `--ignore-scripts` porque un paquete de billeteras exige yarn en sus scripts de instalación.
 
-Evita `npm run dev` salvo que quieras desarrollar el contrato: ejecuta
-`stellar scaffold watch --build-clients`, que compila y puede desplegar de nuevo
-el contrato, lo que cambiaría su ID. Con `STELLAR_NETWORK=local` necesita Docker
-Desktop encendido. Otros scripts (en `app/`): `npm run build`, `npm run lint`,
-`npm run typecheck`.
+Advertencias:
 
-## Despliegue a Testnet
+- `npm start` ejecuta `stellar scaffold watch --build-clients`, que compila y puede volver a desplegar los contratos en Testnet. Para solo ver la interfaz use `npx vite`.
+- `npm run contracts:build` despliega los contratos en Testnet y regenera los clientes. Un despliegue nuevo cambia el ID del contrato y los ítems ya registrados no se trasladan.
 
-`scaffold.yml` define la red `testnet` con la cuenta `testnet-user` (fondeada con
-Friendbot en el primer build) y `allow-deploy: true`, y declara el contrato
-`grano-de-origen` en las redes `local` y `testnet`.
-
-1. Fijar `STELLAR_NETWORK=testnet` y los `PUBLIC_STELLAR_*` de Testnet en `.env`
-   (raíz y `app/`).
-2. Compilar, desplegar y generar el cliente (comando probado):
+## Pruebas
 
 ```bash
-stellar-scaffold build --package grano-de-origen --build-clients --network testnet
+npm run contracts:test   # cargo test de los contratos
+npm run typecheck
+npm run lint
 ```
 
-   Crea y fondea `testnet-user` si no existe, y su clave queda en `.config/`
-   (ignorado por git). El primer despliegue produjo el ID de arriba. Repetir el
-   comando no está probado y podría crear otra instancia con otro ID.
-3. Si el ID cambia, actualizarlo en este README y en `docs/DEMO.md`.
-4. Cargar lotes de ejemplo:
+Verificado hasta ahora:
 
-```bash
-export GRANO_CONTRACT_ID=CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3
-export GRANO_SOURCE=testnet-user
-node scripts/seed-lots.mjs --dry-run   # revisar los comandos
-node scripts/seed-lots.mjs
-```
+- Tests del contrato `closet`: 13 de 13 pasan.
+- Prueba real contra Testnet: registrar una unidad, reclamo correcto, código incorrecto y reclamo doble.
+- Typecheck, lint y build de la app.
+- Un clon limpio del repositorio compila.
 
-El script invoca `register_lot` con `stellar contract invoke` para tres lotes
-(Tarrazú, Naranjo, Tres Ríos). Ya se ejecutó una vez contra el contrato de
-arriba: los lotes 1 a 3 son de ejemplo. El lote 4 es una prueba de integración. Los lotes quedan a nombre de `testnet-user`, así
-que desde el navegador solo se pueden transferir los lotes que registres con tu
-propia billetera.
-
-## Variables de entorno
-
-La plantilla es `app/.env.example`. El Stellar CLI lee el `.env` de la raíz y
-Vite el de `app/`, así que debe existir una copia en ambas carpetas. Solo
-contiene configuración pública de red, sin secretos:
-
-| Variable                            | Uso                                                |
-| ----------------------------------- | -------------------------------------------------- |
-| `STELLAR_NETWORK`                   | Red de `scaffold.yml` a construir y desplegar      |
-| `XDG_CONFIG_HOME`                   | Carpeta de identidades del Stellar CLI (`.config`) |
-| `PUBLIC_STELLAR_NETWORK`            | Red usada por el frontend                          |
-| `PUBLIC_STELLAR_NETWORK_PASSPHRASE` | Passphrase de la red                               |
-| `PUBLIC_STELLAR_RPC_URL`            | RPC de Soroban                                     |
-| `PUBLIC_STELLAR_HORIZON_URL`        | Horizon                                            |
-
-Para Testnet, descomenta el bloque `TESTNET` del archivo. Nunca subas `.env` ni
-claves secretas: `.gitignore` excluye `.env`, `.env.*` (salvo `.env.example`) y
-`.config`.
-
-## Equipo
-
-- **Wilson:** contrato Soroban.
-- **Keylin:** frontend.
-- **Andrès:** producto y pitch.
+Pendiente de verificar: la interfaz en un navegador con Freighter (se está probando) y el aspecto visual.
 
 ## Créditos y licencia
 
-Creado a partir de la plantilla de
-[Scaffold Stellar](https://github.com/stellar-scaffold/cli) (The Aha Company),
-licenciada bajo Apache-2.0. Este repositorio conserva el archivo
-[LICENSE](LICENSE) y se distribuye bajo la misma licencia.
+Basado en [bitfalt/scaffold-stellar-agentic](https://github.com/bitfalt/scaffold-stellar-agentic) y en Scaffold Stellar de The Aha Company, licenciado bajo Apache License 2.0. Consulte los archivos [NOTICE](NOTICE) y [LICENSE](LICENSE) para las atribuciones y los términos completos.

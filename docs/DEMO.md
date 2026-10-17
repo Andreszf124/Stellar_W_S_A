@@ -1,86 +1,103 @@
-# Guion de demo (5:00)
+# Guion de demostración (5 minutos)
 
-Los marcadores `<...>` se completan tras el despliegue.
+Proyecto: Mascota Digital (nombre de trabajo). App beta sobre Stellar Testnet.
+Equipo: Wilson, Keylin y Andrés.
 
-| Tiempo      | Parte            | Habla  | Duración |
-| ----------- | ---------------- | ------ | -------- |
-| 0:00 - 1:00 | Problema         | Andrès | 1:00     |
-| 1:00 - 1:30 | Usuario          | Andrès | 0:30     |
-| 1:30 - 4:00 | Solución en vivo | Keylin | 2:30     |
-| 4:00 - 5:00 | Uso de Stellar   | Wilson | 1:00     |
+Sitio: https://stellar-w-s-a.vercel.app
 
-## Checklist previo (30 min antes)
+## Checklist previo (1 minuto)
 
-- [ ] Wallet del productor con fondos de Testnet (Friendbot) y red en Testnet.
-- [ ] Segunda wallet (comprador) con su dirección copiada y a mano.
-- [ ] Contrato desplegado y su ID anotado: `CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`.
-- [ ] 3 lotes cargados (`node scripts/seed-lots.mjs`) y `lot_count` = 3 verificado.
-- [ ] QR de un lote en pantalla o impreso, probado con un celular.
-- [ ] Pestaña del explorador de Testnet abierta en el contrato (`https://lab.stellar.org/r/testnet/contract/CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`).
-- [ ] Frontend corriendo (`<URL_FRONTEND>` o `npm run dev`) con `.env` en Testnet.
-- [ ] Wi-Fi probado y hotspot del celular como respaldo.
-- [ ] Plan B: video de la demo completa (máx. 2:30) listo en pantalla completa,
-      más capturas del explorador por si falla la red.
-- [ ] Ensayo cronometrado al menos dos veces.
+- [ ] Freighter instalado, en red **Testnet** y con fondos. Si no tiene, usar Friendbot: `https://friendbot.stellar.org/?addr=DIRECCION` (Freighter también lo ofrece).
+- [ ] Sitio abierto en una pestaña: https://stellar-w-s-a.vercel.app
+- [ ] Billetera conectada en el sitio (se pide al entrar a Tienda, Reclamar, Clóset o Tareas).
+- [ ] Una segunda pestaña lista en `/tienda`.
+- [ ] Plan B listo: en el PC, carpeta `scaffold-stellar-agentic\app`, comando `npx vite`, abrir http://localhost:5173.
+- [ ] Saber de antemano qué producto se va a registrar (sugerido: una prenda, por ejemplo "Chaqueta de mezclilla", y después un mueble, por ejemplo "Lámpara de mesa").
 
-## 0:00 - 1:00 Problema (Andrès)
+Nota: el ítem n.º 1 del contrato es de una prueba. Los ítems nuevos tendrán un número mayor; use el que muestre la pantalla.
 
-- El café costarricense se paga por su origen, pero el origen se cuenta, no se prueba.
-- La información de finca, cosecha y proceso vive en papeles y chats: el
-  comprador confía a ciegas y el productor no puede demostrar su trabajo.
-- Cuando un lote cambia de manos, nadie puede verificar quién lo tuvo ni cuándo.
+## Guion con tiempos
 
-## 1:00 - 1:30 Usuario (Andrès)
+### 0:00 - 0:45 Problema
 
-- Productor de Tarrazú con pocas hectáreas, un celular y poco tiempo para trámites.
-- Quiere que el comprador vea su finca y su proceso sin intermediarios.
-- Segundo usuario: el tostador que necesita confiar en el lote que compra.
+Decir:
+- "Compramos ropa y muebles reales, pero esa compra no deja nada en el mundo digital."
+- "Las tiendas no tienen forma simple de darle al comprador una versión digital de lo que vendió."
+- "Queremos que comprar un producto físico también te dé su versión digital, verificable y tuya."
 
-## 1:30 - 4:00 Solución en vivo (Keylin)
+### 0:45 - 1:30 Solución
 
-Wilson apoya con la wallet del comprador si hace falta.
+Decir:
+- "Cuando compra una prenda o un mueble, el comprador reclama su versión digital."
+- "Ese ítem queda a su nombre en la red Stellar y lo usa en su avatar y en su hogar digital."
+- "Con tareas el avatar sube de nivel."
+- "Por ahora solo vestimenta y muebles."
 
-1. (0:30) Conectar la wallet y registrar un lote nuevo: finca, cosecha, proceso.
-   Mostrar la firma y el id asignado.
-2. (0:45) Abrir la consulta pública del lote desde el QR con el celular, sin wallet.
-3. (0:45) Transferir el lote a la dirección del comprador. Mostrar que el dueño
-   cambia y que otra cuenta no puede transferirlo (error `NotOwner`).
-4. (0:30) Volver a la lista y mostrar el contador de lotes actualizado.
+### 1:30 - 4:00 Demostración en vivo
 
-Si algo falla: decirlo en una frase y pasar al video del plan B.
+Paso 1, Tienda (1:30 - 2:20). Ir a **Tienda** (`/tienda`).
+1. En "Producto", elegir un artículo del catálogo.
+2. Pulsar **Registrar unidad**.
+3. Firmar en Freighter. Dice "Esperando su firma..." mientras tanto.
+4. Aparece "Unidad registrada" con el **ítem n.º** y el **código**. Pulsar **Copiar código**.
 
-## 4:00 - 5:00 Uso de Stellar (Wilson)
+Decir: "La tienda registra una unidad. En la red solo queda la huella del código; el código se muestra una sola vez."
 
-- Mostrar la pestaña del explorador: la transacción de registro y la de transferencia.
-- Contrato Soroban en Rust con cuatro funciones; el dueño autoriza cada cambio
-  con su firma.
-- Scaffold Stellar compiló, desplegó y generó el cliente TypeScript; el frontend
-  lo consume sin backend propio.
-- Hoy en Testnet. Próximos pasos: Mainnet, evidencias del lote (hash de fotos y
-  certificaciones), historial de dueños y piloto con una cooperativa.
+Paso 2, Reclamar (2:20 - 3:10). Ir a **Reclamar** (`/reclamar`).
+1. En "Número del ítem", escribir el número que mostró la tienda.
+2. En "Código del producto", pegar el código.
+3. Pulsar **Reclamar ítem** y firmar en Freighter.
+4. Aparece "Listo, el ítem n.º X ya es suyo".
 
-## Frases clave por criterio de evaluación
+Decir: "El comprador revela el código, el contrato comprueba la huella y el ítem pasa a su nombre."
 
-**Integración con Scaffold Stellar (30%)**
+Paso 3, Mi clóset (3:10 - 3:40). Ir a **Mi clóset** (`/closet`).
+1. En "Sus ítems" pulsar **Equipar** en la prenda reclamada; el avatar se la pone.
+2. Si se reclamó un mueble, mostrarlo en "Su hogar digital".
 
-- "El contrato es nuestro único backend: Scaffold lo compila, lo despliega y
-  genera el cliente que usa la interfaz."
-- "Todo el flujo, de la wallet a la transacción, corre en Testnet y se verifica
-  en el explorador ahora mismo."
+Decir: "Las prendas se equipan en el avatar y los muebles aparecen en el hogar."
 
-**Problema real y usuario claro (25%)**
+Paso 4, Tareas (3:40 - 4:00). Ir a **Tareas** (`/tareas`).
+1. Mostrar las tareas completadas y el nivel.
 
-- "El productor vende origen, pero hoy no puede demostrarlo."
-- "Cualquiera con un celular verifica el lote en segundos, sin instalar nada."
+Decir: "Las tareas se marcan solas según lo que posee y equipa. No se hace clic para completarlas."
 
-**Demo funcional (25%)**
+Referencia de tareas (del código): reclamar el primer ítem (50 puntos), equipar una prenda o accesorio (30), reclamar un mueble (40), reunir 3 ítems (60). Un nivel cada 50 puntos.
 
-- "Esto no es un mock: cada paso es una transacción en Testnet."
-- "Registramos, consultamos por QR y transferimos: el ciclo completo del lote."
+### 4:00 - 5:00 Visión y próximos pasos
 
-**Pitch y próximos pasos (20%)**
+Decir:
+- "Hoy está probado de punta a punta en Testnet: registrar, reclamar, equipar y subir de nivel."
+- "Lo siguiente: varias tiendas aliadas, etiqueta NFC en el empaque en vez de escribir el código, mascota animal y una interfaz para regalar o transferir ítems."
+- "Es una beta. Estamos validando con 3 a 5 tiendas piloto."
+- Cierre: "Comprar algo real y tener su versión digital, a su nombre."
 
-- "Empezamos con tres datos y una transferencia porque es lo mínimo que genera
-  confianza."
-- "Siguiente: historial completo de dueños, evidencias del lote y un piloto con
-  una cooperativa de Tarrazú."
+## Si algo falla
+
+| Situación | Qué hacer |
+| --- | --- |
+| La firma tarda | En Testnet puede tardar unos segundos. Seguir hablando de lo que se está haciendo y no pulsar dos veces. |
+| Freighter no sale o no firma | Revisar que esté en Testnet y desbloqueado; reintentar una vez. |
+| Sin fondos | Friendbot: `https://friendbot.stellar.org/?addr=DIRECCION`. |
+| Error al reclamar | Revisar número y código (el código distingue lo escrito; copiarlo con el botón evita errores). Un código solo sirve una vez. |
+| El sitio no carga o sigue fallando | Pasar al plan B: `npx vite` en `scaffold-stellar-agentic\app` y abrir http://localhost:5173. |
+| Todo falla | Contar el flujo con las pantallas y decir con franqueza que es una beta en pruebas. El contrato ya fue probado de punta a punta con un script y tiene 13 tests. |
+
+## Qué NO decir
+
+- No decir que hay un marketplace con varias tiendas: hoy solo existe una página `/tienda` para registrar unidades.
+- No decir que hay pago retenido (escrow).
+- No decir que hay panel de administrador ni base de datos.
+- No decir que hay inicio de sesión con correo o Google: se usa Freighter.
+- No decir que hay etiqueta NFC: hoy el reclamo es por código escrito.
+- No decir que ya se pueden transferir ítems desde la interfaz (el contrato lo permite, la pantalla aún no).
+- No decir que la mascota es un animal: hoy es un avatar humanoide.
+- No presentar los ítems como inversión ni prometer ganancias.
+- No inventar cifras de ventas, usuarios ni ingresos.
+- Decir siempre "beta" y "Testnet" (dinero de prueba).
+
+## Datos de referencia
+
+- Contrato `closet` en Testnet: `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`
+- 13 tests del contrato; probado de punta a punta contra Testnet con un script.
+- Catálogo fijo de 13 productos: ropa, accesorios y muebles.

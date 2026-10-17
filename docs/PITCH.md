@@ -1,86 +1,87 @@
-# Pitch de Grano de Origen
+# Pitch: Mascota Digital
 
-Material para la demo del TicoChallenge. Lo que dice "existe hoy" está construido y
-verificado. Lo que dice "visión" todavía no está construido.
+Nombre de trabajo. Beta en Stellar Testnet. Equipo: Wilson, Keylin y Andrés.
 
-## 1. El problema
+## El problema y por qué importa
 
-Los pequeños productores de café no tienen cómo demostrar el origen y el recorrido de
-su grano. Sin ese historial, les cuesta acceder a mejores precios y a crédito (texto
-del TicoChallenge, reto 02).
+Una persona compra una camiseta o una lámpara en una tienda y la transacción termina ahí. La tienda no tiene un vínculo digital con lo que vendió, y el comprador no recibe nada que pueda usar en su mundo digital. Además, un código o un recibo en papel no prueban quién es el dueño de algo ni se pueden verificar por terceros.
 
-Frase para el pitch: "Hoy un comprador no puede comprobar de qué finca viene un café,
-cuándo se cosechó ni cómo se procesó, y el productor no tiene cómo demostrarlo."
+Importa porque la compra física ya ocurre; falta una capa que la conecte con experiencias digitales sin que el comprador tenga que hacer algo complicado.
 
-Pendiente de completar por el equipo: una o dos cifras reales del sector (por ejemplo,
-de ICAFE o de una cooperativa) con su fuente. No usar números sin fuente.
+## El usuario
 
-## 2. El reto y el usuario
+- Comprador: quien compra ropa o muebles y quiere su versión digital para su avatar y su hogar digital.
+- Tienda: quien vende productos físicos y quiere ofrecer algo extra con cada venta.
 
-- Reto elegido: **Grano de Origen** (tokenización de activos reales).
-- Usuarios:
-  - Productor: registra sus lotes y los entrega a un comprador.
-  - Comprador o tostador: verifica el origen antes de comprar.
-  - Consumidor final: escanea un QR y ve de dónde viene su café.
-- Una persona de ejemplo para contar en la demo (inventada, decirlo así): "Una
-  productora de Tarrazú que vende su cosecha a un tostador y quiere que su finca
-  quede registrada con su nombre."
+## La solución
 
-## 3. La solución (existe hoy)
+Al comprar una prenda, un accesorio o un mueble en una tienda, el comprador reclama la versión digital como ítem en la red Stellar. Con ese ítem viste a su avatar y decora su hogar digital. Con tareas, el avatar mejora y sube de nivel. Por ahora solo vestimenta y muebles, sin comida.
 
-1. El productor conecta su billetera y registra un lote: finca, cosecha y proceso.
-2. El lote queda grabado en Stellar y nadie puede cambiarlo ni borrarlo.
-3. Cualquiera consulta el lote por número o por QR, sin cuenta ni billetera.
-4. El productor transfiere el lote al comprador, y queda el nuevo dueño.
+Flujo que funciona hoy:
+1. La tienda registra una unidad y recibe un código de un solo uso.
+2. El comprador ingresa el número del ítem y el código para reclamarlo.
+3. El ítem queda a su nombre.
+4. En Mi clóset equipa prendas y ve su hogar con muebles.
+5. Las tareas se marcan solas según lo que posee y equipa; el nivel sube por puntos.
 
-Contrato desplegado en Testnet:
-`CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`
+## Cómo se usa Stellar
 
-## 4. La visión de crecimiento (no existe todavía)
+- Propiedad verificable: el contrato `closet` guarda quién es el dueño de cada ítem; cualquiera puede consultarlo. El contrato también permite transferir un ítem (la interfaz para hacerlo aún no existe).
+- Huella del código: en la red solo se guarda el sha256 del código de un solo uso. Al reclamar, el comprador revela el código y el contrato comprueba que coincida. Leer la red no basta para reclamar un ítem.
+- Contrato en Testnet: `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`. Tiene 13 tests y fue probado de punta a punta contra Testnet con un script.
+- Cada registro y cada reclamo los firma la persona con su billetera (Freighter).
 
-**Marketplace de productos físicos de emprendedores y artistas, con una mascota digital.**
+## Modelo de negocio (hipótesis a validar)
 
-- Cada compra genera un NFT: la mascota digital del comprador.
-- Mientras llega el pedido, la mascota "crece" con los hitos del envío (preparación,
-  despacho, entrega) y le va contando la historia del negocio: la finca, el taller o
-  el artista.
-- Una etiqueta NFC en el empaque abre, al tocarla con el teléfono, la página del lote
-  o del NFT y verifica que el producto es auténtico.
-- El pago puede quedar retenido hasta que se confirme la entrega (escrow).
-- El café es el primer producto. El mismo modelo sirve para cualquier producto físico
-  con origen que contar.
+Nada de esto está validado ni tiene cifras. Son opciones a probar con tiendas piloto:
 
-Hipótesis de negocio (a validar, no confirmadas): comisión por venta, venta de etiquetas
-NFC y plan para emprendedores.
+- Comisión por venta a la tienda.
+- Plan mensual para tiendas.
+- Ítems digitales especiales o colecciones limitadas.
+- Regalías en la reventa entre usuarios.
+- Marcas que patrocinan tareas o colecciones.
+- Venta de etiquetas NFC o QR.
 
-## 5. Cómo respondemos a cada criterio de evaluación
+Referencia verificable: Trustless Work cobra 0,3% por liberar un pago (dato de las notas del taller). Sirve solo como punto de comparación de cómo se cobra en esta red; no es nuestro modelo.
 
-| Criterio | Peso | Evidencia que tenemos | Brecha | Qué hacer |
-|---|---|---|---|---|
-| Integración con Scaffold Stellar | 30% | Proyecto creado con `stellar scaffold init`; contrato registrado en `scaffold.yml`; despliegue y cliente TypeScript generados con `stellar-scaffold build --build-clients`; cliente versionado para que un clon compile; conexión de billetera con el kit de Scaffold; CI con tests, clippy y wasm | No usamos los eventos en vivo, aunque el contrato ya emite `LotRegistered` y `LotTransferred` y `app-lib` trae `subscribeToEvents` | Mostrar un feed de lotes en vivo con los eventos. Es pequeño y se nota |
-| Problema real y usuario claro | 25% | Problema tomado del reto; tres usuarios definidos | Faltan cifras con fuente y una voz real de productor | Una cifra con fuente y, si se puede, una frase de un productor o cooperativa |
-| Demostración funcional | 25% | Contrato en Testnet, 3 lotes de ejemplo, flujo probado de punta a punta contra la red con un script | **Nunca se probó en el navegador con una billetera real.** El QR usa la dirección de la página, así que desde `localhost` un celular no lo abre | Probar con Freighter. Publicar la web (por ejemplo en Vercel) para que el QR funcione en celulares |
-| Pitch y próximos pasos | 20% | Guion de 5 minutos en `docs/DEMO.md`; visión del marketplace | Falta ensayar con cronómetro | Ensayar dos veces y mostrar el roadmap de abajo |
+## Riesgos
 
-## 6. Próximos pasos (para la diapositiva final)
+- Arranque de dos lados: sin tiendas no hay ítems, y sin compradores las tiendas no se interesan. Mitigación a probar: piloto con 3 a 5 tiendas.
+- Legal en Costa Rica: protección de datos (Ley 8968), derechos del consumidor (Ley 7472) y facturación digital. Hay que validarlo con un abogado.
+- Menores de edad: el público de avatares y mascotas puede incluirlos; requiere criterio propio.
+- No presentar los ítems como inversión: son artículos de uso, no un producto financiero.
+- Es una beta en Testnet: el dinero es de prueba y la interfaz se sigue ensayando con la billetera.
+
+## Próximos pasos
 
 Corto plazo:
-- Publicar la web para que los QR funcionen desde cualquier celular.
-- Entrar sin billetera, con correo o Google (por ejemplo, con Cavos).
-- Historial de transferencias y página "Mis lotes".
+- Ensayar la interfaz de punta a punta con Freighter y pulir lo que falle.
+- Conseguir 3 a 5 tiendas piloto.
+- Interfaz para transferir ítems (el contrato ya lo permite).
 
 Mediano plazo:
-- Pago retenido hasta la entrega con escrow (por ejemplo, con Trustless Work).
-- Mascota digital ligada al estado del pedido.
-- Etiqueta NFC en el empaque.
-- Panel de administrador con reportes.
+- Marketplace con varias tiendas aliadas.
+- Etiqueta NFC en el empaque para reclamar sin escribir el código.
+- Mascota con arte animal en lugar del avatar humanoide.
+- Inicio de sesión con correo o Google para quien no tiene billetera.
+- Base de datos y panel de administrador.
 
 Largo plazo:
-- Abrir el marketplace a otros emprendedores y artistas.
-- Pagos con stablecoin y paso a mainnet.
+- Pago retenido con escrow ligado a la entrega del producto.
+- Colecciones limitadas y tareas patrocinadas por marcas.
+- Validar el modelo de negocio y el marco legal antes de abrir a más público.
 
-## 7. Lo que no hay que decir
+## Existe hoy / Aún no
 
-- No decir que hay un marketplace, una mascota o NFC: es visión.
-- No decir que la app se probó con billetera real hasta que se pruebe.
-- No dar cifras de mercado sin fuente.
+| Existe hoy | Aún no |
+| --- | --- |
+| Contrato `closet` en Testnet (13 tests) | Marketplace con varias tiendas aliadas |
+| Página Tienda: registrar una unidad y obtener código de un solo uso | Pago retenido con escrow |
+| Solo la huella sha256 del código queda en la red | Panel de administrador |
+| Reclamar un ítem con número y código | Base de datos |
+| Ítem a nombre del comprador | Inicio de sesión con correo o Google |
+| Mi clóset: equipar prendas y accesorios en el avatar | Mascota con arte animal (hoy avatar humanoide) |
+| Hogar digital con muebles | Interfaz para transferir ítems (el contrato sí lo permite) |
+| Tareas que se marcan solas y nivel por puntos | Etiqueta NFC en el empaque (hoy el reclamo es por código escrito) |
+| Catálogo fijo de 13 productos (ropa, accesorios, muebles) | Comida u otras categorías |
+| Prueba de punta a punta contra Testnet con un script | Prueba de la interfaz con Freighter terminada (se está ensayando) |

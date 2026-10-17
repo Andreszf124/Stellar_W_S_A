@@ -1,52 +1,54 @@
-import React from "react"
 import { Link } from "react-router-dom"
-import { PlusIcon, SearchIcon, TransferIcon } from "../components/Icons"
-import styles from "./Home.module.css"
+import styles from "../closet/closet.module.css"
 
-const ACTIONS = [
+const STEPS = [
 	{
-		to: "/registrar",
-		title: "Registrar un lote",
-		text: "Soy productor y quiero dejar constancia del origen de mi café.",
-		icon: <PlusIcon size={24} />,
+		title: "Compre en una tienda",
+		text: "Cada producto de ropa o muebles trae un código de un solo uso.",
 	},
 	{
-		to: "/lote",
-		title: "Consultar un lote",
-		text: "Quiero saber de dónde viene el café. No necesito billetera.",
-		icon: <SearchIcon size={24} />,
+		title: "Reclame su ítem digital",
+		text: "Escriba el código y el ítem queda a su nombre en la red Stellar.",
 	},
 	{
-		to: "/transferir",
-		title: "Transferir un lote",
-		text: "Soy productor y quiero entregar la propiedad a un comprador.",
-		icon: <TransferIcon size={24} />,
+		title: "Vista y decore",
+		text: "Equipe a su avatar, decore su hogar y suba de nivel con tareas.",
 	},
 ]
 
-const Home: React.FC = () => (
-	<div className={styles.Home}>
-		<section className={styles.intro}>
-			<h1>Grano de Origen</h1>
-			<p>
-				Hoy es difícil comprobar de qué finca viene un café, cuándo se cosechó y
-				cómo se procesó. Con Grano de Origen el productor registra cada lote en
-				Stellar y cualquier comprador puede verificarlo, sin intermediarios y
-				sin que nadie pueda cambiar el historial.
-			</p>
-		</section>
+const Home = () => (
+	<div className={styles.page}>
+		<h1>Lo que compra, también en su mundo digital</h1>
+		<p className={styles.lead}>
+			Cada prenda o mueble que compra en una tienda le da su versión digital
+			para su avatar y su hogar. Con tareas, usted lo hace crecer.
+		</p>
 
-		<ul className={styles.actions}>
-			{ACTIONS.map(({ to, title, text, icon }) => (
-				<li key={to}>
-					<Link to={to} className={styles.action}>
-						<span className={styles.actionIcon}>{icon}</span>
-						<span className={styles.actionTitle}>{title}</span>
-						<span className={styles.actionText}>{text}</span>
-					</Link>
+		<div className={styles.actions}>
+			<Link
+				to="/reclamar"
+				className={`${styles.linkButton} ${styles.linkButtonPrimary}`}
+			>
+				Reclamar un ítem
+			</Link>
+			<Link to="/closet" className={styles.linkButton}>
+				Ver mi clóset
+			</Link>
+		</div>
+
+		<ol className={styles.steps}>
+			{STEPS.map((step) => (
+				<li key={step.title}>
+					<h2>{step.title}</h2>
+					<p>{step.text}</p>
 				</li>
 			))}
-		</ul>
+		</ol>
+
+		<p className={styles.muted}>
+			¿Tiene una tienda? Registre sus unidades en{" "}
+			<Link to="/tienda">Tienda</Link>.
+		</p>
 	</div>
 )
 

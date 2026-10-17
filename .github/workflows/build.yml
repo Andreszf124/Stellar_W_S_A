@@ -2,7 +2,7 @@ name: Build and test
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "mascota"]
   pull_request:
 
 env:
@@ -10,7 +10,7 @@ env:
 
 jobs:
   contract:
-    name: Contract (test, clippy, wasm)
+    name: Contract (test, fmt, clippy, wasm)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
       - name: Install Rust toolchain
         run: |
           rustup toolchain install 1.93.0 --profile minimal \
-            --component clippy --target wasm32v1-none
+            --component clippy --component rustfmt --target wasm32v1-none
 
       - uses: actions/cache@v4
         with:
@@ -30,12 +30,14 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Format
+        run: cargo fmt --all -- --check
       - name: Test
-        run: cargo test -p grano-de-origen --locked
+        run: cargo test -p closet --locked
       - name: Clippy
-        run: cargo clippy -p grano-de-origen --all-targets --locked -- -D warnings
+        run: cargo clippy -p closet --all-targets --locked -- -D warnings
       - name: Build wasm
-        run: cargo build -p grano-de-origen --target wasm32v1-none --release --locked
+        run: cargo build -p closet --target wasm32v1-none --release --locked
 
   app:
     name: App (lint, typecheck, build)
@@ -46,14 +48,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       # A transitive wallet dependency runs `yarn setup` on install, so skip
       # install scripts.
-      - run: npm ci --ignore-scripts
+      - run: npm install --ignore-scripts --no-audit --no-fund
 
-      # The generated contract client is versioned in app-lib/clients, so the app
-      # builds without redeploying the contract.
+      # The generated contract clients are versioned in app-lib/clients and the
+      # public Testnet settings are in app/.env.production, so the app builds
+      # without redeploying anything.
       - name: Lint
         run: npm run lint --workspace app
       - name: Typecheck and build

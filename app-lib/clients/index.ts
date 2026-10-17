@@ -2,7 +2,8 @@
 // Regenerated on every build/redeploy from your deployed contracts.
 // To customize a client, import it into your own code instead.
 
-import { Client as GranoDeOrigen } from "./grano-de-origen/dist/index.js"
+import { Client as Reputation } from "./reputation/dist/index.js"
+import { Client as Closet } from "./closet/dist/index.js"
 
 export const options = {
 	networkPassphrase: "Test SDF Network ; September 2015",
@@ -11,7 +12,12 @@ export const options = {
 	publicKey: undefined,
 }
 
-export const granoDeOrigen = new GranoDeOrigen({
+export const reputation = new Reputation({
 	...options,
-	contractId: "CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3",
+	contractId: "CB5VHRXKO6CPFKSELKIHN3JJXMLQUDRCEBKDCCVRMZW7A534YLYIRK45",
+})
+
+export const closet = new Closet({
+	...options,
+	contractId: "CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO",
 })

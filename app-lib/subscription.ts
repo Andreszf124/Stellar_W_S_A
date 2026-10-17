@@ -20,6 +20,11 @@ const server = new Server(rpcUrl, { allowHttp: stellarNetwork === "LOCAL" })
  * Subscribe to events for a given topic from a given contract. Returns a
  * cleanup function that stops polling when called.
  *
+ * `topic` is the event's first topic: for `#[contractevent] struct VoteCast`
+ * that's the snake_case name, "vote_cast". The trailing "**" also matches
+ * events that carry extra `#[topic]` fields (without it, RPC only matches
+ * events with exactly one topic, so most events never arrive).
+ *
  * Framework-agnostic — wrap in useEffect, $effect, watchEffect, etc.
  */
 export function subscribeToEvents(
@@ -51,7 +56,7 @@ export function subscribeToEvents(
 							filters: [
 								{
 									contractIds: [contractId],
-									topics: [[xdr.ScVal.scvSymbol(topic).toXDR("base64")]],
+									topics: [[xdr.ScVal.scvSymbol(topic).toXDR("base64"), "**"]],
 									type: "contract",
 								},
 							],
@@ -63,7 +68,7 @@ export function subscribeToEvents(
 							filters: [
 								{
 									contractIds: [contractId],
-									topics: [[xdr.ScVal.scvSymbol(topic).toXDR("base64")]],
+									topics: [[xdr.ScVal.scvSymbol(topic).toXDR("base64"), "**"]],
 									type: "contract",
 								},
 							],

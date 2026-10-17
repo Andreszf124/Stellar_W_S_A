@@ -4,11 +4,11 @@
 //! enumeration of all the token IDs in the contract as well as all the token
 //! IDs owned by each account.
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String};
+use soroban_sdk::{Address, Env, String, contract, contractimpl, contracttype};
 use stellar_tokens::non_fungible::{
+    Base, NonFungibleToken,
     burnable::NonFungibleBurnable,
     enumerable::{Enumerable, NonFungibleEnumerable},
-    Base, NonFungibleToken,
 };
 
 #[contracttype]
@@ -27,8 +27,11 @@ impl ExampleContract {
     }
 
     pub fn mint(e: &Env, to: Address) -> u32 {
-        let owner: Address =
-            e.storage().instance().get(&DataKey::Owner).expect("owner should be set");
+        let owner: Address = e
+            .storage()
+            .instance()
+            .get(&DataKey::Owner)
+            .expect("owner should be set");
         owner.require_auth();
         Enumerable::sequential_mint(e, &to)
     }

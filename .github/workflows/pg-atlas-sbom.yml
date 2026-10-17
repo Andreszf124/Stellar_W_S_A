@@ -1,4 +1,4 @@
-name: Submit SBOM to PG Atlas
+﻿name: Submit SBOM to PG Atlas
 on:
   push:
     branches: [main]

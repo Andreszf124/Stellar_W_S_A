@@ -6,14 +6,14 @@
 //! accounts.
 
 use soroban_sdk::{
-    contract, contractimpl, symbol_short, Address, Env, MuxedAddress, String, Symbol, Vec,
+    Address, Env, MuxedAddress, String, Symbol, Vec, contract, contractimpl, symbol_short,
 };
 use stellar_access::access_control::{self as access_control, AccessControl};
 use stellar_macros::only_role;
 use stellar_tokens::fungible::{
+    Base, FungibleToken,
     allowlist::{AllowList, FungibleAllowList},
     burnable::FungibleBurnable,
-    Base, FungibleToken,
 };
 
 #[contract]
