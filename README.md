@@ -84,8 +84,8 @@ La UI depende solo de la interfaz `LotService`; el cliente generado
 ## Correr en local
 
 ```bash
-git clone https://github.com/EZunigaF/grano-de-origen.git
-cd grano-de-origen
+git clone https://github.com/Andreszf124/Stellar_W_S_A.git
+cd Stellar_W_S_A
 cp app/.env.example .env        # ver "Variables de entorno"
 cp .env app/.env
 npm install
