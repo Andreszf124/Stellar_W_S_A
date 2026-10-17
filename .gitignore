@@ -38,6 +38,11 @@ lerna-debug.log*
 # generated contract bindings + clients (Binding packages and flattened index.ts)
 app-lib/clients/*
 !app-lib/clients/.gitkeep
+# The deployed contract's client is versioned so a fresh clone compiles without
+# redeploying (scaffold regenerates it with the same content).
+!app-lib/clients/index.ts
+!app-lib/clients/grano-de-origen/
+!app-lib/clients/grano-de-origen/dist/
 
 # Agent/editor scratch
 .claude/
