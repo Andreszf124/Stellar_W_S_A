@@ -11,6 +11,7 @@ import {
 	networkPassphrase,
 	stellarNetwork,
 } from "@stellar-scaffold/app-lib"
+import { closet } from "@stellar-scaffold/app-lib/clients"
 import { type SignTransactionFn } from "../cavos/context"
 import { friendlyError } from "./closetService"
 
@@ -103,3 +104,12 @@ export async function payXlm({
 /** Link to a transaction on the public explorer (Testnet by default). */
 export const txUrl = (hash: string) =>
 	`https://stellar.expert/explorer/${stellarNetwork === "PUBLIC" ? "public" : "testnet"}/tx/${hash}`
+
+const explorer = `https://stellar.expert/explorer/${stellarNetwork === "PUBLIC" ? "public" : "testnet"}`
+
+/** Link to an account on the public explorer. */
+export const accountUrl = (address: string) => `${explorer}/account/${address}`
+
+/** Link to the `closet` contract, where every item NFT lives. */
+export const closetContractUrl = () =>
+	`${explorer}/contract/${closet.options.contractId}`

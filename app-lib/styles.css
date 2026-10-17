@@ -1,17 +1,36 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Inconsolata:wght@500&display=swap");
 
 :root {
-	--color-bg: #fffaf3;
-	--color-surface: #fff1e0;
-	--color-text: #3b2a22;
-	--color-text-muted: #6b5548;
-	--color-border: #ecd9c4;
-	--color-accent: #b8431f;
-	--color-success: #146c43;
-	--color-error: #b3261e;
-	--color-warning: #b86e00;
+	/* Dark "space" palette (Nebula Wear reference). Components use only these tokens. */
+	--color-bg: #070b18;
+	--color-surface: #0d1326;
+	--color-card: #111a33;
+	--color-card-2: #16213f;
+	--color-field: #0d1326;
+	--color-text: #e8ecff;
+	--color-text-muted: #9aa6d0;
+	--color-border: #24305a;
+	--color-border-strong: #4a5a94;
+	--color-accent: #8b5cf6;
+	--color-accent-strong: #6d28d9;
+	--color-accent-2: #22d3ee;
+	--color-on-accent: #ffffff;
+	--color-success: #34d399;
+	--color-success-bg: rgba(52, 211, 153, 0.12);
+	--color-success-fg: #6ee7b7;
+	--color-error: #f87171;
+	--color-error-bg: rgba(248, 113, 113, 0.12);
+	--color-error-fg: #fca5a5;
+	--color-warning: #fbbf24;
+	--color-warning-bg: rgba(251, 191, 36, 0.12);
+	--color-warning-fg: #fcd34d;
+	--color-gradient: linear-gradient(
+		135deg,
+		var(--color-accent),
+		var(--color-accent-strong)
+	);
 	--radius: 14px;
-	--shadow: 0 4px 16px rgba(120, 70, 30, 0.1);
+	--shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
 *,
@@ -24,13 +43,26 @@ body {
 	margin: 0;
 	overflow-x: hidden;
 	font-family: Inter, system-ui, sans-serif;
-	background: var(--color-bg);
+	background:
+		radial-gradient(
+			900px 500px at 85% -10%,
+			rgba(139, 92, 246, 0.22),
+			transparent 60%
+		),
+		radial-gradient(
+			700px 400px at -10% 20%,
+			rgba(34, 211, 238, 0.12),
+			transparent 60%
+		),
+		var(--color-bg);
+	background-attachment: fixed;
 	color: var(--color-text);
 	line-height: 1.6;
+	min-height: 100vh;
 }
 
 a {
-	color: var(--color-accent);
+	color: var(--color-accent-2);
 }
 
 a:has(button) {
@@ -40,9 +72,9 @@ a:has(button) {
 code {
 	font-family: Inconsolata, monospace;
 	font-size: 0.9em;
-	background: var(--color-surface);
+	background: var(--color-card-2);
 	padding: 0.1em 0.3em;
-	border-radius: 3px;
+	border-radius: 6px;
 	border: 1px solid var(--color-border);
 }
 
@@ -52,13 +84,14 @@ button {
 	padding: 0.4rem 0.9rem;
 	border-radius: var(--radius);
 	border: 1px solid var(--color-border);
-	background: var(--color-surface);
+	background: var(--color-card);
 	color: var(--color-text);
 	cursor: pointer;
 }
 
 button:hover:not(:disabled) {
-	background: var(--color-border);
+	background: var(--color-card-2);
+	border-color: var(--color-border-strong);
 }
 
 button:disabled {
@@ -74,18 +107,18 @@ input:not([type]) {
 	padding: 0.5rem 0.75rem;
 	border-radius: var(--radius);
 	border: 1px solid var(--color-border);
-	background: var(--color-bg);
+	background: var(--color-field);
 	color: var(--color-text);
 	width: 100%;
 }
 
 input:focus {
-	outline: 2px solid var(--color-accent);
+	outline: 2px solid var(--color-accent-2);
 	outline-offset: -1px;
 }
 
 .card {
-	background: var(--color-bg);
+	background: var(--color-card);
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius);
 	padding: 1.5rem;
@@ -96,13 +129,16 @@ dialog {
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius);
 	padding: 1.5rem;
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+	background: var(--color-surface);
+	color: var(--color-text);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 	max-width: 400px;
 	width: 100%;
 }
 
 dialog::backdrop {
-	background: rgba(0, 0, 0, 0.4);
+	background: rgba(3, 6, 15, 0.75);
+	backdrop-filter: blur(4px);
 }
 
 /* ── Shared component classes ───────────────────────────────────────────────
@@ -111,8 +147,9 @@ dialog::backdrop {
 
 /* NetworkPill */
 .network-pill {
-	background-color: #f0f2f5;
-	color: #4a5362;
+	background-color: var(--color-card);
+	border: 1px solid var(--color-border);
+	color: var(--color-text-muted);
 	padding: 4px 10px;
 	border-radius: 16px;
 	font-size: 12px;
@@ -148,7 +185,7 @@ dialog::backdrop {
 }
 
 .network-dot--disconnected {
-	background-color: #c1c7d0;
+	background-color: var(--color-border-strong);
 }
 
 /* ConnectAccount */
@@ -168,6 +205,28 @@ dialog::backdrop {
 .wallet-balance {
 	font-size: 0.875rem;
 	color: var(--color-text-muted);
+}
+
+/* The XLM balance as the reference's wallet chip: a green dot and the amount. */
+.wallet-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.3rem 0.8rem;
+	border: 1px solid var(--color-border);
+	border-radius: 999px;
+	background: var(--color-card);
+	color: var(--color-text);
+	font-weight: 600;
+}
+
+.wallet-chip::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--color-success);
+	box-shadow: 0 0 8px var(--color-success);
 }
 
 .wallet-profile {
@@ -237,13 +296,13 @@ dialog code {
 }
 
 .wallet-primary {
-	background: var(--color-accent);
-	border-color: var(--color-accent);
-	color: white;
+	background: var(--color-gradient);
+	border-color: transparent;
+	color: var(--color-on-accent);
 	font-weight: 600;
 }
 
 .wallet-primary:hover:not(:disabled) {
-	background: var(--color-accent);
+	background: var(--color-gradient);
 	filter: brightness(1.1);
 }

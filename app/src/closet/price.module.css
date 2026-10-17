@@ -1,0 +1,18 @@
+.price {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.1rem 0.5rem;
+}
+
+.xlm {
+	font-size: 1.25em;
+	font-weight: 800;
+	color: var(--color-text);
+}
+
+.usd {
+	font-size: 0.75em;
+	color: var(--color-text-muted);
+	white-space: nowrap;
+}

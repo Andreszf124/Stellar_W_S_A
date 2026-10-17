@@ -52,7 +52,7 @@ export const WalletButton = () => {
 
 	return (
 		<div className="wallet-connected" style={{ opacity: isPending ? 0.6 : 1 }}>
-			<span className="wallet-balance">
+			<span className="wallet-chip" title="Saldo de su billetera en XLM">
 				{balances?.xlm?.balance ?? "-"} XLM
 			</span>
 

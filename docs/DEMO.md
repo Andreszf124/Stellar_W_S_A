@@ -1,121 +1,78 @@
-# Guion de demostración (5 minutos)
+# Guion de demostración (4 minutos)
 
-Proyecto: Mascota Digital (nombre de trabajo). App beta sobre Stellar Testnet.
-Equipo: Wilson, Keylin y Andrés.
+Proyecto: Mascota Digital. App beta sobre Stellar Testnet, con el diseño de
+Nebula Wear.
 
-Sitio: https://stellar-w-s-a.vercel.app
+## Antes de empezar
 
-## Checklist previo (1 minuto)
+- [ ] `cd app && npx vite` y abrir http://localhost:5173 (o el sitio publicado).
+- [ ] Para la parte con Stellar real: Freighter instalado, en **Testnet**, con
+      XLM de prueba (Friendbot).
+- [ ] Un código de una unidad sembrada (los tiene el equipo en un CSV local)
+      para el reclamo.
 
-- [ ] Freighter instalado, en red **Testnet** y con fondos. Si no tiene, usar Friendbot: `https://friendbot.stellar.org/?addr=DIRECCION` (Freighter también lo ofrece).
-- [ ] Sitio abierto en una pestaña: https://stellar-w-s-a.vercel.app
-- [ ] Billetera conectada en el sitio (se pide al entrar a Mi negocio, Comprar, Reclamar, Clóset o Misiones).
-- [ ] Una segunda pestaña lista en `/tienda`.
-- [ ] Plan B listo: en el PC, carpeta `scaffold-stellar-agentic\app`, comando `npx vite`, abrir http://localhost:5173.
-- [ ] Saber de antemano qué producto se va a registrar (sugerido: una prenda, por ejemplo "Chaqueta de mezclilla", y después un mueble, por ejemplo "Lámpara de mesa").
+## Parte 1: modo demo, sin billetera (2 minutos)
 
-Nota: el ítem n.º 1 del contrato es de una prueba anterior; las 100 unidades sembradas (20 tipos x 5) son las siguientes. Para reclamar sirve el código de una unidad nueva registrada en `/tienda` (el código se muestra una sola vez) o uno de los códigos sembrados del CSV local `scripts/out/` (lo tiene el equipo; no está en el repo). Use el número que muestre la pantalla.
+Decir: "Cualquiera puede probar el flujo sin instalar nada. Es una demo: el pago
+es simulado."
 
-La interfaz con Freighter y su aspecto a 390 px y 1280 px se están ensayando: ensayar el guion completo antes de presentar.
+1. **Tienda** (`/`): el banner muestra el flujo Tienda → Pedidos → Mi avatar →
+   Billetera. Mostrar los filtros (incluidos Hogar y Mascotas) y los precios en
+   XLM.
+2. Pulsar **Comprar y recibir NFT** en un producto. A la izquierda se ve el
+   avatar probándose el producto.
+3. Pagar con **XLM** (simulado), escribir nombre y dirección (las mascotas no
+   piden envío). Mostrar los pasos y el recibo.
+4. **Pedidos** (`/pedidos`): el pedido con método, dirección y estado de envío
+   simulado.
+5. **Mi avatar** (`/avatar`): el ítem llegó al instante; equiparlo, cambiar piel
+   y cabello, descargar el SVG.
 
-## Guion con tiempos
+## Parte 2: con billetera, Stellar real (2 minutos)
 
-### 0:00 - 0:45 Problema
+Decir: "Al conectar una billetera, el pago se firma en ella y el ítem es del
+contrato en Stellar."
 
-Decir:
-- "Compramos ropa y muebles reales, pero esa compra no deja nada en el mundo digital."
-- "Las tiendas no tienen forma simple de darle al comprador una versión digital de lo que vendió."
-- "Queremos que comprar un producto físico también te dé su versión digital, verificable y tuya."
-
-### 0:45 - 1:30 Solución
-
-Decir:
-- "Cuando compra una prenda o un mueble, el comprador reclama su versión digital."
-- "Ese ítem queda a su nombre en la red Stellar y lo usa en su avatar y en su hogar digital."
-- "Todo se paga en XLM, y con misiones se desbloquean productos de cada negocio."
-- "Por ahora solo vestimenta y muebles."
-
-### 1:30 - 4:15 Demostración en vivo
-
-Paso 1, Mi negocio (1:30 - 2:15). Ir a **Mi negocio** (`/tienda`).
-1. En "Producto", elegir un artículo del catálogo.
-2. Pulsar **Registrar unidad**.
-3. Firmar en Freighter. Dice "Esperando su firma..." mientras tanto.
-4. Aparece "Unidad registrada" con el **ítem n.º** y el **código**. Pulsar **Copiar código**.
-
-Decir: "La tienda registra una unidad. En la red solo queda la huella del código; el código se muestra una sola vez."
-
-Paso 2, Reclamar (2:15 - 3:00). Ir a **Reclamar** (`/reclamar`).
-1. En "Número del ítem", escribir el número que mostró la tienda.
-2. En "Código del producto", pegar el código.
-3. Pulsar **Reclamar ítem** y firmar en Freighter.
-4. Aparece "Listo, el ítem n.º X ya es suyo".
-
-Decir: "El comprador revela el código, el contrato comprueba la huella y el ítem pasa a su nombre."
-
-Paso 3, Mi clóset (3:00 - 3:30). Ir a **Mi clóset** (`/closet`).
-1. En "Sus ítems" pulsar **Equipar** en la prenda reclamada; el avatar se la pone.
-2. Si se reclamó un mueble, mostrarlo en "Su hogar digital".
-
-Decir: "Las prendas se equipan en el avatar y los muebles aparecen en el hogar."
-
-Paso 4, Misiones (3:30 - 3:45). Ir a **Misiones** (`/tareas`).
-1. Mostrar el avance y los productos que desbloquea cada misión.
-
-Decir: "El avance se calcula solo según lo que posee y equipa. El bloqueo de productos lo verifica la app, no la red."
-
-Paso 5, Negocios (3:45 - 4:00). Ir a **Negocios** (`/tiendas`) y abrir el perfil de uno.
-1. Mostrar su historia, sus productos y sus misiones.
-
-Decir: "Cada negocio crea sus productos, su perfil y sus misiones desde Mi negocio. Los 3 del directorio son de EJEMPLO."
-
-Paso 6, Mascotas (4:00 - 4:15). Ir a **Mascotas** (`/mascotas`).
-1. Elegir una de las 6 mascotas (perro, gato, conejo, zorro, panda, pájaro).
-
-Decir: "Es una beta: la mascota se elige y se guarda en el navegador, pero la ropa todavía se equipa en el avatar humano."
-
-Referencia de tareas (del código): reclamar el primer ítem (50 puntos), equipar una prenda o accesorio (30), reclamar un mueble (40), reunir 3 ítems (60). Un nivel cada 50 puntos.
-
-### 4:15 - 5:00 Visión y próximos pasos
-
-Decir:
-- "Hoy está probado de punta a punta en Testnet: registrar, reclamar, equipar y subir de nivel."
-- "Lo siguiente: varias tiendas aliadas, etiqueta NFC en el empaque en vez de escribir el código, mascota que se vista y suba de nivel, y una interfaz para regalar o transferir ítems."
-- "Es una beta. Estamos validando con 3 a 5 tiendas piloto."
-- Cierre: "Comprar algo real y tener su versión digital, a su nombre."
+1. Conectar la billetera con el botón de arriba a la derecha. El saldo aparece
+   como chip y el banner de demo desaparece.
+2. **Tienda**: ahora se ve el stock real leído del contrato. Comprar con
+   **XLM**: la billetera pide la firma, el recibo trae el enlace de la
+   transacción en stellar.expert.
+3. **Pedidos**: el pedido queda "NFT por reclamar". Escribir el código del
+   producto y pulsar **Reclamar mi NFT** (firma en la billetera). Pasa a "NFT
+   reclamado".
+4. **Mi avatar**: el ítem aparece en el guardarropa; equiparlo.
+5. **Billetera**: saldo en XLM, dirección, contrato de ítems y "Cómo funciona en
+   Stellar".
 
 ## Si algo falla
 
-| Situación | Qué hacer |
-| --- | --- |
-| La firma tarda | En Testnet puede tardar unos segundos. Seguir hablando de lo que se está haciendo y no pulsar dos veces. |
-| Freighter no sale o no firma | Revisar que esté en Testnet y desbloqueado; reintentar una vez. |
-| Se perdió el código | Usar otro de los códigos sembrados del CSV local, o registrar una unidad nueva en `/tienda`. |
-| Sin fondos | Friendbot: `https://friendbot.stellar.org/?addr=DIRECCION`. |
-| Error al reclamar | Revisar número y código (el código distingue lo escrito; copiarlo con el botón evita errores). Un código solo sirve una vez. |
-| El sitio no carga o sigue fallando | Pasar al plan B: `npx vite` en `scaffold-stellar-agentic\app` y abrir http://localhost:5173. |
-| Todo falla | Contar el flujo con las pantallas y decir con franqueza que es una beta en pruebas. El contrato ya fue probado de punta a punta con un script y tiene 13 tests. |
+| Situación                     | Qué hacer                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| La firma tarda                | En Testnet puede tardar unos segundos. No pulsar dos veces.                        |
+| La billetera no sale          | Revisar que esté en Testnet y desbloqueada.                                        |
+| Sin fondos                    | Botón "+ XLM de prueba" en Billetera, o Friendbot.                                 |
+| Código incorrecto al reclamar | Copiarlo de nuevo; solo sirve una vez por unidad.                                  |
+| No hay stock en la tienda     | Las unidades sembradas se agotaron: registrar más con `scripts/seed-products.mjs`. |
+| Todo falla                    | Pasar al modo demo (desconectar la billetera) y contar el flujo con él.            |
 
 ## Qué NO decir
 
-- No decir que hay varias tiendas aliadas reales: el directorio trae 3 negocios de EJEMPLO y el resto los crea cualquiera desde `/tienda` (Mi negocio).
-- No decir que hay pago retenido (escrow): la compra en XLM es un pago directo.
-- No decir que las misiones ni el panel de negocio son seguros: el bloqueo por misiones y el dueño del negocio se verifican en la app, no en la red.
-- No decir que los datos de Supabase están protegidos: las altas de productos, misiones y perfiles son abiertas (sin inicio de sesión), solo sirven como demo en Testnet. No se guarda progreso de usuario en la base.
-- No decir que la app entrega el código de reclamo: lo entrega el negocio.
-- No decir que hay inicio de sesión con correo o Google: se usa Freighter.
-- No decir que hay etiqueta NFC: hoy el reclamo es por código escrito.
-- No decir que ya se pueden transferir ítems desde la interfaz (el contrato lo permite, la pantalla aún no).
-- No decir que la mascota se viste o sube de nivel: las 6 mascotas solo se eligen (beta); la ropa va en el avatar humano.
-- No decir que la interfaz ya fue verificada en navegador con Freighter ni a 390 px y 1280 px: se está ensayando.
-- No presentar los ítems como inversión ni prometer ganancias.
-- No inventar cifras de ventas, usuarios ni ingresos.
+- No decir que el envío es real: es simulado. La única moneda es XLM.
+- No decir que el modo demo crea NFT en Stellar: son ítems locales de este
+  navegador.
+- No decir que hay pago retenido (escrow) ni devoluciones: el pago en XLM es
+  directo.
+- No decir que la app entrega el código de reclamo: lo entrega la tienda con el
+  producto.
+- No decir que ya está verificado con una billetera real de punta a punta ni a
+  390 px.
+- No presentar los ítems como inversión ni inventar cifras de ventas o usuarios.
 - Decir siempre "beta" y "Testnet" (dinero de prueba).
 
 ## Datos de referencia
 
-- Contrato `closet` en Testnet: `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`
-- 13 tests del contrato; probado de punta a punta contra Testnet con un script.
-- Catálogo fijo de 20 tipos de producto: ropa, accesorios y muebles.
-- 100 unidades de prueba sembradas (20 tipos x 5), cada una con su código; los códigos están en un CSV local del equipo.
-- CI: contrato (formato, tests, clippy, wasm) y app (lint, tipos, build).
+- Contrato `closet` en Testnet:
+  `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`
+- Catálogo fijo: 13 productos que se visten en el avatar, con precio en XLM, más
+  6 mascotas.

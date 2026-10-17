@@ -181,15 +181,21 @@ export const HAIR_COLORS = [
 
 export const DEFAULT_LOOK: Look = { skin: "#e0ac69", hair: "#3b2a20" }
 
-const SHIRT = "#e5e7eb"
-const PANTS = "#374151"
-const INK = "#1f2937"
-
-/** The avatar wearing the given items, as an SVG string. */
-export function avatarSvg(wear: Wear[], look: Look = DEFAULT_LOOK) {
+/**
+ * The avatar wearing the given items, as an SVG string. With `mannequin` it is
+ * a neutral grey figure with no hair, the way the shop shows a product on its own.
+ */
+export function avatarSvg(
+	wear: Wear[],
+	look: Look = DEFAULT_LOOK,
+	mannequin = false,
+) {
 	// The colors are injected into the SVG, so they are checked as hex first.
-	const SKIN = safe(look.skin)
+	const SKIN = mannequin ? "#64748b" : safe(look.skin)
 	const HAIR = safe(look.hair)
+	const SHIRT = mannequin ? "#475569" : "#e5e7eb"
+	const PANTS = mannequin ? "#334155" : "#374151"
+	const INK = mannequin ? "#334155" : "#1f2937"
 	const bySlot = new Map<string, Wear>()
 	wear.forEach((w) => bySlot.set(w.slot, w))
 	const draw = (slot: string) => {
@@ -231,18 +237,22 @@ export function avatarSvg(wear: Wear[], look: Look = DEFAULT_LOOK) {
 		`<circle cx="66" cy="72" r="6" fill="${SKIN}"/><circle cx="134" cy="72" r="6" fill="${SKIN}"/>`,
 	)
 	parts.push(`<circle cx="100" cy="68" r="34" fill="${SKIN}"/>`)
-	parts.push(
-		`<path d="M66 66 C62 28 138 28 134 66 C128 50 114 42 100 44 C86 42 72 50 66 66 Z" fill="${HAIR}"/>`,
-	)
+	if (!mannequin) {
+		parts.push(
+			`<path d="M66 66 C62 28 138 28 134 66 C128 50 114 42 100 44 C86 42 72 50 66 66 Z" fill="${HAIR}"/>`,
+		)
+	}
 	parts.push(
 		`<circle cx="88" cy="70" r="3.5" fill="${INK}"/><circle cx="112" cy="70" r="3.5" fill="${INK}"/>`,
 	)
 	parts.push(
 		`<path d="M89 84 Q100 93 111 84" stroke="${INK}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
 	)
-	parts.push(
-		`<circle cx="80" cy="81" r="4" fill="#f87171" opacity=".25"/><circle cx="120" cy="81" r="4" fill="#f87171" opacity=".25"/>`,
-	)
+	if (!mannequin) {
+		parts.push(
+			`<circle cx="80" cy="81" r="4" fill="#f87171" opacity=".25"/><circle cx="120" cy="81" r="4" fill="#f87171" opacity=".25"/>`,
+		)
+	}
 	// Glasses first, so hats and headphones sit on top of the glasses arms.
 	;["eyes", "hat", "ears"].forEach((slot) => parts.push(draw(slot)))
 

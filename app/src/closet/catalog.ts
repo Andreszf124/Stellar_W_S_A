@@ -18,7 +18,7 @@ export interface Model {
 	category: CategoryTag
 	slot: Slot
 	color: string
-	/** Price in XLM, the reference currency. It lives in the app, not in the contract. */
+	/** Price in XLM (Stellar Lumens), what the buyer pays. */
 	priceXlm: number
 	/** One short sentence for the shop card. */
 	desc: string
@@ -234,29 +234,21 @@ export const SLOT_LABEL: Record<Slot, string> = {
 
 export const SLOT_ORDER = Object.keys(SLOT_LABEL) as Slot[]
 
-/**
- * A product a business sells. The built-in `MODELS` have no `store` and any
- * business can register units of them. A custom product is made by one
- * business (`store` = its address) from a base design: it keeps the base
- * `key`, `slot` and `category` and sets its own name, color, price and text.
- */
-export interface Product extends Model {
-	store?: string
+/** A shop filter: the avatar slots it groups, in the order the shop shows them. */
+export interface ShopFilter {
+	id: string
+	label: string
+	slots: Slot[]
 }
 
-/**
- * Finds the product an on-chain item name refers to. A custom product of the
- * same store wins, then any custom product with that name, then the built-in
- * models.
- */
-export function lookupProduct(
-	products: Product[],
-	name: string,
-	store?: string,
-): Product | undefined {
-	return (
-		products.find((p) => p.store && p.name === name && p.store === store) ??
-		products.find((p) => p.store && p.name === name) ??
-		products.find((p) => !p.store && p.name === name)
-	)
-}
+export const SHOP_FILTERS: ShopFilter[] = [
+	{ id: "hats", label: "Gorros", slots: ["hat"] },
+	{ id: "eyewear", label: "Lentes", slots: ["eyes"] },
+	{ id: "tops", label: "Prendas", slots: ["top", "legs"] },
+	{ id: "shoes", label: "Calzado", slots: ["feet"] },
+	{ id: "accessories", label: "Accesorios", slots: ["ears", "neck"] },
+	{ id: "home", label: "Hogar", slots: ["furniture"] },
+]
+
+/** What the shop sells besides pets: what goes on the avatar and what furnishes the home. */
+export const SHOP_MODELS = MODELS

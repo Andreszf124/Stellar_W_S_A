@@ -1,79 +1,56 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react"
-import { Link } from "react-router-dom"
-import {
-	CATEGORY_LABEL,
-	MODELS,
-	type CategoryTag,
-	type Product,
-} from "../closet/catalog"
+import { useSearchParams } from "react-router-dom"
+import { SHOP_FILTERS, SHOP_MODELS, type Model } from "../closet/catalog"
 import {
 	friendlyError,
 	listItems,
 	type ClosetItem,
 } from "../closet/closetService"
 import { Avatar, ModelThumb } from "../closet/components"
-import { lockingMission, type Mission } from "../closet/missions"
-import { formatXlm } from "../closet/money"
-import styles from "../closet/shop.module.css"
-import { useBusinesses } from "../closet/useBusinesses"
-import { useMissions, useUserProgress } from "../closet/useMissions"
-import { useProducts } from "../closet/useProducts"
+import { useAccount } from "../closet/demo"
+import { PETS, PetSvg, useOwnedPets, usePet, type Pet } from "../closet/pets"
+import Price from "../closet/Price"
+import { useCloset } from "../closet/useCloset"
 import { useWallet } from "../hooks/useWallet"
+import { platformAddress } from "../trustless/config"
 
 const ProductCheckout = lazy(() => import("../closet/ProductCheckout"))
+const PetCheckout = lazy(() => import("../closet/PetCheckout"))
 
-// Same page size as the catalog page, so both share one cache.
 const PAGE_SIZE = 24
 const MAX_UNITS = 120
 
-type Filter = "all" | CategoryTag
-
-const FILTERS: { id: Filter; label: string }[] = [
-	{ id: "all", label: "Todo" },
-	{ id: "Clothing", label: "Ropa" },
-	{ id: "Accessory", label: "Accesorios" },
-	{ id: "Furniture", label: "Muebles" },
-]
-
 const STEPS = [
-	"Elija un producto y pague en XLM con su billetera.",
-	"La tienda le entrega el código de un solo uso.",
-	"Reclame el ítem y vístalo en su avatar o su hogar.",
+	"Compre un producto y pague en XLM",
+	"Reciba su ítem NFT en Stellar",
+	"Equípelo en su avatar",
 ]
 
-const FEATURED = MODELS.find((m) => m.key === "hoodie") ?? MODELS[0]
-
-const productId = (p: Product) => `${p.store ?? ""}|${p.key}|${p.name}`
-
-interface Offer {
-	/** Units this person can buy now, oldest first. */
-	open: ClosetItem[]
-	/** A mission that locks at least one unit, if any. */
-	lockedBy?: Mission
-	/** Businesses that have units of it, open or locked. */
-	sellers: string[]
+const HeroAvatar = ({ address }: { address: string }) => {
+	const { wear, look } = useCloset(address)
+	return <Avatar wear={wear} look={look} />
 }
 
 const Shop = () => {
-	const { address } = useWallet()
-	const { products }: { products: Product[] } = useProducts()
-	const { missions } = useMissions()
-	const { progress, isLoading: progressLoading } = useUserProgress(
-		address ?? undefined,
-	)
-	const { byWallet, nameOf } = useBusinesses()
-	const [filter, setFilter] = useState<Filter>("all")
-	const [buying, setBuying] = useState<{
-		product: Product
-		units: ClosetItem[]
-	}>()
-	const [needWallet, setNeedWallet] = useState(false)
+	const { address, isDemo } = useAccount()
+	const { items: owned } = useCloset(address)
+	const { address: wallet } = useWallet()
+	const [params, setParams] = useSearchParams()
+	const filter = params.get("c") ?? "all"
+	const setFilter = (id: string) => setParams(id === "all" ? {} : { c: id })
+	const { petKey, setPet } = usePet()
+	const { isOwned } = useOwnedPets(address)
+	const [buyingPet, setBuyingPet] = useState<Pet>()
+	const [buying, setBuying] = useState<{ product: Model; unit?: ClosetItem }>()
 	const opener = useRef<HTMLButtonElement | null>(null)
 
+	// The stock is read from the contract. In demo mode nothing is bought on the
+	// network, so the shop stays open and there is nothing to read.
 	const query = useInfiniteQuery({
 		queryKey: ["closet", "products"],
 		initialPageParam: 0,
+		enabled: !isDemo,
 		queryFn: ({ pageParam }) => listItems(pageParam, PAGE_SIZE),
 		getNextPageParam: (last, pages) => {
 			const loaded = pages.length * PAGE_SIZE
@@ -91,6 +68,7 @@ const Shop = () => {
 	const { hasNextPage, isFetchingNextPage, fetchNextPage, error } = query
 	useEffect(() => {
 		if (
+			!isDemo &&
 			hasNextPage &&
 			!isFetchingNextPage &&
 			!error &&
@@ -98,7 +76,14 @@ const Shop = () => {
 		) {
 			void fetchNextPage()
 		}
-	}, [hasNextPage, isFetchingNextPage, error, loaded.length, fetchNextPage])
+	}, [
+		isDemo,
+		hasNextPage,
+		isFetchingNextPage,
+		error,
+		loaded.length,
+		fetchNextPage,
+	])
 
 	// Units still for sale per product name, oldest first.
 	const unclaimed = useMemo(() => {
@@ -110,92 +95,44 @@ const Shop = () => {
 		return byName
 	}, [loaded])
 
-	// What each product offers this person: free units, locked ones and sellers.
-	const offers = useMemo(() => {
-		const map = new Map<string, Offer>()
-		for (const product of products) {
-			const units = (unclaimed.get(product.name) ?? []).filter(
-				(u) => !product.store || u.store === product.store,
-			)
-			const open: ClosetItem[] = []
-			let lockedBy: Mission | undefined
-			for (const unit of units) {
-				const lock = lockingMission(
-					missions,
-					progress,
-					product.name,
-					unit.store,
-				)
-				if (lock) lockedBy ??= lock
-				else open.push(unit)
-			}
-			map.set(productId(product), {
-				open,
-				lockedBy,
-				sellers: [...new Set(units.map((u) => u.store))],
-			})
-		}
-		return map
-	}, [products, unclaimed, missions, progress])
-
-	const shown = products.filter(
-		(p) => filter === "all" || p.category === filter,
-	)
-	const incomplete = total > loaded.length
+	const slots = SHOP_FILTERS.find((f) => f.id === filter)?.slots
+	const showPets = filter === "all" || filter === "pets"
+	const shown =
+		filter === "pets"
+			? []
+			: SHOP_MODELS.filter((m) => !slots || slots.includes(m.slot))
+	// With a wallet the pet is paid to the platform account, which must be set.
+	const canBuyPet = isDemo || Boolean(wallet && platformAddress)
+	const incomplete = !isDemo && total > loaded.length
+	const checking = !isDemo && query.isLoading
 
 	const buy = (
-		product: Product,
-		open: ClosetItem[],
+		product: Model,
+		unit: ClosetItem | undefined,
 		button: HTMLButtonElement,
 	) => {
-		if (open.length === 0) return
-		if (!address) {
-			setNeedWallet(true)
-			return
-		}
-		setNeedWallet(false)
 		opener.current = button
-		// A snapshot: the list changes when the payment refreshes the stock, and
-		// the open window must keep showing its receipt.
-		setBuying({ product, units: open })
-	}
-
-	const sellerLine = (product: Product, sellers: string[]) => {
-		const wallets =
-			product.store && sellers.length === 0 ? [product.store] : sellers
-		const [wallet] = wallets
-		if (!wallet) return null
-		if (wallets.length > 1) {
-			return (
-				<p className={styles.seller}>Vendido por {wallets.length} negocios</p>
-			)
-		}
-		const ref = byWallet(wallet)?.ref
-		return (
-			<p className={styles.seller}>
-				Vendido por{" "}
-				{ref ? (
-					<Link to={`/tiendas/${encodeURIComponent(ref)}`}>
-						{nameOf(wallet)}
-					</Link>
-				) : (
-					nameOf(wallet)
-				)}
-			</p>
-		)
+		// A snapshot: the stock refreshes after the payment and the open window
+		// must keep showing its receipt.
+		setBuying({ product, unit })
 	}
 
 	return (
-		<div className={styles.page}>
-			<section className={styles.hero}>
+		<section className="view">
+			<div className="hero">
 				<div>
-					<span className={styles.pill}>Stellar Testnet</span>
-					<h1>Compre lo real. Vístalo en su mundo digital.</h1>
-					<p className={styles.lead}>
-						Cada producto que compra en una tienda trae su versión digital para
-						su avatar o su hogar. Aquí paga en XLM con su billetera.
+					<span className="pill">Stellar Testnet</span>
+					<h1>
+						Compre lo real.
+						<br />
+						Vístalo en el metaverso.
+					</h1>
+					<p>
+						Cada producto físico que compra llega a su puerta <em>y</em> trae un
+						ítem NFT en la red Stellar. Use sus ítems para vestir a su avatar.
+						Todo se paga en XLM (Stellar Lumens) con su billetera.
 					</p>
-					<ol className={styles.heroSteps}>
+					<ol className="hero-steps">
 						{STEPS.map((step, i) => (
 							<li key={step}>
 								<b>{i + 1}</b> {step}
@@ -203,27 +140,21 @@ const Shop = () => {
 						))}
 					</ol>
 				</div>
-				<div className={styles.heroArt} aria-hidden="true">
-					{FEATURED && (
-						<Avatar
-							wear={[
-								{
-									slot: FEATURED.slot,
-									key: FEATURED.key,
-									color: FEATURED.color,
-								},
-							]}
-						/>
-					)}
+				<div className="hero-avatar">
+					<HeroAvatar key={address} address={address} />
 				</div>
-			</section>
+			</div>
 
-			<div className={styles.filters} role="group" aria-label="Categoría">
-				{FILTERS.map((f) => (
+			<div className="filters" role="group" aria-label="Categoría">
+				{[
+					{ id: "all", label: "Todo" },
+					...SHOP_FILTERS,
+					{ id: "pets", label: "Mascotas" },
+				].map((f) => (
 					<button
 						key={f.id}
 						type="button"
-						className={styles.chip}
+						className="chip"
 						aria-pressed={filter === f.id}
 						onClick={() => setFilter(f.id)}
 					>
@@ -232,18 +163,13 @@ const Shop = () => {
 				))}
 			</div>
 
-			{needWallet && (
-				<p className={styles.notice} role="status">
-					Conecte su billetera con el botón de la parte superior para comprar.
+			{checking && (
+				<p role="status" className="muted">
+					Revisando qué hay disponible en la red...
 				</p>
 			)}
-			{query.isLoading && (
-				<p role="status" className={styles.muted}>
-					Revisando qué hay disponible...
-				</p>
-			)}
-			{query.error && (
-				<div className={styles.errorBox} role="alert">
+			{!isDemo && query.error && (
+				<div className="error" role="alert">
 					<p>{friendlyError(query.error)}</p>
 					<button type="button" onClick={() => void query.refetch()}>
 						Reintentar
@@ -251,72 +177,121 @@ const Shop = () => {
 				</div>
 			)}
 			{incomplete && !query.error && (
-				<p className={styles.muted} role="status">
+				<p className="muted" role="status">
 					Se han revisado {loaded.length} de {total} unidades; puede haber más
 					disponibles.
 				</p>
 			)}
 
-			<ul className={styles.grid}>
+			<ul className="grid">
 				{shown.map((product) => {
-					const offer = offers.get(productId(product))
-					const open = offer?.open ?? []
-					const lockedBy = open.length === 0 ? offer?.lockedBy : undefined
-					const checking = query.isLoading || progressLoading
+					const units = unclaimed.get(product.name) ?? []
+					const [unit] = units
+					const available = isDemo || Boolean(unit)
+					const ownedCount = owned.filter((i) => i.name === product.name).length
 					return (
-						<li key={productId(product)} className={styles.card}>
-							<div className={styles.thumb}>
+						<li key={product.key} className="panel product">
+							<div className="thumb">
 								<ModelThumb model={product} />
+								{ownedCount > 0 && (
+									<span className="badge">
+										✓ Ya tiene {ownedCount} NFT{ownedCount > 1 ? "s" : ""}
+									</span>
+								)}
 							</div>
 							<h3>{product.name}</h3>
-							<span className={styles.badge}>
-								{CATEGORY_LABEL[product.category]}
-							</span>
-							<p className={styles.desc}>{product.desc}</p>
-							<p className={styles.price}>
-								<strong>{formatXlm(product.priceXlm)}</strong>
-							</p>
-							{sellerLine(product, offer?.sellers ?? [])}
-							{lockedBy && !checking ? (
-								<p className={styles.locked}>
-									Bloqueado por misión:{" "}
-									<Link to="/tareas">{lockedBy.title}</Link>
-									{!address &&
-										" Conecte su billetera para ver si ya la cumplió."}
-								</p>
-							) : (
-								<p className={open.length ? styles.stock : styles.out}>
-									{checking
-										? "Revisando..."
-										: open.length
-											? `${open.length} disponible${open.length > 1 ? "s" : ""}`
+							<p className="desc">{product.desc}</p>
+							<Price xlm={product.priceXlm} />
+							<p className={available ? "stock" : "out"}>
+								{checking
+									? "Revisando..."
+									: isDemo
+										? "Disponible (demo)"
+										: unit
+											? `${units.length} disponible${units.length > 1 ? "s" : ""}`
 											: "Agotado"}
-								</p>
-							)}
+							</p>
 							<button
 								type="button"
-								className={styles.buy}
-								disabled={open.length === 0}
-								onClick={(e) => buy(product, open, e.currentTarget)}
+								className="btn block"
+								disabled={!available || checking}
+								onClick={(e) => buy(product, unit, e.currentTarget)}
 							>
-								{lockedBy && !checking ? "Bloqueado" : "Comprar"}
+								Comprar y recibir NFT
 							</button>
 						</li>
 					)
 				})}
 			</ul>
 
-			<p className={styles.muted}>
-				Todos los precios están en XLM. ¿Ya tiene un código?{" "}
-				<Link to="/reclamar">Reclame su ítem</Link>.
-			</p>
+			{showPets && (
+				<>
+					<h2 className="section-title">Mascotas</h2>
+					{!canBuyPet && (
+						<p className="notice" role="note">
+							Las compras de mascotas están desactivadas: falta definir{" "}
+							<code>PUBLIC_PLATFORM_ADDRESS</code> en <code>app/.env</code>, la
+							dirección que recibe sus pagos.
+						</p>
+					)}
+					<ul className="grid">
+						{PETS.map((pet) => {
+							const mine = isOwned(pet.key) || petKey === pet.key
+							const selected = petKey === pet.key
+							return (
+								<li key={pet.key} className="panel product">
+									<div className="thumb pet-thumb">
+										<PetSvg petKey={pet.key} size={160} />
+										{selected && <span className="badge">✓ Su mascota</span>}
+									</div>
+									<h3>
+										{pet.name} <span className="muted">· {pet.species}</span>
+									</h3>
+									<p className="desc">{pet.description}</p>
+									<Price xlm={pet.priceXlm} />
+									{mine ? (
+										<button
+											type="button"
+											className="btn block"
+											aria-pressed={selected}
+											onClick={() => setPet(pet.key)}
+										>
+											{selected ? "Elegida" : "Elegir"}
+										</button>
+									) : (
+										<button
+											type="button"
+											className="btn block"
+											disabled={!canBuyPet}
+											onClick={() => setBuyingPet(pet)}
+										>
+											Comprar mascota
+										</button>
+									)}
+								</li>
+							)
+						})}
+					</ul>
+				</>
+			)}
 
-			{buying && address && (
+			{buyingPet && (
+				<Suspense fallback={null}>
+					<PetCheckout
+						key={buyingPet.key}
+						pet={buyingPet}
+						address={address}
+						onClose={() => setBuyingPet(undefined)}
+					/>
+				</Suspense>
+			)}
+
+			{buying && (
 				<Suspense fallback={null}>
 					<ProductCheckout
-						key={productId(buying.product)}
+						key={`${buying.product.key}-${buying.unit?.id ?? "demo"}`}
 						product={buying.product}
-						units={buying.units}
+						unit={buying.unit}
 						address={address}
 						onClose={() => {
 							setBuying(undefined)
@@ -325,7 +300,7 @@ const Shop = () => {
 					/>
 				</Suspense>
 			)}
-		</div>
+		</section>
 	)
 }
 

@@ -1,4 +1,4 @@
-/** XLM is the reference currency of the whole app: every price is in XLM. */
+/** Every price in the app is in XLM (Stellar Lumens), the currency of the network. */
 export const formatXlm = (amount: number) =>
 	`${amount.toLocaleString("es", { maximumFractionDigits: 2 })} XLM`
 

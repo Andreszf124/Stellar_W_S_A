@@ -8,7 +8,6 @@ import {
 	type Wear,
 } from "./avatarArt"
 import { type Model } from "./catalog"
-import styles from "./closet.module.css"
 
 // The SVG strings come from avatarArt.ts, built only from the fixed catalog
 // with hex-checked colors, never from user input.
@@ -16,27 +15,22 @@ export const Avatar = ({
 	wear,
 	look,
 	label = "Su avatar",
+	mannequin = false,
 }: {
 	wear: Wear[]
 	look?: Look
 	label?: string
+	/** A neutral grey figure, the way a product looks on its own in the shop. */
+	mannequin?: boolean
 }) => (
 	<div
-		className={styles.avatar}
 		role="img"
 		aria-label={label}
-		dangerouslySetInnerHTML={{ __html: avatarSvg(wear, look) }}
+		dangerouslySetInnerHTML={{ __html: avatarSvg(wear, look, mannequin) }}
 	/>
 )
 
-/** A product on its own: furniture in the room, everything else on the avatar. */
-export const ModelThumb = ({ model }: { model: Model }) =>
-	model.slot === "furniture" ? (
-		<HomeScene furniture={[{ key: model.key, color: model.color }]} />
-	) : (
-		<Avatar wear={[{ slot: model.slot, key: model.key, color: model.color }]} />
-	)
-
+/** The digital home with the given furniture in it. */
 export const HomeScene = ({
 	furniture,
 	label = "Su hogar digital",
@@ -45,12 +39,26 @@ export const HomeScene = ({
 	label?: string
 }) => (
 	<div
-		className={styles.scene}
 		role="img"
 		aria-label={label}
 		dangerouslySetInnerHTML={{ __html: roomSvg(furniture) }}
 	/>
 )
+
+/** A product on its own: furniture in the room, the rest on the neutral figure. */
+export const ModelThumb = ({ model }: { model: Model }) =>
+	model.slot === "furniture" ? (
+		<HomeScene
+			label={model.name}
+			furniture={[{ key: model.key, color: model.color }]}
+		/>
+	) : (
+		<Avatar
+			mannequin
+			label={model.name}
+			wear={[{ slot: model.slot, key: model.key, color: model.color }]}
+		/>
+	)
 
 /** Shows the page only when a wallet is connected. */
 export const WalletRequired = ({
@@ -61,7 +69,7 @@ export const WalletRequired = ({
 	const { address } = useWallet()
 	if (!address) {
 		return (
-			<p className={styles.notice} role="status">
+			<p className="notice" role="status">
 				Conecte su billetera con el botón de la parte superior para continuar.
 			</p>
 		)

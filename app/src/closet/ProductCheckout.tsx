@@ -1,40 +1,28 @@
-import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { CATEGORY_LABEL, type Product } from "./catalog"
-import styles from "./checkout.module.css"
+import { CATEGORY_LABEL, type Model } from "./catalog"
 import { type ClosetItem } from "./closetService"
 import { Avatar, HomeScene } from "./components"
-import { saveOrder } from "./orders"
+import { addDemoItem, isDemoAddress } from "./demo"
+import { shortAddress } from "./money"
+import { newOrderId, saveOrder } from "./orders"
 import PayDialog from "./PayDialog"
-import { useBusinesses } from "./useBusinesses"
 import { useCloset } from "./useCloset"
 
 interface Props {
-	product: Product
-	/** Units already unlocked for this person, oldest first. */
-	units: ClosetItem[]
+	product: Model
+	/** The unit that is bought: the oldest one still for sale. None in demo mode. */
+	unit?: ClosetItem
+	/** The connected wallet, or the demo visitor. */
 	address: string
 	onClose: () => void
 }
 
-const ProductCheckout = ({ product, units, address, onClose }: Props) => {
+/** The payment window for one product, with the avatar trying it on. */
+const ProductCheckout = ({ product, unit, address, onClose }: Props) => {
 	const { wear, look, furniture } = useCloset(address)
-	const { byWallet, nameOf } = useBusinesses()
-	const stores = useMemo(() => [...new Set(units.map((u) => u.store))], [units])
-	const [store, setStore] = useState(stores[0] ?? "")
-	const [paid, setPaid] = useState(false)
-
-	const unit = units.find((u) => u.store === store) ?? units[0]
-	if (!unit) return null
-
-	const profile = byWallet(unit.store)
-	const sellerLink = profile && (
-		<Link to={`/tiendas/${encodeURIComponent(profile.ref)}`}>
-			{nameOf(unit.store)}
-		</Link>
-	)
-
 	const isFurniture = product.slot === "furniture"
+	const demo = isDemoAddress(address)
+
 	const tryOn = [
 		...wear.filter((w) => w.slot !== product.slot),
 		{ slot: product.slot, key: product.key, color: product.color },
@@ -42,17 +30,22 @@ const ProductCheckout = ({ product, units, address, onClose }: Props) => {
 
 	return (
 		<PayDialog
-			key={unit.id}
 			title={product.name}
 			subtitle={
-				<>
-					{CATEGORY_LABEL[product.category]} · ítem n.º {unit.id} · Vendido por{" "}
-					{sellerLink ?? nameOf(unit.store)}
-				</>
+				demo || !unit ? (
+					<>{CATEGORY_LABEL[product.category]} · modo demo</>
+				) : (
+					<>
+						{CATEGORY_LABEL[product.category]} · ítem n.º {unit.id} · Tienda{" "}
+						{shortAddress(unit.store)}
+					</>
+				)
 			}
 			priceXlm={product.priceXlm}
-			to={unit.store}
-			memo={`Closet n.${unit.id}`}
+			shipping
+			demo={demo}
+			to={unit?.store ?? ""}
+			memo={`Closet n.${unit?.id ?? 0}`}
 			preview={
 				isFurniture ? (
 					<HomeScene
@@ -66,50 +59,54 @@ const ProductCheckout = ({ product, units, address, onClose }: Props) => {
 				)
 			}
 			caption={
-				isFurniture ? "Así se vería en su hogar" : "Así se vería su avatar"
+				isFurniture
+					? `Vista previa: su hogar con ${product.name}`
+					: `Vista previa: su avatar con ${product.name}`
 			}
-			extra={
-				stores.length > 1 ? (
-					<div className={styles.sellerPick}>
-						<label htmlFor="buy-from">Comprar a</label>
-						<select
-							id="buy-from"
-							value={unit.store}
-							disabled={paid}
-							onChange={(e) => setStore(e.target.value)}
-						>
-							{stores.map((s) => (
-								<option key={s} value={s}>
-									{nameOf(s)}
-								</option>
-							))}
-						</select>
-						{sellerLink && <span>Ver el perfil de {sellerLink}</span>}
-					</div>
-				) : undefined
-			}
-			onPaid={(hash) => {
-				setPaid(true)
+			onPaid={(result) => {
+				// Demo: the item is delivered at once, as a local item. With a wallet
+				// it is the contract's unit, claimed later with the code.
+				const item = demo
+					? addDemoItem(product.name, product.category)
+					: undefined
+				const itemId = item?.id ?? unit?.id
+				if (itemId === undefined) return
 				saveOrder(address, {
-					itemId: unit.id,
+					id: newOrderId(),
+					itemId,
 					name: product.name,
-					store: unit.store,
-					priceXlm: product.priceXlm,
-					hash,
+					store: item?.store ?? unit?.store ?? "",
+					method: result.method,
+					priceXlm: result.xlm,
+					hash: result.hash,
 					date: Date.now(),
+					shipping: result.shipping,
 				})
 			}}
-			invalidate={[["closet", "products"]]}
+			invalidate={[["closet"]]}
 			successText={
-				<>
-					La tienda le entregará el código de un solo uso del ítem n.º {unit.id}
-					. Con ese código lo reclama y pasa a ser suyo.
-				</>
+				demo ? (
+					<>
+						Su pedido de demostración quedó registrado y su ítem NFT de prueba
+						ya está en su guardarropa. Conecte una billetera para comprar de
+						verdad en Stellar Testnet.
+					</>
+				) : (
+					<>
+						Su pedido quedó registrado. La tienda le entrega el código de un
+						solo uso del ítem n.º {unit?.id} junto con el producto; con ese
+						código lo reclama en Pedidos y su ítem NFT pasa a ser suyo.
+					</>
+				)
 			}
 			successActions={
 				<>
-					<Link to="/pedidos">Ver mis pedidos</Link>
-					<Link to="/reclamar">Reclamar un ítem</Link>
+					{demo && (
+						<Link to="/avatar">
+							{isFurniture ? "Ver en mi hogar" : "Equipar en mi avatar"}
+						</Link>
+					)}
+					<Link to="/pedidos">Ir a mis pedidos</Link>
 				</>
 			}
 			onClose={onClose}

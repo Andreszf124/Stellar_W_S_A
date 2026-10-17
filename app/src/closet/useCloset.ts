@@ -8,9 +8,9 @@ import {
 	type Look,
 	type Wear,
 } from "./avatarArt"
+import { findModel } from "./catalog"
 import { itemsOf, type ClosetItem } from "./closetService"
-import { completedTaskIds, levelOf, levelProgress, pointsFor } from "./tasks"
-import { useProducts } from "./useProducts"
+import { isDemoAddress, loadDemoItems } from "./demo"
 
 type Equipped = Record<string, number>
 
@@ -57,23 +57,27 @@ function save(address: string, equipped: Equipped) {
 }
 
 /**
- * The owner's items from the contract, what the avatar wears (saved in this
- * browser) and the level that comes from the tasks they completed.
+ * The owner's items from the contract and what the avatar wears (saved in this
+ * browser). Without an address it still returns the default avatar, so the shop
+ * can show one before anyone connects a wallet.
  */
-export function useCloset(address: string) {
+export function useCloset(address: string | undefined) {
 	const query = useQuery({
 		queryKey: ["closet", address],
-		queryFn: () => itemsOf(address),
+		// The demo visitor's items are local; a wallet's come from the contract.
+		queryFn: () =>
+			isDemoAddress(address) ? loadDemoItems() : itemsOf(address ?? ""),
+		enabled: Boolean(address),
 	})
-	const { find: findProduct } = useProducts()
-	const find = (item: ClosetItem) => findProduct(item.name, item.store)
-	const [equipped, setEquipped] = useState<Equipped>(() => load(address))
-	const [look, setLookState] = useState<Look>(() => loadLook(address))
+	const key = address ?? ""
+	const find = (item: ClosetItem) => findModel(item.name)
+	const [equipped, setEquipped] = useState<Equipped>(() => load(key))
+	const [look, setLookState] = useState<Look>(() => loadLook(key))
 
 	const setLook = (change: Partial<Look>) => {
 		const next = { ...look, ...change }
 		setLookState(next)
-		saveLook(address, next)
+		if (address) saveLook(address, next)
 	}
 
 	const items: ClosetItem[] = query.data ?? []
@@ -99,7 +103,7 @@ export function useCloset(address: string) {
 
 	const toggleEquip = (item: ClosetItem) => {
 		const model = find(item)
-		if (!model || model.slot === "furniture") return
+		if (!model || model.slot === "furniture" || !address) return
 		const next = { ...equipped }
 		if (next[model.slot] === item.id) delete next[model.slot]
 		else next[model.slot] = item.id
@@ -107,28 +111,20 @@ export function useCloset(address: string) {
 		save(address, next)
 	}
 
-	const done = completedTaskIds({
-		itemCount: items.length,
-		equippedCount: wear.length,
-		furnitureCount: furniture.length,
-	})
-	const points = pointsFor(done)
-
 	return {
 		items,
-		/** The product (artwork, price, store) an owned item refers to. */
+		/** The design an owned item refers to. */
 		find,
 		isLoading: query.isLoading,
+		isFetching: query.isFetching,
 		error: query.error,
+		refetch: query.refetch,
 		wear,
 		wornIds,
+		/** Furniture that furnishes the home. */
 		furniture,
 		toggleEquip,
 		look,
 		setLook,
-		done,
-		points,
-		level: levelOf(points),
-		progress: levelProgress(points),
 	}
 }

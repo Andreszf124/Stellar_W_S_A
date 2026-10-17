@@ -89,7 +89,7 @@
 }
 
 .primary {
-	background: var(--color-accent);
+	background: var(--color-accent-strong);
 	border-color: var(--color-accent);
 	color: white;
 	font-weight: 600;
@@ -97,7 +97,7 @@
 }
 
 .primary:hover:not(:disabled) {
-	background: var(--color-accent);
+	background: var(--color-accent-strong);
 	filter: brightness(1.1);
 }
 
@@ -140,7 +140,7 @@
 
 .warn {
 	border-color: var(--color-warning);
-	color: #b36b00;
+	color: var(--color-warning-fg);
 }
 
 .actions {
