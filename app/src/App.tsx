@@ -1,15 +1,24 @@
 import { labPrefix } from "@stellar-scaffold/app-lib"
-import { NavLink, Outlet, Route, Routes } from "react-router-dom"
+import { Link, Outlet, Route, Routes } from "react-router-dom"
 import styles from "./App.module.css"
+import { AppNav } from "./components/AppNav"
 import ConnectAccount from "./components/ConnectAccount"
+import { BeanIcon } from "./components/Icons"
 import Debug from "./pages/Debug"
 import Home from "./pages/Home"
+import LotLookup from "./pages/LotLookup"
+import RegisterLot from "./pages/RegisterLot"
+import TransferLot from "./pages/TransferLot"
 
 function App() {
 	return (
 		<Routes>
 			<Route element={<AppLayout />}>
 				<Route path="/" element={<Home />} />
+				<Route path="/registrar" element={<RegisterLot />} />
+				<Route path="/lote" element={<LotLookup />} />
+				<Route path="/lote/:id" element={<LotLookup />} />
+				<Route path="/transferir" element={<TransferLot />} />
 				<Route path="/debug" element={<Debug />} />
 				<Route path="/debug/:contractName" element={<Debug />} />
 			</Route>
@@ -20,18 +29,11 @@ function App() {
 const AppLayout = () => (
 	<div className={styles.AppLayout}>
 		<header className={styles.header}>
-			<span className={styles.logo}>Scaffold</span>
-			<nav className={styles.headerNav}>
-				<NavLink
-					to="/debug"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Contract Explorer
-				</NavLink>
-				<a href={labPrefix()} target="_blank" rel="noreferrer">
-					Transaction Explorer
-				</a>
-			</nav>
+			<Link to="/" className={styles.logo}>
+				<BeanIcon size={22} />
+				Grano de Origen
+			</Link>
+			<AppNav />
 			<ConnectAccount />
 		</header>
 
@@ -41,22 +43,9 @@ const AppLayout = () => (
 
 		<footer className={styles.footer}>
 			<nav className={styles.footerNav}>
-				<a
-					href="https://github.com/stellar-scaffold/cli"
-					target="_blank"
-					rel="noreferrer"
-				>
-					GitHub
-				</a>
-				<a
-					href="https://www.youtube.com/watch?v=0syGaIn3ULk&list=PLmr3tp_7-7Gjj6gn5-bBn-QTMyaWzwOU5"
-					target="_blank"
-					rel="noreferrer"
-				>
-					Tutorial
-				</a>
-				<a href="https://scaffoldstellar.org" target="_blank" rel="noreferrer">
-					View docs
+				<span>Trazabilidad de café en Stellar</span>
+				<a href={labPrefix()} target="_blank" rel="noreferrer">
+					Explorador de transacciones
 				</a>
 			</nav>
 		</footer>

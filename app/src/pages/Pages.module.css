@@ -1,0 +1,37 @@
+.page {
+	max-width: 760px;
+	margin: 0 auto;
+	display: grid;
+	gap: 1.5rem;
+}
+
+.page h1 {
+	margin: 0;
+	color: var(--cafe-primary);
+	font-weight: 600;
+}
+
+.lead {
+	margin: 0;
+	color: var(--cafe-muted);
+	max-width: 60ch;
+}
+
+.searchRow {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-end;
+	flex-wrap: wrap;
+	max-width: 520px;
+}
+
+.searchRow > div {
+	flex: 1;
+	min-width: 12rem;
+}
+
+.actions {
+	display: flex;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}

@@ -19,6 +19,7 @@
     "@theahaco/contract-explorer": "^1.3.0",
     "@theahaco/ts-config": "^1.3.0",
     "lossless-json": "^4.3.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.18.1"
