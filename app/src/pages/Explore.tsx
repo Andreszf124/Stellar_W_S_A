@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
-import { CATEGORY_LABEL, findModel, type CategoryTag } from "../closet/catalog"
+import { CATEGORY_LABEL, type CategoryTag } from "../closet/catalog"
 import {
 	friendlyError,
 	listItems,
@@ -9,6 +9,8 @@ import {
 } from "../closet/closetService"
 import { Avatar, HomeScene } from "../closet/components"
 import styles from "../closet/explore.module.css"
+import { useBusinesses } from "../closet/useBusinesses"
+import { useProducts } from "../closet/useProducts"
 
 const PAGE_SIZE = 24
 const SKELETONS = Array.from({ length: 8 }, (_, i) => i)
@@ -19,8 +21,9 @@ type StatusFilter = "all" | "available" | "claimed"
 const normalize = (text: string) =>
 	text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 
-const Preview = ({ name }: { name: string }) => {
-	const model = findModel(name)
+const Preview = ({ name, store }: { name: string; store: string }) => {
+	const { find } = useProducts()
+	const model = find(name, store)
 	if (!model) return null
 	return (
 		<div className={styles.preview} aria-hidden="true">
@@ -55,22 +58,36 @@ const StatusIcon = ({ claimed }: { claimed: boolean }) => (
 	</svg>
 )
 
-const ProductCard = ({ item }: { item: ClosetItem }) => (
-	<li className={styles.card}>
-		<Preview name={item.name} />
-		<h3 className={styles.name}>{item.name}</h3>
-		<div className={styles.meta}>
-			<span className={styles.badge}>{CATEGORY_LABEL[item.category]}</span>
-			<span className={styles.id}>n.º {item.id}</span>
-		</div>
-		<span
-			className={`${styles.status} ${item.claimed ? styles.claimed : styles.available}`}
-		>
-			<StatusIcon claimed={item.claimed} />
-			{item.claimed ? "Reclamado" : "Disponible"}
-		</span>
-	</li>
-)
+const ProductCard = ({ item }: { item: ClosetItem }) => {
+	const { byWallet, nameOf } = useBusinesses()
+	const ref = byWallet(item.store)?.ref
+	return (
+		<li className={styles.card}>
+			<Preview name={item.name} store={item.store} />
+			<h3 className={styles.name}>{item.name}</h3>
+			<div className={styles.meta}>
+				<span className={styles.badge}>{CATEGORY_LABEL[item.category]}</span>
+				<span className={styles.id}>n.º {item.id}</span>
+			</div>
+			<p className={styles.seller}>
+				Vendido por{" "}
+				{ref ? (
+					<Link to={`/tiendas/${encodeURIComponent(ref)}`}>
+						{nameOf(item.store)}
+					</Link>
+				) : (
+					nameOf(item.store)
+				)}
+			</p>
+			<span
+				className={`${styles.status} ${item.claimed ? styles.claimed : styles.available}`}
+			>
+				<StatusIcon claimed={item.claimed} />
+				{item.claimed ? "Reclamado" : "Disponible"}
+			</span>
+		</li>
+	)
+}
 
 const Explore = () => {
 	const [category, setCategory] = useState<CategoryFilter>("all")
@@ -160,9 +177,14 @@ const Explore = () => {
 						{total > loaded.length ? ` (${total} en total)` : ""}.
 					</p>
 				)}
-				<Link to="/reclamar" className={styles.claimLink}>
-					Reclamar un ítem
-				</Link>
+				<span className={styles.links}>
+					<Link to="/comprar" className={styles.claimLink}>
+						Ir a comprar
+					</Link>
+					<Link to="/reclamar" className={styles.claimLink}>
+						Reclamar un ítem
+					</Link>
+				</span>
 			</div>
 
 			{hasMore && hasFilters && !query.isFetchingNextPage && (

@@ -18,8 +18,8 @@ export interface Model {
 	category: CategoryTag
 	slot: Slot
 	color: string
-	/** Reference price in US dollars. It lives in the app, not in the contract. */
-	priceUsd: number
+	/** Price in XLM, the reference currency. It lives in the app, not in the contract. */
+	priceXlm: number
 	/** One short sentence for the shop card. */
 	desc: string
 }
@@ -36,7 +36,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "hat",
 		color: "#ef4444",
-		priceUsd: 24,
+		priceXlm: 60,
 		desc: "Gorra de algodón con visera curva y logo bordado.",
 	},
 	{
@@ -45,7 +45,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "hat",
 		color: "#14b8a6",
-		priceUsd: 19,
+		priceXlm: 50,
 		desc: "Gorro suave de lana con pompón.",
 	},
 	{
@@ -54,7 +54,7 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "eyes",
 		color: "#0b1020",
-		priceUsd: 45,
+		priceXlm: 110,
 		desc: "Lentes polarizados con montura mate.",
 	},
 	{
@@ -63,7 +63,7 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "eyes",
 		color: "#f59e0b",
-		priceUsd: 59,
+		priceXlm: 150,
 		desc: "Montura ligera de titanio con cristales claros.",
 	},
 	{
@@ -72,7 +72,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#1e293b",
-		priceUsd: 29,
+		priceXlm: 70,
 		desc: "Camiseta diaria de cuello redondo con una estrella dorada.",
 	},
 	{
@@ -81,7 +81,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#7c3aed",
-		priceUsd: 68,
+		priceXlm: 170,
 		desc: "Sudadera gruesa de algodón orgánico con bolsillo canguro.",
 	},
 	{
@@ -90,7 +90,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#2563eb",
-		priceUsd: 89,
+		priceXlm: 220,
 		desc: "Chaqueta clásica de mezclilla lavada a la piedra.",
 	},
 	{
@@ -99,7 +99,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "feet",
 		color: "#ec4899",
-		priceUsd: 110,
+		priceXlm: 275,
 		desc: "Tenis acolchados para correr, con materiales reciclados.",
 	},
 	{
@@ -108,7 +108,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "feet",
 		color: "#92400e",
-		priceUsd: 125,
+		priceXlm: 310,
 		desc: "Botas de cuero resistentes al agua con suela antideslizante.",
 	},
 	{
@@ -117,7 +117,7 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "ears",
 		color: "#06b6d4",
-		priceUsd: 149,
+		priceXlm: 370,
 		desc: "Audífonos inalámbricos con cancelación de ruido.",
 	},
 	{
@@ -126,7 +126,7 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "neck",
 		color: "#facc15",
-		priceUsd: 79,
+		priceXlm: 200,
 		desc: "Cadena bañada en oro con un dije de estrella.",
 	},
 	{
@@ -135,7 +135,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#f59e0b",
-		priceUsd: 35,
+		priceXlm: 90,
 		desc: "Lámpara de mesa de luz cálida para cualquier rincón.",
 	},
 	{
@@ -144,7 +144,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#92400e",
-		priceUsd: 72,
+		priceXlm: 180,
 		desc: "Silla de madera maciza con acabado natural.",
 	},
 	{
@@ -153,7 +153,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#14b8a6",
-		priceUsd: 54,
+		priceXlm: 135,
 		desc: "Tapete tejido a mano que da calor a la sala.",
 	},
 	{
@@ -162,7 +162,7 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "legs",
 		color: "#2563eb",
-		priceUsd: 62,
+		priceXlm: 155,
 		desc: "Pantalón de mezclilla de corte recto y uso diario.",
 	},
 	{
@@ -171,7 +171,7 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "neck",
 		color: "#dc2626",
-		priceUsd: 26,
+		priceXlm: 65,
 		desc: "Bufanda larga de lana para los días fríos.",
 	},
 	{
@@ -180,7 +180,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#a16207",
-		priceUsd: 96,
+		priceXlm: 240,
 		desc: "Mesa de centro de madera para la sala.",
 	},
 	{
@@ -189,7 +189,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#16a34a",
-		priceUsd: 22,
+		priceXlm: 55,
 		desc: "Planta decorativa en maceta que no necesita riego.",
 	},
 	{
@@ -198,7 +198,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#7c3aed",
-		priceUsd: 41,
+		priceXlm: 100,
 		desc: "Cuadro con marco para decorar la pared.",
 	},
 	{
@@ -207,7 +207,7 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#0f766e",
-		priceUsd: 38,
+		priceXlm: 95,
 		desc: "Reloj de pared de estilo sencillo y silencioso.",
 	},
 ]
@@ -233,3 +233,30 @@ export const SLOT_LABEL: Record<Slot, string> = {
 }
 
 export const SLOT_ORDER = Object.keys(SLOT_LABEL) as Slot[]
+
+/**
+ * A product a business sells. The built-in `MODELS` have no `store` and any
+ * business can register units of them. A custom product is made by one
+ * business (`store` = its address) from a base design: it keeps the base
+ * `key`, `slot` and `category` and sets its own name, color, price and text.
+ */
+export interface Product extends Model {
+	store?: string
+}
+
+/**
+ * Finds the product an on-chain item name refers to. A custom product of the
+ * same store wins, then any custom product with that name, then the built-in
+ * models.
+ */
+export function lookupProduct(
+	products: Product[],
+	name: string,
+	store?: string,
+): Product | undefined {
+	return (
+		products.find((p) => p.store && p.name === name && p.store === store) ??
+		products.find((p) => p.store && p.name === name) ??
+		products.find((p) => !p.store && p.name === name)
+	)
+}

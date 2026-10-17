@@ -4,8 +4,9 @@ import { CATEGORY_LABEL, MODELS } from "../closet/catalog"
 import styles from "../closet/closet.module.css"
 import { ModelThumb } from "../closet/components"
 import home from "../closet/home.module.css"
+import { formatXlm } from "../closet/money"
+import { useBusinesses } from "../closet/useBusinesses"
 import { useStats } from "../closet/useStats"
-import { useStores } from "../closet/useStores"
 import { type StoreCategory } from "../lib/supabase"
 
 const Icon = ({ children }: { children: ReactNode }) => (
@@ -26,7 +27,7 @@ const Icon = ({ children }: { children: ReactNode }) => (
 const BENEFITS = [
 	{
 		title: "Algo digital con cada venta",
-		text: "Su cliente se lleva, además del producto, una versión digital para su avatar o su hogar.",
+		text: "Su cliente se lleva, además del producto, una versión digital para su avatar o su hogar, y la paga en XLM.",
 		icon: (
 			<g>
 				<rect x="3" y="8" width="18" height="12" rx="2" />
@@ -64,11 +65,23 @@ const FAQ = [
 	},
 	{
 		q: "¿Cuesta dinero?",
-		a: "No. Es una beta en Testnet y usa dinero de prueba, sin valor real.",
+		a: "Todo se paga en XLM, pero es una beta en Testnet: usa XLM de prueba, sin valor real.",
+	},
+	{
+		q: "¿Cómo pago una compra?",
+		a: "Desde Comprar, con XLM, firmando en su billetera. La aplicación nunca ve sus claves. Después el negocio le entrega el código para reclamar su ítem.",
+	},
+	{
+		q: "¿Las mascotas tienen precio?",
+		a: "Sí. Cada mascota tiene su precio en XLM y se paga a la cuenta de la plataforma.",
+	},
+	{
+		q: "¿Qué son las misiones?",
+		a: "Retos que un negocio pone para desbloquear productos específicos. La aplicación comprueba su avance, pero el bloqueo se verifica en la app, no en la red.",
 	},
 	{
 		q: "¿Qué pasa si pierdo el código?",
-		a: "La tienda lo entregó una sola vez. Debe pedírselo de nuevo a la tienda.",
+		a: "El negocio lo entregó una sola vez. Debe pedírselo de nuevo.",
 	},
 	{
 		q: "¿Puedo regalar un ítem?",
@@ -97,8 +110,8 @@ const ICONS = [
 
 const STEPS = [
 	{
-		title: "Compre en una tienda",
-		text: "Cada producto de ropa o muebles trae un código de un solo uso.",
+		title: "Compre con XLM",
+		text: "Elija un producto de un negocio y pague en XLM. El negocio le entrega un código de un solo uso.",
 	},
 	{
 		title: "Reclame su ítem digital",
@@ -106,7 +119,7 @@ const STEPS = [
 	},
 	{
 		title: "Vista y decore",
-		text: "Equipe a su avatar, decore su hogar y suba de nivel con tareas.",
+		text: "Equipe a su avatar, decore su hogar y complete misiones para desbloquear más productos.",
 	},
 ]
 
@@ -117,30 +130,31 @@ const STORE_CATEGORY_LABEL: Record<StoreCategory, string> = {
 }
 
 const StoreDirectory = () => {
-	const { data, isPending, isError } = useStores()
+	const { businesses, isPending, isError } = useBusinesses()
+	const shown = businesses.slice(0, 6)
 	return (
 		<div className={home.directory}>
-			<h3 id="home-directory">Directorio de tiendas</h3>
+			<h3 id="home-directory">Negocios</h3>
 			{isPending && (
 				<p className={home.directoryNote} role="status">
-					Cargando el directorio...
+					Cargando los negocios...
 				</p>
 			)}
 			{isError && (
 				<p className={home.directoryNote} role="alert">
-					No pudimos cargar el directorio ahora.
+					No pudimos cargar los negocios ahora.
 				</p>
 			)}
-			{data && data.length === 0 && (
-				<p className={home.directoryNote}>
-					Por ahora no hay tiendas en el directorio.
-				</p>
+			{!isPending && !isError && businesses.length === 0 && (
+				<p className={home.directoryNote}>Por ahora no hay negocios.</p>
 			)}
-			{data && data.length > 0 && (
+			{shown.length > 0 && (
 				<ul className={home.storeList} aria-labelledby="home-directory">
-					{data.map((store) => (
-						<li key={store.id} className={home.storeCard}>
-							<h4>{store.name}</h4>
+					{shown.map((business) => (
+						<li key={business.ref} className={home.storeCard}>
+							<h4>
+								<Link to={`/tiendas/${business.ref}`}>{business.name}</Link>
+							</h4>
 							<span className={home.storeTag}>
 								<svg
 									viewBox="0 0 24 24"
@@ -153,15 +167,16 @@ const StoreDirectory = () => {
 								>
 									<path d="M4 9l1-4h14l1 4M4 9v10h16V9M4 9h16M10 19v-5h4v5" />
 								</svg>
-								{STORE_CATEGORY_LABEL[store.category] ?? store.category}
+								{STORE_CATEGORY_LABEL[business.category] ?? business.category}
+								{business.example ? " · ejemplo" : ""}
 							</span>
-							<p>{store.description}</p>
+							<p>{business.tagline ?? business.description}</p>
 						</li>
 					))}
 				</ul>
 			)}
 			<Link to="/tiendas" className={styles.linkButton}>
-				Ver todas las tiendas
+				Ver todos los negocios
 			</Link>
 		</div>
 	)
@@ -173,8 +188,9 @@ const Home = () => {
 		<div className={styles.page}>
 			<h1>Lo que compra, también en su mundo digital</h1>
 			<p className={styles.lead}>
-				Cada prenda o mueble que compra en una tienda le da su versión digital
-				para su avatar y su hogar. Con tareas, usted lo hace crecer.
+				Cada prenda o mueble que paga en XLM a un negocio le da su versión
+				digital para su avatar y su hogar. Con misiones, usted desbloquea más
+				productos.
 			</p>
 
 			<div className={styles.actions}>
@@ -189,6 +205,12 @@ const Home = () => {
 				</Link>
 				<Link to="/closet" className={styles.linkButton}>
 					Ver mi clóset
+				</Link>
+				<Link to="/hogar" className={styles.linkButton}>
+					Mi hogar
+				</Link>
+				<Link to="/tareas" className={styles.linkButton}>
+					Misiones
 				</Link>
 			</div>
 
@@ -214,8 +236,8 @@ const Home = () => {
 			</ol>
 
 			<p className={styles.muted}>
-				¿Tiene una tienda? Registre sus unidades en{" "}
-				<Link to="/tienda">Tienda</Link>.
+				¿Tiene un negocio? Registre sus unidades y cree sus productos en{" "}
+				<Link to="/tienda">Mi negocio</Link>.
 			</p>
 
 			<dl className={home.stats}>
@@ -234,9 +256,10 @@ const Home = () => {
 			</dl>
 
 			<section className={home.section} aria-labelledby="home-catalog">
-				<h2 id="home-catalog">Qué puede reclamar</h2>
+				<h2 id="home-catalog">Qué puede comprar</h2>
 				<p className={home.sectionLead}>
-					Estos son los tipos de producto disponibles hoy.
+					Estos son los tipos de producto base y su precio en XLM. Los negocios
+					pueden crear los suyos.
 				</p>
 				<ul className={home.grid}>
 					{MODELS.map((model) => (
@@ -246,11 +269,14 @@ const Home = () => {
 							</div>
 							<h3>{model.name}</h3>
 							<p>{CATEGORY_LABEL[model.category]}</p>
+							<p>
+								<strong>{formatXlm(model.priceXlm)}</strong>
+							</p>
 						</li>
 					))}
 				</ul>
-				<Link to="/productos" className={styles.linkButton}>
-					Ver todo el catálogo
+				<Link to="/comprar" className={styles.linkButton}>
+					Ir a comprar
 				</Link>
 			</section>
 
@@ -265,11 +291,15 @@ const Home = () => {
 						</li>
 					))}
 				</ul>
+				<p className={home.sectionLead}>
+					Cada negocio puede crear sus productos, su perfil con su historia y
+					sus misiones desde Mi negocio.
+				</p>
 				<Link
 					to="/tienda"
 					className={`${styles.linkButton} ${styles.linkButtonPrimary}`}
 				>
-					Registrar unidades
+					Ir a Mi negocio
 				</Link>
 				<StoreDirectory />
 			</section>

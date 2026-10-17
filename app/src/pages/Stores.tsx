@@ -1,11 +1,11 @@
 import { type ReactNode, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import styles from "../closet/stores.module.css"
-import { useStores } from "../closet/useStores"
-import { type Store, type StoreCategory } from "../lib/supabase"
+import { type Business, useBusinesses } from "../closet/useBusinesses"
+import { useProducts } from "../closet/useProducts"
+import { type StoreCategory } from "../lib/supabase"
 
 const PAGE_SIZE = 12
-const EXAMPLE_PREFIX = "Tienda de ejemplo: "
 
 const CATEGORY_LABEL: Record<StoreCategory, string> = {
 	ropa: "Ropa",
@@ -81,30 +81,38 @@ const SearchIcon = () => (
 	</Icon>
 )
 
-const displayName = (name: string) =>
-	name.startsWith(EXAMPLE_PREFIX) ? name.slice(EXAMPLE_PREFIX.length) : name
-
-const StoreCard = ({ store }: { store: Store }) => {
+const StoreCard = ({
+	store,
+	productCount,
+}: {
+	store: Business
+	productCount: number
+}) => {
 	const place = [store.city, store.province].filter(Boolean).join(", ")
-	const tags = store.tags ?? []
-	const rating = typeof store.rating === "number" ? store.rating : null
-	const titleId = `store-${store.id}`
+	const tags = store.tags
+	const rating = store.rating
+	const titleId = `store-${store.ref}`
+	const summary = store.description || store.tagline
 	return (
 		<li
 			className={`${styles.card} ${store.featured ? styles.cardFeatured : ""}`}
 			aria-labelledby={titleId}
 		>
-			<div className={styles.badges}>
-				<span className={styles.badgeExample}>Ejemplo</span>
-				{store.featured && (
-					<span className={styles.badgeFeatured}>
-						<StarIcon />
-						Destacada
-					</span>
-				)}
-			</div>
+			{(store.example || store.featured) && (
+				<div className={styles.badges}>
+					{store.example && (
+						<span className={styles.badgeExample}>Ejemplo</span>
+					)}
+					{store.featured && (
+						<span className={styles.badgeFeatured}>
+							<StarIcon />
+							Destacada
+						</span>
+					)}
+				</div>
+			)}
 			<h3 id={titleId} className={styles.cardTitle}>
-				{displayName(store.name)}
+				{store.name}
 			</h3>
 			<p className={styles.meta}>
 				<span className={styles.metaItem}>
@@ -118,8 +126,10 @@ const StoreCard = ({ store }: { store: Store }) => {
 					</span>
 				)}
 			</p>
-			{store.tagline && <p className={styles.tagline}>{store.tagline}</p>}
-			<p className={styles.description}>{store.description}</p>
+			{store.tagline && store.description && (
+				<p className={styles.tagline}>{store.tagline}</p>
+			)}
+			<p className={styles.description}>{summary}</p>
 			{tags.length > 0 && (
 				<ul className={styles.chips} aria-label="Etiquetas">
 					{tags.map((tag) => (
@@ -129,9 +139,15 @@ const StoreCard = ({ store }: { store: Store }) => {
 					))}
 				</ul>
 			)}
-			{(store.since_year || rating !== null) && (
+			{(store.sinceYear || rating !== null || productCount > 0) && (
 				<p className={styles.facts}>
-					{store.since_year && <span>Desde {store.since_year}</span>}
+					{store.sinceYear && <span>Desde {store.sinceYear}</span>}
+					{productCount > 0 && (
+						<span className={styles.productCount}>
+							{productCount}{" "}
+							{productCount === 1 ? "producto propio" : "productos propios"}
+						</span>
+					)}
 					{rating !== null && (
 						<span className={styles.metaItem}>
 							<StarIcon />
@@ -140,9 +156,12 @@ const StoreCard = ({ store }: { store: Store }) => {
 					)}
 				</p>
 			)}
-			<Link to="/productos" className={styles.cardLink}>
-				Ver productos
-				<span className={styles.srOnly}> de {displayName(store.name)}</span>
+			<Link
+				to={`/tiendas/${encodeURIComponent(store.ref)}`}
+				className={styles.cardLink}
+			>
+				Ver perfil y productos
+				<span className={styles.srOnly}> de {store.name}</span>
 			</Link>
 		</li>
 	)
@@ -157,14 +176,22 @@ const Skeletons = () => (
 )
 
 const Stores = () => {
-	const { data, isPending, isError } = useStores()
+	const { businesses: stores, isPending, isError } = useBusinesses()
+	const { custom } = useProducts()
 	const [query, setQuery] = useState("")
 	const [category, setCategory] = useState<CategoryFilter>("todas")
 	const [province, setProvince] = useState("")
 	const [onlyFeatured, setOnlyFeatured] = useState(false)
 	const [visible, setVisible] = useState(PAGE_SIZE)
 
-	const stores = useMemo(() => data ?? [], [data])
+	const productCounts = useMemo(() => {
+		const counts = new Map<string, number>()
+		for (const p of custom) {
+			if (p.store) counts.set(p.store, (counts.get(p.store) ?? 0) + 1)
+		}
+		return counts
+	}, [custom])
+	const hasExample = stores.some((s) => s.example)
 	const provinces = useMemo(
 		() =>
 			[
@@ -183,9 +210,7 @@ const Stores = () => {
 			if (province && s.province !== province) return false
 			if (onlyFeatured && !s.featured) return false
 			if (!q) return true
-			const haystack = normalize(
-				[displayName(s.name), s.city ?? "", ...(s.tags ?? [])].join(" "),
-			)
+			const haystack = normalize([s.name, s.city ?? "", ...s.tags].join(" "))
 			return haystack.includes(q)
 		})
 	}, [stores, query, category, province, onlyFeatured])
@@ -202,14 +227,16 @@ const Stores = () => {
 	return (
 		<div className={styles.page}>
 			<h1>Directorio de tiendas</h1>
-			{data && (
+			{!isPending && (
 				<p className={styles.count}>
-					{data.length} {data.length === 1 ? "tienda" : "tiendas"} en total
+					{stores.length} {stores.length === 1 ? "tienda" : "tiendas"} en total
 				</p>
 			)}
-			<p className={styles.notice}>
-				Estas tiendas son datos de ejemplo para la demostración.
-			</p>
+			{hasExample && (
+				<p className={styles.notice}>
+					Las tiendas marcadas como Ejemplo son datos de demostración.
+				</p>
+			)}
 
 			<form
 				className={styles.filters}
@@ -294,12 +321,12 @@ const Stores = () => {
 					<Skeletons />
 				</>
 			)}
-			{isError && (
+			{isError && stores.length === 0 && (
 				<p className={styles.error} role="alert">
 					No pudimos cargar el directorio ahora.
 				</p>
 			)}
-			{data && filtered.length === 0 && (
+			{!isPending && !isError && filtered.length === 0 && (
 				<div className={styles.empty}>
 					<p>Ninguna tienda coincide con su búsqueda</p>
 					<button type="button" className={styles.button} onClick={reset}>
@@ -307,14 +334,20 @@ const Stores = () => {
 					</button>
 				</div>
 			)}
-			{data && filtered.length > 0 && (
+			{filtered.length > 0 && (
 				<>
 					<p className={styles.status} aria-live="polite">
 						Mostrando {shown.length} de {filtered.length}
 					</p>
 					<ul className={styles.grid}>
 						{shown.map((store) => (
-							<StoreCard key={store.id} store={store} />
+							<StoreCard
+								key={store.ref}
+								store={store}
+								productCount={
+									store.wallet ? (productCounts.get(store.wallet) ?? 0) : 0
+								}
+							/>
 						))}
 					</ul>
 					{shown.length < filtered.length && (

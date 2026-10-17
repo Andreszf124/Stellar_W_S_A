@@ -2,14 +2,18 @@ import { useQueries } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import styles from "../closet/account.module.css"
-import { findModel } from "../closet/catalog"
 import { getItem } from "../closet/closetService"
 import { ModelThumb, WalletRequired } from "../closet/components"
+import { formatXlm } from "../closet/money"
 import { loadOrders } from "../closet/orders"
 import { txUrl } from "../closet/payment"
+import { useBusinesses } from "../closet/useBusinesses"
+import { useProducts } from "../closet/useProducts"
 
 const OrdersList = ({ address }: { address: string }) => {
 	const orders = useMemo(() => loadOrders(address), [address])
+	const { find } = useProducts()
+	const { byWallet, nameOf } = useBusinesses()
 
 	// The status comes from the contract: an item is "claimed" once its code is used.
 	const statuses = useQueries({
@@ -32,7 +36,8 @@ const OrdersList = ({ address }: { address: string }) => {
 	return (
 		<ul className={styles.orders}>
 			{orders.map((order, i) => {
-				const model = findModel(order.name)
+				const model = find(order.name, order.store)
+				const profile = byWallet(order.store)
 				const status = statuses[i]
 				const claimed = status?.data?.claimed
 				const label = status?.isError
@@ -60,7 +65,14 @@ const OrdersList = ({ address }: { address: string }) => {
 								{new Date(order.date).toLocaleString("es")}
 							</span>
 							<span className={styles.muted}>
-								Pagó {order.amountXlm} XLM (${order.priceUsd.toFixed(2)})
+								Pagó {formatXlm(order.priceXlm)} a{" "}
+								{profile ? (
+									<Link to={`/tiendas/${encodeURIComponent(profile.ref)}`}>
+										{profile.name}
+									</Link>
+								) : (
+									nameOf(order.store)
+								)}
 							</span>
 							<span className={styles.links}>
 								<a href={txUrl(order.hash)} target="_blank" rel="noreferrer">

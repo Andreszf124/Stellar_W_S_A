@@ -1,14 +1,9 @@
 import { Link } from "react-router-dom"
 import { avatarSvg, HAIR_COLORS, SKIN_TONES } from "../closet/avatarArt"
-import {
-	CATEGORY_LABEL,
-	findModel,
-	SLOT_LABEL,
-	SLOT_ORDER,
-} from "../closet/catalog"
+import { CATEGORY_LABEL, SLOT_LABEL, SLOT_ORDER } from "../closet/catalog"
 import styles from "../closet/closet.module.css"
 import { friendlyError } from "../closet/closetService"
-import { Avatar, HomeScene, WalletRequired } from "../closet/components"
+import { Avatar, WalletRequired } from "../closet/components"
 import { PETS, PetSvg, usePet } from "../closet/pets"
 import petStyles from "../closet/pets.module.css"
 import { useCloset } from "../closet/useCloset"
@@ -70,6 +65,7 @@ const Swatches = ({
 const ClosetView = ({ address }: { address: string }) => {
 	const {
 		items,
+		find,
 		isLoading,
 		error,
 		wear,
@@ -88,9 +84,9 @@ const ClosetView = ({ address }: { address: string }) => {
 	// Items grouped by the part of the body they go on, in a fixed order.
 	const groups = SLOT_ORDER.map((slot) => ({
 		slot,
-		items: items.filter((i) => findModel(i.name)?.slot === slot),
+		items: items.filter((i) => find(i)?.slot === slot),
 	})).filter((g) => g.items.length > 0)
-	const noDesign = items.filter((i) => !findModel(i.name))
+	const noDesign = items.filter((i) => !find(i))
 
 	return (
 		<>
@@ -134,7 +130,7 @@ const ClosetView = ({ address }: { address: string }) => {
 						<div className={styles.barFill} style={{ width: `${progress}%` }} />
 					</div>
 					<p className={styles.muted}>
-						Suba de nivel con las <Link to="/tareas">tareas</Link>.
+						Suba de nivel con las <Link to="/tareas">Misiones</Link>.
 					</p>
 				</section>
 
@@ -157,7 +153,7 @@ const ClosetView = ({ address }: { address: string }) => {
 							<h3>{SLOT_LABEL[slot]}</h3>
 							<ul className={styles.items}>
 								{slotItems.map((item) => {
-									const model = findModel(item.name)
+									const model = find(item)
 									const worn = wornIds.has(item.id)
 									return (
 										<li
@@ -235,10 +231,17 @@ const ClosetView = ({ address }: { address: string }) => {
 
 			<section className={styles.panel} aria-labelledby="home-title">
 				<h2 id="home-title">Su hogar digital</h2>
-				<HomeScene furniture={furniture} />
-				{furniture.length === 0 && (
-					<p className={styles.muted}>Reclame un mueble para verlo aquí.</p>
-				)}
+				<p>
+					{furniture.length === 0
+						? "Todavía no tiene muebles. Reclame uno para decorar su hogar."
+						: `Tiene ${furniture.length} ${furniture.length === 1 ? "mueble" : "muebles"} en su hogar.`}
+				</p>
+				<Link
+					className={`${styles.linkButton} ${styles.linkButtonPrimary}`}
+					to="/hogar"
+				>
+					Ver mi hogar
+				</Link>
 			</section>
 		</>
 	)
@@ -246,10 +249,10 @@ const ClosetView = ({ address }: { address: string }) => {
 
 const Closet = () => (
 	<div className={styles.page}>
-		<h1>Mi clóset y hogar</h1>
+		<h1>Mi clóset</h1>
 		<p className={styles.lead}>
-			Aquí viven los ítems digitales de lo que compra. Vista a su avatar y
-			decore su hogar.
+			Aquí viven los ítems digitales de lo que compra. Vista a su avatar; los
+			muebles decoran su hogar.
 		</p>
 		<WalletRequired>
 			{(address) => <ClosetView key={address} address={address} />}

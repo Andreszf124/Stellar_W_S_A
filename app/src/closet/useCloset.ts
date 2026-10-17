@@ -8,9 +8,9 @@ import {
 	type Look,
 	type Wear,
 } from "./avatarArt"
-import { findModel } from "./catalog"
 import { itemsOf, type ClosetItem } from "./closetService"
 import { completedTaskIds, levelOf, levelProgress, pointsFor } from "./tasks"
+import { useProducts } from "./useProducts"
 
 type Equipped = Record<string, number>
 
@@ -65,6 +65,8 @@ export function useCloset(address: string) {
 		queryKey: ["closet", address],
 		queryFn: () => itemsOf(address),
 	})
+	const { find: findProduct } = useProducts()
+	const find = (item: ClosetItem) => findProduct(item.name, item.store)
 	const [equipped, setEquipped] = useState<Equipped>(() => load(address))
 	const [look, setLookState] = useState<Look>(() => loadLook(address))
 
@@ -81,7 +83,7 @@ export function useCloset(address: string) {
 	const wornIds = new Set<number>()
 	for (const [slot, id] of Object.entries(equipped)) {
 		const item = items.find((i) => i.id === id)
-		const model = item && findModel(item.name)
+		const model = item && find(item)
 		if (item && model && model.slot === slot) {
 			wear.push({ slot: model.slot, key: model.key, color: model.color })
 			wornIds.add(item.id)
@@ -89,14 +91,14 @@ export function useCloset(address: string) {
 	}
 
 	const furniture: Furnishing[] = items.flatMap((item) => {
-		const model = findModel(item.name)
+		const model = find(item)
 		return model?.slot === "furniture"
 			? [{ key: model.key, color: model.color }]
 			: []
 	})
 
 	const toggleEquip = (item: ClosetItem) => {
-		const model = findModel(item.name)
+		const model = find(item)
 		if (!model || model.slot === "furniture") return
 		const next = { ...equipped }
 		if (next[model.slot] === item.id) delete next[model.slot]
@@ -114,6 +116,8 @@ export function useCloset(address: string) {
 
 	return {
 		items,
+		/** The product (artwork, price, store) an owned item refers to. */
+		find,
 		isLoading: query.isLoading,
 		error: query.error,
 		wear,

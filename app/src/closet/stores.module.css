@@ -302,3 +302,8 @@
 		grid-template-columns: repeat(3, 1fr);
 	}
 }
+
+.productCount {
+	font-weight: 600;
+	color: var(--color-text);
+}

@@ -269,3 +269,20 @@
 		gap: 0.6rem;
 	}
 }
+
+.seller {
+	margin: 0;
+	font-size: 0.8rem;
+	color: var(--color-text-muted);
+}
+
+.seller a {
+	color: var(--color-accent);
+	font-weight: 600;
+}
+
+.links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem 1rem;
+}

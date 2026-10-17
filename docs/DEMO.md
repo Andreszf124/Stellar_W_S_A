@@ -9,7 +9,7 @@ Sitio: https://stellar-w-s-a.vercel.app
 
 - [ ] Freighter instalado, en red **Testnet** y con fondos. Si no tiene, usar Friendbot: `https://friendbot.stellar.org/?addr=DIRECCION` (Freighter también lo ofrece).
 - [ ] Sitio abierto en una pestaña: https://stellar-w-s-a.vercel.app
-- [ ] Billetera conectada en el sitio (se pide al entrar a Tienda, Reclamar, Clóset o Tareas).
+- [ ] Billetera conectada en el sitio (se pide al entrar a Mi negocio, Comprar, Reclamar, Clóset o Misiones).
 - [ ] Una segunda pestaña lista en `/tienda`.
 - [ ] Plan B listo: en el PC, carpeta `scaffold-stellar-agentic\app`, comando `npx vite`, abrir http://localhost:5173.
 - [ ] Saber de antemano qué producto se va a registrar (sugerido: una prenda, por ejemplo "Chaqueta de mezclilla", y después un mueble, por ejemplo "Lámpara de mesa").
@@ -32,12 +32,12 @@ Decir:
 Decir:
 - "Cuando compra una prenda o un mueble, el comprador reclama su versión digital."
 - "Ese ítem queda a su nombre en la red Stellar y lo usa en su avatar y en su hogar digital."
-- "Con tareas el avatar sube de nivel."
+- "Todo se paga en XLM, y con misiones se desbloquean productos de cada negocio."
 - "Por ahora solo vestimenta y muebles."
 
 ### 1:30 - 4:15 Demostración en vivo
 
-Paso 1, Tienda (1:30 - 2:15). Ir a **Tienda** (`/tienda`).
+Paso 1, Mi negocio (1:30 - 2:15). Ir a **Mi negocio** (`/tienda`).
 1. En "Producto", elegir un artículo del catálogo.
 2. Pulsar **Registrar unidad**.
 3. Firmar en Freighter. Dice "Esperando su firma..." mientras tanto.
@@ -59,15 +59,15 @@ Paso 3, Mi clóset (3:00 - 3:30). Ir a **Mi clóset** (`/closet`).
 
 Decir: "Las prendas se equipan en el avatar y los muebles aparecen en el hogar."
 
-Paso 4, Tareas (3:30 - 3:45). Ir a **Tareas** (`/tareas`).
-1. Mostrar las tareas completadas y el nivel.
+Paso 4, Misiones (3:30 - 3:45). Ir a **Misiones** (`/tareas`).
+1. Mostrar el avance y los productos que desbloquea cada misión.
 
-Decir: "Las tareas se marcan solas según lo que posee y equipa. No se hace clic para completarlas."
+Decir: "El avance se calcula solo según lo que posee y equipa. El bloqueo de productos lo verifica la app, no la red."
 
-Paso 5, Productos (3:45 - 4:00). Ir a **Productos** (`/productos`).
-1. Filtrar por categoría o por estado (Disponible / Reclamado) y mostrar que la unidad reclamada figura como Reclamado.
+Paso 5, Negocios (3:45 - 4:00). Ir a **Negocios** (`/tiendas`) y abrir el perfil de uno.
+1. Mostrar su historia, sus productos y sus misiones.
 
-Decir: "Cualquiera puede ver las unidades registradas en la red y si ya fueron reclamadas."
+Decir: "Cada negocio crea sus productos, su perfil y sus misiones desde Mi negocio. Los 3 del directorio son de EJEMPLO."
 
 Paso 6, Mascotas (4:00 - 4:15). Ir a **Mascotas** (`/mascotas`).
 1. Elegir una de las 6 mascotas (perro, gato, conejo, zorro, panda, pájaro).
@@ -98,9 +98,11 @@ Decir:
 
 ## Qué NO decir
 
-- No decir que hay un marketplace con varias tiendas: hoy solo existe una página `/tienda` para registrar unidades.
-- No decir que hay pago retenido (escrow).
-- No decir que hay panel de administrador. La base (Supabase) solo guarda un directorio de tiendas de solo lectura con 3 tiendas de EJEMPLO: no decir que son tiendas aliadas reales ni que se guarda progreso o datos de usuario.
+- No decir que hay varias tiendas aliadas reales: el directorio trae 3 negocios de EJEMPLO y el resto los crea cualquiera desde `/tienda` (Mi negocio).
+- No decir que hay pago retenido (escrow): la compra en XLM es un pago directo.
+- No decir que las misiones ni el panel de negocio son seguros: el bloqueo por misiones y el dueño del negocio se verifican en la app, no en la red.
+- No decir que los datos de Supabase están protegidos: las altas de productos, misiones y perfiles son abiertas (sin inicio de sesión), solo sirven como demo en Testnet. No se guarda progreso de usuario en la base.
+- No decir que la app entrega el código de reclamo: lo entrega el negocio.
 - No decir que hay inicio de sesión con correo o Google: se usa Freighter.
 - No decir que hay etiqueta NFC: hoy el reclamo es por código escrito.
 - No decir que ya se pueden transferir ítems desde la interfaz (el contrato lo permite, la pantalla aún no).

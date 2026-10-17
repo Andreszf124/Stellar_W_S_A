@@ -1,122 +1,110 @@
-import { useState, type FormEvent } from "react"
-import { CATEGORY_LABEL, MODELS, findModel } from "../closet/catalog"
-import { generateClaimCode } from "../closet/claimCode"
-import styles from "../closet/closet.module.css"
-import { friendlyError, registerItem } from "../closet/closetService"
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import styles from "../closet/business.module.css"
+import BusinessProfileForm from "../closet/BusinessProfileForm"
 import { WalletRequired } from "../closet/components"
-import { useWallet } from "../hooks/useWallet"
+import InventoryTable from "../closet/InventoryTable"
+import MissionsAdmin from "../closet/MissionsAdmin"
+import ProductForm from "../closet/ProductForm"
+import UnitsRegistrar from "../closet/UnitsRegistrar"
+import { useBusinesses } from "../closet/useBusinesses"
 
-type Result =
-	| { status: "idle" }
-	| { status: "sending" }
-	| { status: "done"; id: number; code: string; name: string }
-	| { status: "error"; message: string }
+const SECTIONS = [
+	{ id: "inventario", label: "Inventario" },
+	{ id: "productos", label: "Productos" },
+	{ id: "unidades", label: "Registrar unidades" },
+	{ id: "perfil", label: "Perfil" },
+	{ id: "misiones", label: "Misiones" },
+] as const
 
-const StoreForm = ({ address }: { address: string }) => {
-	const { signTransaction } = useWallet()
-	const [modelName, setModelName] = useState(MODELS[0]?.name ?? "")
-	const [result, setResult] = useState<Result>({ status: "idle" })
-	const [copied, setCopied] = useState(false)
+type SectionId = (typeof SECTIONS)[number]["id"]
 
-	const submit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		const model = findModel(modelName)
-		if (!model) {
-			setResult({ status: "error", message: "Elija un modelo de la lista." })
-			return
-		}
+const fromHash = (): SectionId => {
+	const hash = window.location.hash.slice(1)
+	return SECTIONS.find((s) => s.id === hash)?.id ?? "inventario"
+}
 
-		setCopied(false)
-		setResult({ status: "sending" })
-		// The code is made here and only its hash goes on-chain. It is shown once.
-		const code = generateClaimCode()
-		try {
-			const id = await registerItem(address, model, code, signTransaction)
-			setResult({ status: "done", id, code, name: model.name })
-		} catch (e) {
-			setResult({ status: "error", message: friendlyError(e) })
-		}
+const BusinessPanel = ({ address }: { address: string }) => {
+	const { byWallet, isPending } = useBusinesses()
+	const [section, setSection] = useState<SectionId>(fromHash)
+	const business = byWallet(address)
+
+	const open = (id: SectionId) => {
+		setSection(id)
+		window.history.replaceState(null, "", `#${id}`)
 	}
-
-	const copy = async (code: string) => {
-		try {
-			await navigator.clipboard.writeText(code)
-			setCopied(true)
-		} catch {
-			setCopied(false)
-		}
-	}
-
-	const sending = result.status === "sending"
 
 	return (
 		<>
-			<form className={styles.form} onSubmit={(e) => void submit(e)}>
-				<div className={styles.field}>
-					<label htmlFor="model">Producto</label>
-					<select
-						id="model"
-						value={modelName}
-						disabled={sending}
-						onChange={(e) => setModelName(e.target.value)}
-					>
-						{MODELS.map((m) => (
-							<option key={m.key} value={m.name}>
-								{m.name} ({CATEGORY_LABEL[m.category]})
-							</option>
-						))}
-					</select>
-					<span className={styles.muted}>
-						Por ahora el catálogo es fijo. Cada registro es una unidad que usted
-						vende.
-					</span>
-				</div>
-				<button type="submit" className={styles.primary} disabled={sending}>
-					{sending ? "Esperando su firma..." : "Registrar unidad"}
-				</button>
-			</form>
+			<div className={styles.headerRow}>
+				{business ? (
+					<>
+						<p className={styles.businessName}>{business.name}</p>
+						<Link to={`/tiendas/${business.ref}`} className={styles.publicLink}>
+							Ver mi perfil público
+						</Link>
+					</>
+				) : (
+					<p className={styles.businessName} role="status">
+						{isPending
+							? "Buscando su perfil..."
+							: "Aún no tiene perfil: créelo abajo"}
+						{!isPending && (
+							<>
+								{" "}
+								(
+								<button
+									type="button"
+									className={styles.linkButton}
+									onClick={() => open("perfil")}
+								>
+									ir a Perfil
+								</button>
+								)
+							</>
+						)}
+					</p>
+				)}
+			</div>
 
-			{result.status === "error" && (
-				<p className={`${styles.notice} ${styles.error}`} role="alert">
-					{result.message}
-				</p>
-			)}
-			{result.status === "done" && (
-				<section
-					className={`${styles.notice} ${styles.success}`}
-					role="status"
-					aria-labelledby="done-title"
-				>
-					<h2 id="done-title">Unidad registrada</h2>
-					<p>
-						{result.name}, ítem n.º <strong>{result.id}</strong>. Entregue al
-						comprador este número y este código:
-					</p>
-					<p>
-						<span className={styles.code}>{result.code}</span>
-					</p>
-					<p className={styles.muted}>
-						Guárdelo ahora: no se vuelve a mostrar. En la red solo queda su
-						huella, así que nadie puede reclamar el ítem sin el código.
-					</p>
-					<button type="button" onClick={() => void copy(result.code)}>
-						{copied ? "Copiado" : "Copiar código"}
-					</button>
-				</section>
-			)}
+			<nav aria-label="Secciones de Mi negocio">
+				<ul className={styles.tabs}>
+					{SECTIONS.map((s) => (
+						<li key={s.id}>
+							<button
+								type="button"
+								className={styles.tab}
+								aria-pressed={section === s.id}
+								onClick={() => open(s.id)}
+							>
+								{s.label}
+							</button>
+						</li>
+					))}
+				</ul>
+			</nav>
+
+			<div id={section}>
+				{section === "inventario" && <InventoryTable address={address} />}
+				{section === "productos" && <ProductForm address={address} />}
+				{section === "unidades" && <UnitsRegistrar address={address} />}
+				{section === "perfil" && <BusinessProfileForm address={address} />}
+				{section === "misiones" && <MissionsAdmin address={address} />}
+			</div>
 		</>
 	)
 }
 
 const Store = () => (
 	<div className={styles.page}>
-		<h1>Tienda</h1>
+		<h1>Mi negocio</h1>
 		<p className={styles.lead}>
-			Registre cada unidad que vende y entregue al comprador su código de un
-			solo uso. Con él reclamará la versión digital.
+			Cree sus productos, registre cada unidad que vende y entregue al comprador
+			su código de un solo uso. Su negocio es la dirección de su billetera
+			conectada.
 		</p>
 		<WalletRequired>
-			{(address) => <StoreForm key={address} address={address} />}
+			{(address) => <BusinessPanel key={address} address={address} />}
 		</WalletRequired>
 	</div>
 )

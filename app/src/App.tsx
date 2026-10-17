@@ -1,4 +1,3 @@
-import { labPrefix } from "@stellar-scaffold/app-lib"
 import { NavLink, Outlet, Route, Routes } from "react-router-dom"
 import styles from "./App.module.css"
 import ConnectAccount from "./components/ConnectAccount"
@@ -7,11 +6,13 @@ import Closet from "./pages/Closet"
 import Debug from "./pages/Debug"
 import Escrows from "./pages/Escrows"
 import Explore from "./pages/Explore"
+import Hogar from "./pages/Hogar"
 import Home from "./pages/Home"
 import Orders from "./pages/Orders"
 import Pets from "./pages/Pets"
 import Shop from "./pages/Shop"
 import Store from "./pages/Store"
+import StoreProfile from "./pages/StoreProfile"
 import Stores from "./pages/Stores"
 import Tasks from "./pages/Tasks"
 import Wallet from "./pages/Wallet"
@@ -21,16 +22,18 @@ function App() {
 		<Routes>
 			<Route element={<AppLayout />}>
 				<Route path="/" element={<Home />} />
-				<Route path="/closet" element={<Closet />} />
-				<Route path="/mascotas" element={<Pets />} />
 				<Route path="/comprar" element={<Shop />} />
 				<Route path="/pedidos" element={<Orders />} />
 				<Route path="/billetera" element={<Wallet />} />
-				<Route path="/productos" element={<Explore />} />
-				<Route path="/reclamar" element={<Claim />} />
+				<Route path="/closet" element={<Closet />} />
+				<Route path="/hogar" element={<Hogar />} />
+				<Route path="/mascotas" element={<Pets />} />
 				<Route path="/tareas" element={<Tasks />} />
-				<Route path="/tienda" element={<Store />} />
+				<Route path="/reclamar" element={<Claim />} />
 				<Route path="/tiendas" element={<Stores />} />
+				<Route path="/tiendas/:ref" element={<StoreProfile />} />
+				<Route path="/tienda" element={<Store />} />
+				<Route path="/productos" element={<Explore />} />
 				<Route path="/escrows" element={<Escrows />} />
 				<Route path="/debug" element={<Debug />} />
 				<Route path="/debug/:contractName" element={<Debug />} />
@@ -39,90 +42,52 @@ function App() {
 	)
 }
 
+const navClass = ({ isActive }: { isActive: boolean }) =>
+	isActive ? styles.active : ""
+
 const AppLayout = () => (
 	<div className={styles.AppLayout}>
 		<header className={styles.header}>
 			<NavLink to="/" className={styles.logo}>
 				Mascota Digital
 			</NavLink>
-			<nav className={styles.headerNav}>
-				<NavLink
-					to="/closet"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Mi clóset
-				</NavLink>
-				<NavLink
-					to="/comprar"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
+			<nav className={styles.headerNav} aria-label="Principal">
+				<NavLink to="/comprar" className={navClass}>
 					Comprar
 				</NavLink>
-				<NavLink
-					to="/pedidos"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Pedidos
+				<NavLink to="/closet" className={navClass}>
+					Mi clóset
 				</NavLink>
-				<NavLink
-					to="/billetera"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Billetera
+				<NavLink to="/hogar" className={navClass}>
+					Mi hogar
 				</NavLink>
-				<NavLink
-					to="/productos"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Productos
-				</NavLink>
-				<NavLink
-					to="/mascotas"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
+				<NavLink to="/mascotas" className={navClass}>
 					Mascotas
 				</NavLink>
-				<NavLink
-					to="/reclamar"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
+				<NavLink to="/tareas" className={navClass}>
+					Misiones
+				</NavLink>
+				<NavLink to="/reclamar" className={navClass}>
 					Reclamar
 				</NavLink>
-				<NavLink
-					to="/tareas"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Tareas
+				<NavLink to="/tiendas" className={navClass}>
+					Negocios
 				</NavLink>
-				<NavLink
-					to="/tienda"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Tienda
+				<NavLink to="/tienda" end className={navClass}>
+					Mi negocio
 				</NavLink>
-				<NavLink
-					to="/tiendas"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Tiendas
-				</NavLink>
-				<NavLink
-					to="/escrows"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Escrow Studio
-				</NavLink>
-				<NavLink
-					to="/debug"
-					className={({ isActive }) => (isActive ? styles.active : "")}
-				>
-					Contracts
-				</NavLink>
-				<a href={labPrefix()} target="_blank" rel="noreferrer">
-					Transaction Explorer
-				</a>
 			</nav>
-			<ConnectAccount />
+			<div className={styles.account}>
+				<nav className={styles.accountNav} aria-label="Cuenta">
+					<NavLink to="/pedidos" className={navClass}>
+						Pedidos
+					</NavLink>
+					<NavLink to="/billetera" className={navClass}>
+						Billetera
+					</NavLink>
+				</nav>
+				<ConnectAccount />
+			</div>
 		</header>
 
 		<main className={styles.main}>
@@ -130,7 +95,7 @@ const AppLayout = () => (
 		</main>
 
 		<footer className={styles.footer}>
-			<nav className={styles.footerNav}>
+			<nav className={styles.footerNav} aria-label="Enlaces de ayuda">
 				<a
 					href="https://github.com/stellar-scaffold/cli"
 					target="_blank"

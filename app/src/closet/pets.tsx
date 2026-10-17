@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useState, type ReactNode } from "react"
 
 export type PetKey = "perro" | "gato" | "conejo" | "zorro" | "panda" | "pajaro"
 
@@ -7,6 +7,8 @@ export interface Pet {
 	name: string
 	species: string
 	description: string
+	/** Price in XLM (Testnet), paid to the platform account. */
+	priceXlm: number
 	color: string
 }
 
@@ -16,6 +18,7 @@ export const PETS: Pet[] = [
 		name: "Canelo",
 		species: "Perro",
 		description: "Leal y juguetón, siempre lo espera con la cola en alto.",
+		priceXlm: 60,
 		color: "#c98b4f",
 	},
 	{
@@ -23,6 +26,7 @@ export const PETS: Pet[] = [
 		name: "Mishi",
 		species: "Gato",
 		description: "Tranquilo y curioso, le gusta dormir al sol.",
+		priceXlm: 70,
 		color: "#8f9aa8",
 	},
 	{
@@ -30,6 +34,7 @@ export const PETS: Pet[] = [
 		name: "Nube",
 		species: "Conejo",
 		description: "Suave y ágil, salta de alegría con cada tarea.",
+		priceXlm: 50,
 		color: "#e9d7c4",
 	},
 	{
@@ -37,6 +42,7 @@ export const PETS: Pet[] = [
 		name: "Chispa",
 		species: "Zorro",
 		description: "Astuto y veloz, siempre encuentra el mejor camino.",
+		priceXlm: 110,
 		color: "#d9672b",
 	},
 	{
@@ -44,6 +50,7 @@ export const PETS: Pet[] = [
 		name: "Bambú",
 		species: "Panda",
 		description: "Paciente y cariñoso, disfruta cada momento con calma.",
+		priceXlm: 150,
 		color: "#f4f1ec",
 	},
 	{
@@ -51,6 +58,7 @@ export const PETS: Pet[] = [
 		name: "Piquito",
 		species: "Pájaro",
 		description: "Alegre y cantarín, anuncia sus buenas noticias.",
+		priceXlm: 40,
 		color: "#3f9bb8",
 	},
 ]
@@ -273,4 +281,56 @@ export const usePet = () => {
 		}
 	}, [])
 	return { petKey, setPet }
+}
+
+const ownedKey = (address: string) => `closet:pets:${address}`
+
+/** Reads the saved list and keeps only known pet keys, without repeats. */
+const readOwned = (address?: string): PetKey[] => {
+	if (!address) return []
+	try {
+		const parsed: unknown = JSON.parse(
+			localStorage.getItem(ownedKey(address)) ?? "[]",
+		)
+		if (!Array.isArray(parsed)) return []
+		return PETS.map((p) => p.key).filter((key) => parsed.includes(key))
+	} catch {
+		return []
+	}
+}
+
+/** Pets bought by this wallet, kept in this browser (localStorage). */
+export const useOwnedPets = (address?: string) => {
+	const [state, setState] = useState(() => ({
+		address,
+		owned: readOwned(address),
+	}))
+
+	// Re-read the list when the connected wallet changes.
+	useEffect(() => {
+		setState((prev) =>
+			prev.address === address ? prev : { address, owned: readOwned(address) },
+		)
+	}, [address])
+
+	const owned = state.address === address ? state.owned : readOwned(address)
+
+	const add = useCallback(
+		(key: PetKey) => {
+			if (!address) return
+			const next = readOwned(address)
+			if (!next.includes(key)) next.push(key)
+			setState({ address, owned: next })
+			try {
+				localStorage.setItem(ownedKey(address), JSON.stringify(next))
+			} catch {
+				// private mode: the purchase lasts only for this visit
+			}
+		},
+		[address],
+	)
+
+	const isOwned = useCallback((key: PetKey) => owned.includes(key), [owned])
+
+	return { owned, add, isOwned }
 }

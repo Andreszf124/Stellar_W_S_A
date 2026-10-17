@@ -12,9 +12,19 @@ import styles from "./closet.module.css"
 
 // The SVG strings come from avatarArt.ts, built only from the fixed catalog
 // with hex-checked colors, never from user input.
-export const Avatar = ({ wear, look }: { wear: Wear[]; look?: Look }) => (
+export const Avatar = ({
+	wear,
+	look,
+	label = "Su avatar",
+}: {
+	wear: Wear[]
+	look?: Look
+	label?: string
+}) => (
 	<div
 		className={styles.avatar}
+		role="img"
+		aria-label={label}
 		dangerouslySetInnerHTML={{ __html: avatarSvg(wear, look) }}
 	/>
 )
@@ -27,9 +37,17 @@ export const ModelThumb = ({ model }: { model: Model }) =>
 		<Avatar wear={[{ slot: model.slot, key: model.key, color: model.color }]} />
 	)
 
-export const HomeScene = ({ furniture }: { furniture: Furnishing[] }) => (
+export const HomeScene = ({
+	furniture,
+	label = "Su hogar digital",
+}: {
+	furniture: Furnishing[]
+	label?: string
+}) => (
 	<div
 		className={styles.scene}
+		role="img"
+		aria-label={label}
 		dangerouslySetInnerHTML={{ __html: roomSvg(furniture) }}
 	/>
 )

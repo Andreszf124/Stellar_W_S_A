@@ -5,7 +5,7 @@ import {
 	CATEGORY_LABEL,
 	MODELS,
 	type CategoryTag,
-	type Model,
+	type Product,
 } from "../closet/catalog"
 import {
 	friendlyError,
@@ -13,11 +13,15 @@ import {
 	type ClosetItem,
 } from "../closet/closetService"
 import { Avatar, ModelThumb } from "../closet/components"
+import { lockingMission, type Mission } from "../closet/missions"
+import { formatXlm } from "../closet/money"
 import styles from "../closet/shop.module.css"
-import { toXlm, useXlmRate } from "../closet/useXlmRate"
+import { useBusinesses } from "../closet/useBusinesses"
+import { useMissions, useUserProgress } from "../closet/useMissions"
+import { useProducts } from "../closet/useProducts"
 import { useWallet } from "../hooks/useWallet"
 
-const CheckoutDialog = lazy(() => import("../closet/CheckoutDialog"))
+const ProductCheckout = lazy(() => import("../closet/ProductCheckout"))
 
 // Same page size as the catalog page, so both share one cache.
 const PAGE_SIZE = 24
@@ -40,11 +44,30 @@ const STEPS = [
 
 const FEATURED = MODELS.find((m) => m.key === "hoodie") ?? MODELS[0]
 
+const productId = (p: Product) => `${p.store ?? ""}|${p.key}|${p.name}`
+
+interface Offer {
+	/** Units this person can buy now, oldest first. */
+	open: ClosetItem[]
+	/** A mission that locks at least one unit, if any. */
+	lockedBy?: Mission
+	/** Businesses that have units of it, open or locked. */
+	sellers: string[]
+}
+
 const Shop = () => {
 	const { address } = useWallet()
-	const { rate, live } = useXlmRate()
+	const { products }: { products: Product[] } = useProducts()
+	const { missions } = useMissions()
+	const { progress, isLoading: progressLoading } = useUserProgress(
+		address ?? undefined,
+	)
+	const { byWallet, nameOf } = useBusinesses()
 	const [filter, setFilter] = useState<Filter>("all")
-	const [buying, setBuying] = useState<{ model: Model; unit: ClosetItem }>()
+	const [buying, setBuying] = useState<{
+		product: Product
+		units: ClosetItem[]
+	}>()
 	const [needWallet, setNeedWallet] = useState(false)
 	const opener = useRef<HTMLButtonElement | null>(null)
 
@@ -78,7 +101,7 @@ const Shop = () => {
 	}, [hasNextPage, isFetchingNextPage, error, loaded.length, fetchNextPage])
 
 	// Units still for sale per product name, oldest first.
-	const stock = useMemo(() => {
+	const unclaimed = useMemo(() => {
 		const byName = new Map<string, ClosetItem[]>()
 		for (const item of [...loaded].reverse()) {
 			if (item.claimed) continue
@@ -87,19 +110,79 @@ const Shop = () => {
 		return byName
 	}, [loaded])
 
-	const models = MODELS.filter((m) => filter === "all" || m.category === filter)
+	// What each product offers this person: free units, locked ones and sellers.
+	const offers = useMemo(() => {
+		const map = new Map<string, Offer>()
+		for (const product of products) {
+			const units = (unclaimed.get(product.name) ?? []).filter(
+				(u) => !product.store || u.store === product.store,
+			)
+			const open: ClosetItem[] = []
+			let lockedBy: Mission | undefined
+			for (const unit of units) {
+				const lock = lockingMission(
+					missions,
+					progress,
+					product.name,
+					unit.store,
+				)
+				if (lock) lockedBy ??= lock
+				else open.push(unit)
+			}
+			map.set(productId(product), {
+				open,
+				lockedBy,
+				sellers: [...new Set(units.map((u) => u.store))],
+			})
+		}
+		return map
+	}, [products, unclaimed, missions, progress])
+
+	const shown = products.filter(
+		(p) => filter === "all" || p.category === filter,
+	)
 	const incomplete = total > loaded.length
 
-	const buy = (model: Model, button: HTMLButtonElement) => {
-		const unit = stock.get(model.name)?.[0]
-		if (!unit) return
+	const buy = (
+		product: Product,
+		open: ClosetItem[],
+		button: HTMLButtonElement,
+	) => {
+		if (open.length === 0) return
 		if (!address) {
 			setNeedWallet(true)
 			return
 		}
 		setNeedWallet(false)
 		opener.current = button
-		setBuying({ model, unit })
+		// A snapshot: the list changes when the payment refreshes the stock, and
+		// the open window must keep showing its receipt.
+		setBuying({ product, units: open })
+	}
+
+	const sellerLine = (product: Product, sellers: string[]) => {
+		const wallets =
+			product.store && sellers.length === 0 ? [product.store] : sellers
+		const [wallet] = wallets
+		if (!wallet) return null
+		if (wallets.length > 1) {
+			return (
+				<p className={styles.seller}>Vendido por {wallets.length} negocios</p>
+			)
+		}
+		const ref = byWallet(wallet)?.ref
+		return (
+			<p className={styles.seller}>
+				Vendido por{" "}
+				{ref ? (
+					<Link to={`/tiendas/${encodeURIComponent(ref)}`}>
+						{nameOf(wallet)}
+					</Link>
+				) : (
+					nameOf(wallet)
+				)}
+			</p>
+		)
 	}
 
 	return (
@@ -175,36 +258,48 @@ const Shop = () => {
 			)}
 
 			<ul className={styles.grid}>
-				{models.map((model) => {
-					const available = stock.get(model.name)?.length ?? 0
+				{shown.map((product) => {
+					const offer = offers.get(productId(product))
+					const open = offer?.open ?? []
+					const lockedBy = open.length === 0 ? offer?.lockedBy : undefined
+					const checking = query.isLoading || progressLoading
 					return (
-						<li key={model.key} className={styles.card}>
+						<li key={productId(product)} className={styles.card}>
 							<div className={styles.thumb}>
-								<ModelThumb model={model} />
+								<ModelThumb model={product} />
 							</div>
-							<h3>{model.name}</h3>
+							<h3>{product.name}</h3>
 							<span className={styles.badge}>
-								{CATEGORY_LABEL[model.category]}
+								{CATEGORY_LABEL[product.category]}
 							</span>
-							<p className={styles.desc}>{model.desc}</p>
+							<p className={styles.desc}>{product.desc}</p>
 							<p className={styles.price}>
-								<strong>${model.priceUsd.toFixed(2)}</strong>
-								<span>≈ {toXlm(model.priceUsd, rate)} XLM</span>
+								<strong>{formatXlm(product.priceXlm)}</strong>
 							</p>
-							<p className={available ? styles.stock : styles.out}>
-								{query.isLoading
-									? "Revisando..."
-									: available
-										? `${available} disponible${available > 1 ? "s" : ""}`
-										: "Agotado"}
-							</p>
+							{sellerLine(product, offer?.sellers ?? [])}
+							{lockedBy && !checking ? (
+								<p className={styles.locked}>
+									Bloqueado por misión:{" "}
+									<Link to="/tareas">{lockedBy.title}</Link>
+									{!address &&
+										" Conecte su billetera para ver si ya la cumplió."}
+								</p>
+							) : (
+								<p className={open.length ? styles.stock : styles.out}>
+									{checking
+										? "Revisando..."
+										: open.length
+											? `${open.length} disponible${open.length > 1 ? "s" : ""}`
+											: "Agotado"}
+								</p>
+							)}
 							<button
 								type="button"
 								className={styles.buy}
-								disabled={available === 0}
-								onClick={(e) => buy(model, e.currentTarget)}
+								disabled={open.length === 0}
+								onClick={(e) => buy(product, open, e.currentTarget)}
 							>
-								Comprar
+								{lockedBy && !checking ? "Bloqueado" : "Comprar"}
 							</button>
 						</li>
 					)
@@ -212,17 +307,16 @@ const Shop = () => {
 			</ul>
 
 			<p className={styles.muted}>
-				El precio en XLM usa una tasa {live ? "en vivo" : "de prueba"} de $
-				{rate.toFixed(4)}. ¿Ya tiene un código?{" "}
+				Todos los precios están en XLM. ¿Ya tiene un código?{" "}
 				<Link to="/reclamar">Reclame su ítem</Link>.
 			</p>
 
 			{buying && address && (
 				<Suspense fallback={null}>
-					<CheckoutDialog
-						key={buying.unit.id}
-						model={buying.model}
-						unit={buying.unit}
+					<ProductCheckout
+						key={productId(buying.product)}
+						product={buying.product}
+						units={buying.units}
 						address={address}
 						onClose={() => {
 							setBuying(undefined)
