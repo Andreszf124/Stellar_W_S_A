@@ -84,3 +84,10 @@ contracts:
       owner: ${account.me}
     networks:
       local:
+
+  grano-de-origen:
+    type: workspace
+    source: grano-de-origen
+    networks:
+      local:
+      testnet:
