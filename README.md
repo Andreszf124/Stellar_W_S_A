@@ -1,4 +1,4 @@
-# Mascota Digital
+# ZooKi
 
 Tienda donde cada producto físico que se compra trae un ítem NFT en la red Stellar, con el que se viste un avatar. El diseño y las vistas vienen del prototipo "Nebula Wear" (`StellarAvatarStore`); la parte de Stellar usa billetera real y un contrato Soroban.
 

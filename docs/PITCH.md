@@ -1,4 +1,4 @@
-# Pitch: Mascota Digital
+# Pitch: ZooKi
 
 Nombre de trabajo. Beta en Stellar Testnet. Equipo: Wilson, Keylin y Andrés.
 

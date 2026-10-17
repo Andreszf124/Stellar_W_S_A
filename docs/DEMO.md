@@ -1,6 +1,6 @@
 # Guion de demostración (4 minutos)
 
-Proyecto: Mascota Digital. App beta sobre Stellar Testnet, con el diseño de
+Proyecto: ZooKi. App beta sobre Stellar Testnet, con el diseño de
 Nebula Wear.
 
 ## Antes de empezar

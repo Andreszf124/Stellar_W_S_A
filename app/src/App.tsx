@@ -67,7 +67,7 @@ const AppLayout = () => {
 						✦
 					</span>
 					<span className={styles.logoText}>
-						<span className={styles.logoName}>Mascota Digital</span>
+						<span className={styles.logoName}>ZooKi</span>
 						<span className={styles.logoTag}>
 							Productos reales · Ítems reales · En Stellar
 						</span>
