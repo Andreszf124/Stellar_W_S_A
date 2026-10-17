@@ -167,6 +167,9 @@ const StoreDirectory = () => {
 					))}
 				</ul>
 			)}
+			<Link to="/tiendas" className={styles.linkButton}>
+				Ver todas las tiendas
+			</Link>
 		</div>
 	)
 }
