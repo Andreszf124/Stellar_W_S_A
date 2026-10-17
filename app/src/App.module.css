@@ -29,19 +29,10 @@
 }
 
 .logoMark {
-	display: grid;
-	place-items: center;
+	display: block;
 	flex: none;
 	width: 40px;
 	height: 40px;
-	border-radius: 12px;
-	font-size: 1.35rem;
-	color: var(--color-on-accent);
-	background: linear-gradient(
-		135deg,
-		var(--color-accent),
-		var(--color-accent-2)
-	);
 }
 
 .logoText {

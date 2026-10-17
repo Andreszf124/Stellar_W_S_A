@@ -63,9 +63,13 @@ const AppLayout = () => {
 		<div className={styles.AppLayout}>
 			<header className={styles.header}>
 				<NavLink to="/" className={styles.logo}>
-					<span className={styles.logoMark} aria-hidden="true">
-						✦
-					</span>
+					<img
+						className={styles.logoMark}
+						src="/zooki-icon.svg"
+						alt=""
+						width={40}
+						height={40}
+					/>
 					<span className={styles.logoText}>
 						<span className={styles.logoName}>ZooKi</span>
 						<span className={styles.logoTag}>
