@@ -20,8 +20,8 @@ const Home = () => (
 	<div className={styles.page}>
 		<h1>Lo que compra, también en su mundo digital</h1>
 		<p className={styles.lead}>
-			Cada prenda o mueble que compra en una tienda aliada le da su versión
-			digital para su avatar y su hogar. Con tareas, usted lo hace crecer.
+			Cada prenda o mueble que compra en una tienda le da su versión digital
+			para su avatar y su hogar. Con tareas, usted lo hace crecer.
 		</p>
 
 		<div className={styles.actions}>

@@ -1,0 +1,62 @@
+name: Build and test
+
+on:
+  push:
+    branches: ["main", "mascota"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  contract:
+    name: Contract (test, fmt, clippy, wasm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The pinned channel and wasm target live in rust-toolchain.toml.
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install 1.93.0 --profile minimal \
+            --component clippy --component rustfmt --target wasm32v1-none
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Test
+        run: cargo test -p closet --locked
+      - name: Clippy
+        run: cargo clippy -p closet --all-targets --locked -- -D warnings
+      - name: Build wasm
+        run: cargo build -p closet --target wasm32v1-none --release --locked
+
+  app:
+    name: App (lint, typecheck, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # A transitive wallet dependency runs `yarn setup` on install, so skip
+      # install scripts.
+      - run: npm install --ignore-scripts --no-audit --no-fund
+
+      # The generated contract clients are versioned in app-lib/clients and the
+      # public Testnet settings are in app/.env.production, so the app builds
+      # without redeploying anything.
+      - name: Lint
+        run: npm run lint --workspace app
+      - name: Typecheck and build
+        run: npm run build --workspace app
