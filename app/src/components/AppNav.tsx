@@ -20,11 +20,5 @@ export const AppNav = () => (
 				{label}
 			</NavLink>
 		))}
-		<NavLink
-			to="/debug"
-			className={({ isActive }) => (isActive ? styles.active : "")}
-		>
-			Depurador
-		</NavLink>
 	</nav>
 )

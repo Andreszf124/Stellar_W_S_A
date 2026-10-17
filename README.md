@@ -87,32 +87,42 @@ La UI depende solo de la interfaz `LotService`; el cliente generado
 git clone https://github.com/EZunigaF/grano-de-origen.git
 cd grano-de-origen
 cp app/.env.example .env        # ver "Variables de entorno"
+cp .env app/.env
 npm install
-npm run dev
+cd app
+npx vite
 ```
 
-`npm run dev` ejecuta `stellar scaffold watch --build-clients` junto con Vite;
-abre la URL que imprime Vite. Con `STELLAR_NETWORK=local` necesita Docker
+`npx vite` solo levanta la interfaz y usa el contrato ya desplegado en Testnet
+(ver el ID arriba). El cliente del contrato se genera con el build de Scaffold
+(ver "Despliegue a Testnet") y no se versiona; un clon nuevo debe generarlo
+antes de que la app compile.
+
+Evita `npm run dev` salvo que quieras desarrollar el contrato: ejecuta
+`stellar scaffold watch --build-clients`, que compila y puede desplegar de nuevo
+el contrato, lo que cambiaría su ID. Con `STELLAR_NETWORK=local` necesita Docker
 Desktop encendido. Otros scripts (en `app/`): `npm run build`, `npm run lint`,
 `npm run typecheck`.
 
 ## Despliegue a Testnet
 
-`scaffold.yml` ya define la red `testnet` con la cuenta `testnet-user`
-(fondeada con Friendbot en el primer build) y `allow-deploy: true`. Falta
-declarar el contrato `grano-de-origen` bajo `contracts:` con una entrada
-`testnet`; las entradas actuales son del template.
+`scaffold.yml` define la red `testnet` con la cuenta `testnet-user` (fondeada con
+Friendbot en el primer build) y `allow-deploy: true`, y declara el contrato
+`grano-de-origen` en las redes `local` y `testnet`.
 
-1. Fijar `STELLAR_NETWORK=testnet` y los `PUBLIC_STELLAR_*` de Testnet en `.env`.
-2. Construir y desplegar con Scaffold hacia `testnet`. `scaffold.yml` indica que
-   la red se elige con `--network <nombre>` o `STELLAR_NETWORK`, pero **no pude
-   confirmar el subcomando exacto** para un despliegue único a Testnet;
-   revisa `stellar scaffold --help`.
-3. Alternativa que documenta el template: `stellar registry publish` y luego
-   `stellar registry deploy --deployed-name <nombre> --published-name <nombre>
-   -- <args del constructor>`. No está probada con este contrato.
-4. Anotar el ID resultante en este README (`CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`).
-5. Cargar lotes de ejemplo:
+1. Fijar `STELLAR_NETWORK=testnet` y los `PUBLIC_STELLAR_*` de Testnet en `.env`
+   (raíz y `app/`).
+2. Compilar, desplegar y generar el cliente (comando probado):
+
+```bash
+stellar-scaffold build --package grano-de-origen --build-clients --network testnet
+```
+
+   Crea y fondea `testnet-user` si no existe, y su clave queda en `.config/`
+   (ignorado por git). El primer despliegue produjo el ID de arriba. Repetir el
+   comando no está probado y podría crear otra instancia con otro ID.
+3. Si el ID cambia, actualizarlo en este README y en `docs/DEMO.md`.
+4. Cargar lotes de ejemplo:
 
 ```bash
 export GRANO_CONTRACT_ID=CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3
@@ -122,15 +132,16 @@ node scripts/seed-lots.mjs
 ```
 
 El script invoca `register_lot` con `stellar contract invoke` para tres lotes
-(Tarrazú, Naranjo, Tres Ríos). Asume los parámetros `owner`, `farm`, `harvest`
-y `process`; confírmalos con `register_lot --help`.
+(Tarrazú, Naranjo, Tres Ríos). Ya se ejecutó una vez contra el contrato de
+arriba: `lot_count` devuelve 3. Los lotes quedan a nombre de `testnet-user`, así
+que desde el navegador solo se pueden transferir los lotes que registres con tu
+propia billetera.
 
 ## Variables de entorno
 
-La plantilla es `app/.env.example`. En la raíz no hay `.env.example`, aunque el
-README del template pide copiarlo desde ahí; no confirmé qué ubicación lee cada
-herramienta, así que si algo no resuelve, copia el archivo a ambas carpetas.
-Solo contiene configuración pública de red, sin secretos:
+La plantilla es `app/.env.example`. El Stellar CLI lee el `.env` de la raíz y
+Vite el de `app/`, así que debe existir una copia en ambas carpetas. Solo
+contiene configuración pública de red, sin secretos:
 
 | Variable                            | Uso                                                |
 | ----------------------------------- | -------------------------------------------------- |
