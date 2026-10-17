@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { FormField } from "../components/FormField"
 import { SearchIcon } from "../components/Icons"
@@ -20,6 +20,11 @@ const LotLookup = () => {
 	const navigate = useNavigate()
 	const [search, setSearch] = useState(idParam ?? "")
 	const [searchError, setSearchError] = useState<string>()
+
+	// Keep the search box in step with the URL (back button, shared links).
+	useEffect(() => {
+		setSearch(idParam ?? "")
+	}, [idParam])
 
 	const id = parseLotId(idParam)
 	const invalidParam = idParam !== undefined && id === null

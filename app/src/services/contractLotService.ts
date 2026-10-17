@@ -1,7 +1,7 @@
 import { signTransaction } from "@stellar-scaffold/app-lib"
 import { granoDeOrigen } from "@stellar-scaffold/app-lib/clients"
 import { LotError, type LotErrorCode } from "./errors"
-import  { type Lot, type LotService } from "./lotService"
+import { type Lot, type LotService } from "./lotService"
 
 /** Contract error numbers, as declared in contracts/grano-de-origen/src/error.rs. */
 const CONTRACT_ERROR_CODES: Record<number, LotErrorCode> = {
@@ -13,12 +13,25 @@ const CONTRACT_ERROR_CODES: Record<number, LotErrorCode> = {
 
 const CONTRACT_ERROR_PATTERN = /Error\(Contract, #(\d+)\)/
 
+/**
+ * Read calls return the error's doc text instead of its number, so match both
+ * (texts come from contracts/grano-de-origen/src/error.rs).
+ */
+const CONTRACT_ERROR_TEXTS: [RegExp, LotErrorCode][] = [
+	[/No lot exists/i, "LotNotFound"],
+	[/not the current owner/i, "NotOwner"],
+	[/text field is empty/i, "InvalidInput"],
+	[/already the current owner/i, "SameOwner"],
+]
+
 /** Turns anything thrown by the generated client into a `LotError`. */
 const toLotError = (error: unknown): LotError => {
 	if (error instanceof LotError) return error
 	const raw = error instanceof Error ? error.message : String(error)
 	const match = CONTRACT_ERROR_PATTERN.exec(raw)
-	const code = match?.[1] ? CONTRACT_ERROR_CODES[Number(match[1])] : undefined
+	const code =
+		(match?.[1] ? CONTRACT_ERROR_CODES[Number(match[1])] : undefined) ??
+		CONTRACT_ERROR_TEXTS.find(([pattern]) => pattern.test(raw))?.[1]
 	if (code) return new LotError(code)
 	if (/reject|declin|denied|cancel/i.test(raw)) {
 		return new LotError(

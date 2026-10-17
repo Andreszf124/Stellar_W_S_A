@@ -9,6 +9,9 @@ import { toFriendlyMessage } from "../services/errors"
 import { isValidAddress, lotService } from "../services/lotService"
 import styles from "./Pages.module.css"
 
+/** Lot ids are u32 in the contract. */
+const MAX_LOT_ID = 4_294_967_295
+
 type Result =
 	| { status: "idle" }
 	| { status: "loading" }
@@ -26,7 +29,10 @@ const TransferForm = ({ caller }: { caller: string }) => {
 		event.preventDefault()
 		const id = /^\d+$/.test(lotId.trim()) ? Number(lotId.trim()) : 0
 		const owner = newOwner.trim()
-		const idMsg = id > 0 ? undefined : "Ingrese un número de lote válido."
+		const idMsg =
+			id > 0 && id <= MAX_LOT_ID
+				? undefined
+				: "Ingrese un número de lote válido."
 		const ownerMsg = isValidAddress(owner)
 			? undefined
 			: "La dirección debe empezar con G y tener 56 caracteres."

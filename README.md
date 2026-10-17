@@ -133,7 +133,7 @@ node scripts/seed-lots.mjs
 
 El script invoca `register_lot` con `stellar contract invoke` para tres lotes
 (Tarrazú, Naranjo, Tres Ríos). Ya se ejecutó una vez contra el contrato de
-arriba: `lot_count` devuelve 3. Los lotes quedan a nombre de `testnet-user`, así
+arriba: los lotes 1 a 3 son de ejemplo. El lote 4 es una prueba de integración. Los lotes quedan a nombre de `testnet-user`, así
 que desde el navegador solo se pueden transferir los lotes que registres con tu
 propia billetera.
 

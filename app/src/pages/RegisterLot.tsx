@@ -52,7 +52,12 @@ const RegisterForm = ({ owner }: { owner: string }) => {
 
 		setResult({ status: "loading" })
 		try {
-			const id = await lotService.registerLot({ owner, ...values })
+			const id = await lotService.registerLot({
+				owner,
+				farm: values.farm.trim(),
+				harvest: values.harvest.trim(),
+				process: values.process.trim(),
+			})
 			setResult({ status: "success", id })
 			setValues(EMPTY)
 		} catch (e) {
