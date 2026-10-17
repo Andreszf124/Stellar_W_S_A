@@ -7,8 +7,8 @@ escaneando un QR y el lote se transfiere on-chain al comprador.
 Proyecto del reto "Grano de Origen" del TicoChallenge (Universidad Fidélitas),
 creado sobre [Scaffold Stellar](https://github.com/stellar-scaffold/cli).
 
-- Contrato en Testnet: `<CONTRACT_ID_TESTNET>` (pendiente de despliegue)
-- Explorador: `<URL_EXPLORADOR_TESTNET>`
+- Contrato en Testnet: `CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`
+- Explorador: `https://lab.stellar.org/r/testnet/contract/CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`
 - Frontend desplegado: `<URL_FRONTEND>`
 - Guion de la demo: [docs/DEMO.md](docs/DEMO.md)
 
@@ -84,7 +84,7 @@ La UI depende solo de la interfaz `LotService`; el cliente generado
 ## Correr en local
 
 ```bash
-git clone <URL_DEL_REPO>
+git clone https://github.com/EZunigaF/grano-de-origen.git
 cd grano-de-origen
 cp app/.env.example .env        # ver "Variables de entorno"
 npm install
@@ -111,11 +111,11 @@ declarar el contrato `grano-de-origen` bajo `contracts:` con una entrada
 3. Alternativa que documenta el template: `stellar registry publish` y luego
    `stellar registry deploy --deployed-name <nombre> --published-name <nombre>
    -- <args del constructor>`. No está probada con este contrato.
-4. Anotar el ID resultante en este README (`<CONTRACT_ID_TESTNET>`).
+4. Anotar el ID resultante en este README (`CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`).
 5. Cargar lotes de ejemplo:
 
 ```bash
-export GRANO_CONTRACT_ID=<CONTRACT_ID_TESTNET>
+export GRANO_CONTRACT_ID=CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3
 export GRANO_SOURCE=testnet-user
 node scripts/seed-lots.mjs --dry-run   # revisar los comandos
 node scripts/seed-lots.mjs

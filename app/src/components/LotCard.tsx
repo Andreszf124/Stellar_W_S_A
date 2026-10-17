@@ -2,6 +2,7 @@ import { type ReactNode } from "react"
 import { type Lot } from "../services/lotService"
 import { CalendarIcon, PinIcon, ProcessIcon, UserIcon } from "./Icons"
 import styles from "./LotCard.module.css"
+import { LotQr } from "./LotQr"
 
 const formatDate = (seconds: bigint) =>
 	new Date(Number(seconds) * 1000).toLocaleDateString("es-CR", {
@@ -51,5 +52,8 @@ export const LotCard = ({ lot }: { lot: Lot }) => (
 				{formatDate(lot.created_at)}
 			</Row>
 		</dl>
+		<footer className={styles.qr}>
+			<LotQr lotId={lot.id} size={160} />
+		</footer>
 	</article>
 )

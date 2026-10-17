@@ -13,10 +13,10 @@ Los marcadores `<...>` se completan tras el despliegue.
 
 - [ ] Wallet del productor con fondos de Testnet (Friendbot) y red en Testnet.
 - [ ] Segunda wallet (comprador) con su dirección copiada y a mano.
-- [ ] Contrato desplegado y su ID anotado: `<CONTRACT_ID_TESTNET>`.
+- [ ] Contrato desplegado y su ID anotado: `CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`.
 - [ ] 3 lotes cargados (`node scripts/seed-lots.mjs`) y `lot_count` = 3 verificado.
 - [ ] QR de un lote en pantalla o impreso, probado con un celular.
-- [ ] Pestaña del explorador de Testnet abierta en el contrato (`<URL_EXPLORADOR_TESTNET>`).
+- [ ] Pestaña del explorador de Testnet abierta en el contrato (`https://lab.stellar.org/r/testnet/contract/CDTZKQAOMBPHRD7YK73ETWPJYDTVDM66DRBKQT375RHQSO7I7JZA6SI3`).
 - [ ] Frontend corriendo (`<URL_FRONTEND>` o `npm run dev`) con `.env` en Testnet.
 - [ ] Wi-Fi probado y hotspot del celular como respaldo.
 - [ ] Plan B: video de la demo completa (máx. 2:30) listo en pantalla completa,

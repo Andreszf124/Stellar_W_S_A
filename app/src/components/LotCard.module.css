@@ -61,3 +61,10 @@
 		gap: 0.15rem;
 	}
 }
+
+.qr {
+	display: flex;
+	justify-content: center;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--cafe-border, rgba(0, 0, 0, 0.12));
+}

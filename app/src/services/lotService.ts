@@ -1,7 +1,4 @@
-// import { granoDeOrigen } from "@stellar-scaffold/app-lib/clients"
-// TODO: when the generated client exists, implement `LotService` on top of
-// `granoDeOrigen` (see signAndSend flow in GuessTheNumber) and export it as
-// `lotService`. UI code only depends on the `LotService` interface below.
+import { contractLotService } from "./contractLotService"
 import { LotError } from "./errors"
 
 export interface Lot {
@@ -113,5 +110,5 @@ function createMockLotService(): LotService {
 
 export const mockLotService: LotService = createMockLotService()
 
-// Swap for the real client adapter once the contract is deployed.
-export const lotService: LotService = mockLotService
+// UI code uses this. `mockLotService` stays available for local UI work.
+export const lotService: LotService = contractLotService
