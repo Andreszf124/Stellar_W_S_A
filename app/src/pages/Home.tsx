@@ -1,5 +1,20 @@
-import { Link } from "react-router-dom"
+﻿import { Link } from "react-router-dom"
 import styles from "../closet/closet.module.css"
+
+const ICONS = [
+	<g key="icon1">
+		<path d="M6 8h12l-1 12H7L6 8z" />
+		<path d="M9 8a3 3 0 016 0" />
+	</g>,
+	<g key="icon2">
+		<rect x="4" y="4" width="16" height="16" rx="3" />
+		<path d="M8 12.5l3 3 5-6" />
+	</g>,
+	<g key="icon3">
+		<circle cx="12" cy="7" r="3" />
+		<path d="M5 20c0-4 3-6 7-6s7 2 7 6" />
+	</g>,
+]
 
 const STEPS = [
 	{
@@ -37,8 +52,20 @@ const Home = () => (
 		</div>
 
 		<ol className={styles.steps}>
-			{STEPS.map((step) => (
+			{STEPS.map((step, i) => (
 				<li key={step.title}>
+					<svg
+						className={styles.stepIcon}
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.8"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
+						{ICONS[i]}
+					</svg>
 					<h2>{step.title}</h2>
 					<p>{step.text}</p>
 				</li>
