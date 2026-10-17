@@ -4,6 +4,7 @@ export type Slot =
 	| "ears"
 	| "neck"
 	| "top"
+	| "legs"
 	| "feet"
 	| "furniture"
 
@@ -122,6 +123,48 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#14b8a6",
+	},
+	{
+		key: "pants",
+		name: "Pantalón de mezclilla",
+		category: "Clothing",
+		slot: "legs",
+		color: "#2563eb",
+	},
+	{
+		key: "scarf",
+		name: "Bufanda de lana",
+		category: "Accessory",
+		slot: "neck",
+		color: "#dc2626",
+	},
+	{
+		key: "table",
+		name: "Mesa de centro",
+		category: "Furniture",
+		slot: "furniture",
+		color: "#a16207",
+	},
+	{
+		key: "plant",
+		name: "Planta decorativa",
+		category: "Furniture",
+		slot: "furniture",
+		color: "#16a34a",
+	},
+	{
+		key: "frame",
+		name: "Cuadro de pared",
+		category: "Furniture",
+		slot: "furniture",
+		color: "#7c3aed",
+	},
+	{
+		key: "clock",
+		name: "Reloj de pared",
+		category: "Furniture",
+		slot: "furniture",
+		color: "#0f766e",
 	},
 ]
 

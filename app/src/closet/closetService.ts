@@ -88,6 +88,40 @@ export async function itemsOf(owner: string): Promise<ClosetItem[]> {
 	return Promise.all(tx.result.map((id) => getItem(id)))
 }
 
+const LIST_BATCH_SIZE = 8
+
+/**
+ * One page of registered items, newest first: ids `total - offset` and down.
+ * Reads run in batches of 8 to keep the RPC load low; missing ids are skipped.
+ */
+export async function listItems(
+	offset: number,
+	limit: number,
+): Promise<{ total: number; items: ClosetItem[] }> {
+	const countTx = await closet.item_count()
+	const total = Number(countTx.result)
+	const first = total - offset
+	const last = Math.max(first - limit + 1, 1)
+	const ids: number[] = []
+	for (let id = first; id >= last; id--) ids.push(id)
+
+	const items: ClosetItem[] = []
+	for (let i = 0; i < ids.length; i += LIST_BATCH_SIZE) {
+		const batch = await Promise.all(
+			ids.slice(i, i + LIST_BATCH_SIZE).map((id) =>
+				getItem(id).catch((e: unknown) => {
+					if (/No item exists|Error\(Contract, #1\)/i.test(errorMessage(e))) {
+						return null
+					}
+					throw e
+				}),
+			),
+		)
+		for (const item of batch) if (item) items.push(item)
+	}
+	return { total, items }
+}
+
 /** The store registers one unit and puts only the hash of its code on-chain. */
 export async function registerItem(
 	store: string,

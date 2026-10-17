@@ -29,8 +29,10 @@ Qué se guarda y dónde:
 | Qué tiene equipado el avatar | `localStorage` del navegador (no viaja entre dispositivos) |
 | Puntos y nivel | Se calculan al momento con lo que el usuario posee y equipa |
 | Arte de cada modelo | Catálogo fijo en `app/src/closet/catalog.ts` |
+| Mascota elegida | `localStorage` del navegador |
+| Directorio de tiendas (3 de ejemplo) | Tabla `stores` de Supabase, solo lectura |
 
-El catálogo de modelos es fijo porque el contrato guarda solo el nombre y la categoría del ítem. La app busca el dibujo comparando ese nombre con la lista (14 modelos: ropa, accesorios y muebles).
+El catálogo de modelos es fijo porque el contrato guarda solo el nombre y la categoría del ítem. La app busca el dibujo comparando ese nombre con la lista (20 tipos de producto: 8 de ropa, 5 accesorios y 7 muebles).
 
 ## Estado actual
 
@@ -39,10 +41,18 @@ El catálogo de modelos es fijo porque el contrato guarda solo el nombre y la ca
 | Contrato `closet` desplegado en Testnet | Marketplace con varias tiendas aliadas (solo existe la página `/tienda` para registrar unidades) |
 | Registro de unidades con huella del código | Pago retenido con escrow (la plantilla trae Escrow Studio, pero requiere una clave de Trustless Work y no se usa) |
 | Reclamo con código de un solo uso | Panel de administrador |
-| Clóset, avatar humanoide y hogar digital | Base de datos (Supabase) |
+| Clóset, avatar humanoide y hogar digital | Guardar progreso o datos de usuario en una base de datos |
 | Equipar y quitar prendas | Inicio de sesión con correo (Cavos) |
-| Tareas, puntos y niveles automáticos | Arte de mascota animal (hoy es un avatar humanoide) |
+| Tareas, puntos y niveles automáticos | Mascota que se vista o suba de nivel por separado (hoy la ropa va en el avatar humano) |
 | Conexión con la billetera Freighter | Interfaz para transferir ítems (el contrato ya lo soporta) |
+| Catálogo de 20 tipos de producto (ropa, accesorios y muebles) | Etiqueta NFC en el empaque |
+| 100 unidades de prueba sembradas en Testnet (20 tipos x 5) | |
+| Página `/productos` para explorar unidades con filtros | |
+| Página `/mascotas` con 6 mascotas para elegir (beta) | |
+| Portada con cifras en vivo, catálogo, sección para tiendas y preguntas frecuentes | |
+| Directorio de tiendas de solo lectura (3 tiendas de ejemplo en Supabase) | |
+| Diseño visual nuevo (paleta cálida, contrastes AA medidos) | |
+| CI: contrato (formato, tests, clippy, wasm) y app (lint, tipos, build) | |
 
 El contrato `reputation` (ID `CB5VHRXKO6CPFKSELKIHN3JJXMLQUDRCEBKDCCVRMZW7A534YLYIRK45`) viene de la plantilla y está desplegado, pero no forma parte del flujo de la mascota.
 
@@ -67,7 +77,13 @@ Categorías: `Clothing`, `Accessory`, `Furniture`.
 
 Errores: `ItemNotFound` (1), `EmptyField` (2), `AlreadyClaimed` (3), `InvalidCode` (4), `NotClaimed` (5), `SameOwner` (6).
 
-El ítem n.º 1 es de una prueba de integración, no de un producto real.
+El ítem n.º 1 es de una prueba de integración, no de un producto real. Los ítems siguientes son 100 unidades de prueba sembradas con `scripts/seed-products.mjs`: 20 tipos de producto x 5 unidades, cada una con su propio código de un solo uso. Los códigos no están en el repositorio: quedan en un CSV local en `scripts/out/` (ignorado por git) y los tiene el equipo.
+
+## Mascotas, productos y tiendas (beta)
+
+- `/mascotas`: 6 mascotas para elegir (perro, gato, conejo, zorro, panda y pájaro). La elección se guarda en el navegador. Es una beta: la ropa y los accesorios se siguen equipando en el avatar humano; las mascotas todavía no se visten ni suben de nivel por separado.
+- `/productos`: explora las unidades registradas en el contrato, con filtros por categoría, estado (Disponible o Reclamado) y búsqueda por nombre.
+- Directorio de tiendas: la portada lee la tabla `stores` de Supabase (migración en `supabase/migrations/`). Es de solo lectura y trae 3 tiendas de EJEMPLO. Con la clave pública nadie puede escribir (verificado). No se guarda progreso ni datos de usuario en la base, y no hay inicio de sesión ni panel de administrador.
 
 ## Cómo probar la demo
 
@@ -78,6 +94,9 @@ Necesita la extensión Freighter instalada, configurada en Testnet y con una cue
 3. **Reclamar** (`/reclamar`): escriba el número y el código y pulse "Reclamar ítem". Firme en Freighter. Para ver el reclamo como otro comprador, cambie de cuenta en Freighter antes de reclamar.
 4. **Mi clóset** (`/closet`): el ítem aparece en la lista. Pulse "Equipar" en una prenda o accesorio para verlo en el avatar. Un mueble aparece solo en el hogar digital.
 5. **Tareas** (`/tareas`): las tareas completadas se marcan solas y suben el nivel.
+6. **Productos** (`/productos`) y **Mascotas** (`/mascotas`): explore las unidades con filtros y elija una mascota.
+
+Para reclamar puede usar el código de una unidad que usted registre en `/tienda`, o uno de los códigos sembrados (los tiene el equipo).
 
 Casos que la app informa con un mensaje: código incorrecto, ítem ya reclamado y firma cancelada en la billetera.
 
@@ -87,7 +106,7 @@ Casos que la app informa con un mensaje: código incorrecto, ítem ya reclamado 
 contracts/closet/       Contrato Soroban (Rust): lib.rs, types.rs, error.rs, storage.rs, test.rs
 contracts/reputation/   Contrato de la plantilla (no se usa en el flujo)
 app/src/closet/         Catálogo, tareas, servicio del contrato, hook useCloset, avatar y hogar
-app/src/pages/          Home, Closet, Claim, Tasks, Store (más Escrows y Debug de la plantilla)
+app/src/pages/          Home, Explore, Pets, Closet, Claim, Tasks, Store (más Escrows y Debug de la plantilla)
 app-lib/                Utilidades de red y billetera (Scaffold Stellar)
 app-lib/clients/        Clientes TypeScript generados de los contratos, versionados en el repo
 environments.toml       Contratos por entorno (desarrollo y staging apuntan a Testnet)
@@ -97,7 +116,9 @@ Rutas de la app:
 
 | Ruta | Página |
 | --- | --- |
-| `/` | Inicio |
+| `/` | Inicio (cifras en vivo, catálogo, tiendas, preguntas frecuentes) |
+| `/productos` | Explorar unidades registradas |
+| `/mascotas` | Elegir mascota (beta) |
 | `/closet` | Mi clóset y hogar |
 | `/reclamar` | Reclamar un ítem |
 | `/tareas` | Tareas y nivel |
@@ -138,7 +159,9 @@ Verificado hasta ahora:
 - Typecheck, lint y build de la app.
 - Un clon limpio del repositorio compila.
 
-Pendiente de verificar: la interfaz en un navegador con Freighter (se está probando) y el aspecto visual.
+CI en GitHub: contrato (formato, tests, clippy, wasm) y app (lint, tipos, build).
+
+Sin verificar por nadie: la interfaz en un navegador con Freighter y cómo se ve a 390 px y 1280 px. Se está ensayando.
 
 ## Créditos y licencia
 

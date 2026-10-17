@@ -107,6 +107,17 @@ const WEARABLES: Record<string, (c: string) => string> = {
 	chain: (c) => `
 		<path d="M82 106 Q100 140 118 106" stroke="${c}" stroke-width="3" fill="none" stroke-dasharray="4 1.5"/>
 		<polygon points="${star(100, 128, 7, 3)}" fill="${c}"/>`,
+	pants: (c) =>
+		pair(
+			(dx) => `
+		<rect x="${72 + dx}" y="184" width="24" height="58" rx="8" fill="${c}"/>
+		<path d="M${84 + dx} 192 V238" stroke="${shade(c, 0.35)}" stroke-width="1.5" stroke-dasharray="3 2"/>`,
+		),
+	scarf: (c) => `
+		<rect x="86" y="96" width="28" height="14" rx="7" fill="${c}"/>
+		<path d="M86 102 H114" stroke="${shade(c, -0.3)}" stroke-width="2"/>
+		<path d="M104 108 L116 108 L118 140 L106 140 Z" fill="${shade(c, -0.3)}"/>
+		<path d="M107 130 H117" stroke="${shade(c, 0.35)}" stroke-width="2"/>`,
 }
 
 const FURNITURE: Record<string, (c: string) => string> = {
@@ -125,6 +136,26 @@ const FURNITURE: Record<string, (c: string) => string> = {
 		<rect x="238" y="104" width="62" height="12" rx="3" fill="${shade(c, -0.2)}"/>
 		<rect x="240" y="162" width="8" height="38" fill="${shade(c, -0.35)}"/>
 		<rect x="288" y="162" width="8" height="38" fill="${shade(c, -0.35)}"/>`,
+	table: (c) => `
+		<rect x="116" y="162" width="108" height="10" rx="3" fill="${c}"/>
+		<rect x="122" y="172" width="8" height="28" fill="${shade(c, -0.35)}"/>
+		<rect x="210" y="172" width="8" height="28" fill="${shade(c, -0.35)}"/>`,
+	plant: (c) => `
+		<path d="M350 170 C330 150 328 130 338 120 C350 130 354 150 350 170 Z" fill="${c}"/>
+		<path d="M350 170 C360 145 372 135 380 134 C378 150 368 164 350 170 Z" fill="${shade(c, -0.25)}"/>
+		<path d="M350 170 C346 150 348 135 352 124 C360 138 358 155 350 170 Z" fill="${shade(c, 0.2)}"/>
+		<path d="M334 170 H366 L362 200 H338 Z" fill="#b45309"/>
+		<rect x="332" y="168" width="36" height="6" rx="2" fill="#92400e"/>`,
+	frame: (c) => `
+		<rect x="300" y="40" width="60" height="44" rx="2" fill="${c}"/>
+		<rect x="306" y="46" width="48" height="32" fill="#f8fafc"/>
+		<circle cx="320" cy="56" r="5" fill="#facc15"/>
+		<path d="M306 78 L322 62 L334 72 L342 64 L354 78 Z" fill="${shade(c, 0.2)}"/>`,
+	clock: (c) => `
+		<circle cx="105" cy="58" r="20" fill="${c}"/>
+		<circle cx="105" cy="58" r="16" fill="#f8fafc"/>
+		<path d="M105 46 V58 L113 63" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+		<circle cx="105" cy="58" r="2" fill="#1f2937"/>`,
 }
 
 const SKIN = "#e0ac69"
@@ -144,10 +175,12 @@ export function avatarSvg(wear: Wear[]) {
 
 	const parts: string[] = []
 	parts.push(
-		pair(
-			(dx) =>
-				`<rect x="${72 + dx}" y="184" width="24" height="58" rx="8" fill="${PANTS}"/>`,
-		),
+		bySlot.has("legs")
+			? draw("legs")
+			: pair(
+					(dx) =>
+						`<rect x="${72 + dx}" y="184" width="24" height="58" rx="8" fill="${PANTS}"/>`,
+				),
 	)
 	parts.push(
 		bySlot.has("feet")
@@ -194,7 +227,7 @@ export function avatarSvg(wear: Wear[]) {
 
 /** The digital home with the owned furniture, as an SVG string. */
 export function roomSvg(items: Furnishing[]) {
-	const furniture = ["rug", "lamp", "chair"]
+	const furniture = ["frame", "clock", "rug", "table", "lamp", "chair", "plant"]
 		.map((key) => {
 			const item = items.find((i) => i.key === key)
 			return item ? (FURNITURE[key]?.(safe(item.color)) ?? "") : ""
