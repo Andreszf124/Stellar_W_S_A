@@ -28,7 +28,7 @@ Flujo que funciona hoy:
 
 - Propiedad verificable: el contrato `closet` guarda quién es el dueño de cada ítem; cualquiera puede consultarlo. El contrato también permite transferir un ítem (la interfaz para hacerlo aún no existe).
 - Huella del código: en la red solo se guarda el sha256 del código de un solo uso. Al reclamar, el comprador revela el código y el contrato comprueba que coincida. Leer la red no basta para reclamar un ítem.
-- Contrato en Testnet: `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`. Tiene 13 tests y fue probado de punta a punta contra Testnet con un script.
+- Contrato en Testnet: `CAQQRHJIBNWHDBBETYVT5JZI5D27SWQDYJKHRNY6QTX7RT2TYVYECTUO`. Tiene 13 tests, hay 100 unidades de prueba sembradas (20 tipos x 5) y fue probado de punta a punta contra Testnet con un script.
 - Cada registro y cada reclamo los firma la persona con su billetera (Freighter).
 
 ## Modelo de negocio (hipótesis a validar)
@@ -62,9 +62,9 @@ Corto plazo:
 Mediano plazo:
 - Marketplace con varias tiendas aliadas.
 - Etiqueta NFC en el empaque para reclamar sin escribir el código.
-- Mascota con arte animal en lugar del avatar humanoide.
+- Mascota que se vista y suba de nivel (hoy hay 6 para elegir, pero la ropa va en el avatar humano).
 - Inicio de sesión con correo o Google para quien no tiene billetera.
-- Base de datos y panel de administrador.
+- Guardar progreso y datos de usuario en base de datos, y panel de administrador.
 
 Largo plazo:
 - Pago retenido con escrow ligado a la entrega del producto.
@@ -78,10 +78,17 @@ Largo plazo:
 | Contrato `closet` en Testnet (13 tests) | Marketplace con varias tiendas aliadas |
 | Página Tienda: registrar una unidad y obtener código de un solo uso | Pago retenido con escrow |
 | Solo la huella sha256 del código queda en la red | Panel de administrador |
-| Reclamar un ítem con número y código | Base de datos |
+| Reclamar un ítem con número y código | Guardar progreso o datos de usuario en base de datos |
 | Ítem a nombre del comprador | Inicio de sesión con correo o Google |
-| Mi clóset: equipar prendas y accesorios en el avatar | Mascota con arte animal (hoy avatar humanoide) |
+| Mi clóset: equipar prendas y accesorios en el avatar | Mascota que se vista o suba de nivel (hoy solo se elige, beta) |
 | Hogar digital con muebles | Interfaz para transferir ítems (el contrato sí lo permite) |
 | Tareas que se marcan solas y nivel por puntos | Etiqueta NFC en el empaque (hoy el reclamo es por código escrito) |
-| Catálogo fijo de 13 productos (ropa, accesorios, muebles) | Comida u otras categorías |
-| Prueba de punta a punta contra Testnet con un script | Prueba de la interfaz con Freighter terminada (se está ensayando) |
+| Catálogo fijo de 20 tipos de producto (ropa, accesorios, muebles) | Comida u otras categorías |
+| 100 unidades de prueba sembradas en Testnet (20 tipos x 5) | |
+| Página Productos con filtros por categoría, estado y nombre | |
+| Página Mascotas: 6 mascotas para elegir (beta) | |
+| Portada con cifras en vivo, sección para tiendas y preguntas frecuentes | |
+| Directorio de tiendas de solo lectura (3 tiendas de ejemplo) | |
+| Diseño visual nuevo (paleta cálida, contrastes AA medidos) | |
+| CI del contrato y de la app | |
+| Prueba de punta a punta contra Testnet con un script | Interfaz verificada en navegador con Freighter y a 390 px y 1280 px (se está ensayando) |

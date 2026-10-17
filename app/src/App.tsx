@@ -6,7 +6,9 @@ import Claim from "./pages/Claim"
 import Closet from "./pages/Closet"
 import Debug from "./pages/Debug"
 import Escrows from "./pages/Escrows"
+import Explore from "./pages/Explore"
 import Home from "./pages/Home"
+import Pets from "./pages/Pets"
 import Store from "./pages/Store"
 import Tasks from "./pages/Tasks"
 
@@ -16,6 +18,8 @@ function App() {
 			<Route element={<AppLayout />}>
 				<Route path="/" element={<Home />} />
 				<Route path="/closet" element={<Closet />} />
+				<Route path="/mascotas" element={<Pets />} />
+				<Route path="/productos" element={<Explore />} />
 				<Route path="/reclamar" element={<Claim />} />
 				<Route path="/tareas" element={<Tasks />} />
 				<Route path="/tienda" element={<Store />} />
@@ -39,6 +43,18 @@ const AppLayout = () => (
 					className={({ isActive }) => (isActive ? styles.active : "")}
 				>
 					Mi clóset
+				</NavLink>
+				<NavLink
+					to="/productos"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Productos
+				</NavLink>
+				<NavLink
+					to="/mascotas"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Mascotas
 				</NavLink>
 				<NavLink
 					to="/reclamar"

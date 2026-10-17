@@ -3,6 +3,8 @@ import { CATEGORY_LABEL, findModel } from "../closet/catalog"
 import styles from "../closet/closet.module.css"
 import { friendlyError } from "../closet/closetService"
 import { Avatar, HomeScene, WalletRequired } from "../closet/components"
+import { PETS, PetSvg, usePet } from "../closet/pets"
+import petStyles from "../closet/pets.module.css"
 import { useCloset } from "../closet/useCloset"
 
 const ClosetView = ({ address }: { address: string }) => {
@@ -18,6 +20,8 @@ const ClosetView = ({ address }: { address: string }) => {
 		points,
 		progress,
 	} = useCloset(address)
+	const { petKey } = usePet()
+	const pet = PETS.find((p) => p.key === petKey)
 
 	return (
 		<>
@@ -88,6 +92,35 @@ const ClosetView = ({ address }: { address: string }) => {
 					</ul>
 				</section>
 			</div>
+
+			<section
+				className={styles.panel}
+				style={{ marginBottom: "1.5rem" }}
+				aria-labelledby="pet-title"
+			>
+				<h2 id="pet-title">Su mascota</h2>
+				{pet ? (
+					<div className={petStyles.panelPet}>
+						<div className={petStyles.art}>
+							<PetSvg petKey={pet.key} size={120} />
+						</div>
+						<div>
+							<strong>{pet.name}</strong>
+							<p className={petStyles.muted}>{pet.species}</p>
+							<Link className={petStyles.link} to="/mascotas">
+								Cambiar mascota
+							</Link>
+						</div>
+					</div>
+				) : (
+					<p className={petStyles.muted}>
+						Todavía no eligió una mascota.{" "}
+						<Link className={petStyles.link} to="/mascotas">
+							Elegir mascota
+						</Link>
+					</p>
+				)}
+			</section>
 
 			<section className={styles.panel} aria-labelledby="home-title">
 				<h2 id="home-title">Su hogar digital</h2>

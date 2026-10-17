@@ -53,3 +53,6 @@ app-lib/clients/*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Seed output (claim codes are secrets)
+scripts/out/
