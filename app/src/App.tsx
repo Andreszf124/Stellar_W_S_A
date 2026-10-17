@@ -10,6 +10,7 @@ import Explore from "./pages/Explore"
 import Home from "./pages/Home"
 import Pets from "./pages/Pets"
 import Store from "./pages/Store"
+import Stores from "./pages/Stores"
 import Tasks from "./pages/Tasks"
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
 				<Route path="/reclamar" element={<Claim />} />
 				<Route path="/tareas" element={<Tasks />} />
 				<Route path="/tienda" element={<Store />} />
+				<Route path="/tiendas" element={<Stores />} />
 				<Route path="/escrows" element={<Escrows />} />
 				<Route path="/debug" element={<Debug />} />
 				<Route path="/debug/:contractName" element={<Debug />} />
@@ -73,6 +75,12 @@ const AppLayout = () => (
 					className={({ isActive }) => (isActive ? styles.active : "")}
 				>
 					Tienda
+				</NavLink>
+				<NavLink
+					to="/tiendas"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Tiendas
 				</NavLink>
 				<NavLink
 					to="/escrows"
