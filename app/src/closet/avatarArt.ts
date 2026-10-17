@@ -158,14 +158,38 @@ const FURNITURE: Record<string, (c: string) => string> = {
 		<circle cx="105" cy="58" r="2" fill="#1f2937"/>`,
 }
 
-const SKIN = "#e0ac69"
-const HAIR = "#3b2a20"
+/** Skin tone and hair color of the avatar, both as `#rrggbb`. */
+export interface Look {
+	skin: string
+	hair: string
+}
+
+export const SKIN_TONES = [
+	"#f5d0b5",
+	"#e0ac69",
+	"#c68642",
+	"#8d5524",
+	"#5c3a21",
+]
+export const HAIR_COLORS = [
+	"#1f1611",
+	"#3b2a20",
+	"#a0522d",
+	"#e6c27a",
+	"#9ca3af",
+]
+
+export const DEFAULT_LOOK: Look = { skin: "#e0ac69", hair: "#3b2a20" }
+
 const SHIRT = "#e5e7eb"
 const PANTS = "#374151"
 const INK = "#1f2937"
 
 /** The avatar wearing the given items, as an SVG string. */
-export function avatarSvg(wear: Wear[]) {
+export function avatarSvg(wear: Wear[], look: Look = DEFAULT_LOOK) {
+	// The colors are injected into the SVG, so they are checked as hex first.
+	const SKIN = safe(look.skin)
+	const HAIR = safe(look.hair)
 	const bySlot = new Map<string, Wear>()
 	wear.forEach((w) => bySlot.set(w.slot, w))
 	const draw = (slot: string) => {

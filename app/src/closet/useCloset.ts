@@ -1,6 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { useState } from "react"
-import { type Furnishing, type Wear } from "./avatarArt"
+import {
+	DEFAULT_LOOK,
+	HAIR_COLORS,
+	SKIN_TONES,
+	type Furnishing,
+	type Look,
+	type Wear,
+} from "./avatarArt"
 import { findModel } from "./catalog"
 import { itemsOf, type ClosetItem } from "./closetService"
 import { completedTaskIds, levelOf, levelProgress, pointsFor } from "./tasks"
@@ -8,6 +15,29 @@ import { completedTaskIds, levelOf, levelProgress, pointsFor } from "./tasks"
 type Equipped = Record<string, number>
 
 const storageKey = (address: string) => `closet:equipped:${address}`
+const lookKey = (address: string) => `closet:look:${address}`
+
+/** What was saved in this browser, ignoring anything that is not a known color. */
+function loadLook(address: string): Look {
+	try {
+		const raw = localStorage.getItem(lookKey(address))
+		const saved = raw ? (JSON.parse(raw) as Partial<Look>) : {}
+		return {
+			skin: SKIN_TONES.find((c) => c === saved.skin) ?? DEFAULT_LOOK.skin,
+			hair: HAIR_COLORS.find((c) => c === saved.hair) ?? DEFAULT_LOOK.hair,
+		}
+	} catch {
+		return DEFAULT_LOOK
+	}
+}
+
+function saveLook(address: string, look: Look) {
+	try {
+		localStorage.setItem(lookKey(address), JSON.stringify(look))
+	} catch {
+		// Private mode: the avatar just won't remember its colors.
+	}
+}
 
 function load(address: string): Equipped {
 	try {
@@ -36,6 +66,13 @@ export function useCloset(address: string) {
 		queryFn: () => itemsOf(address),
 	})
 	const [equipped, setEquipped] = useState<Equipped>(() => load(address))
+	const [look, setLookState] = useState<Look>(() => loadLook(address))
+
+	const setLook = (change: Partial<Look>) => {
+		const next = { ...look, ...change }
+		setLookState(next)
+		saveLook(address, next)
+	}
 
 	const items: ClosetItem[] = query.data ?? []
 
@@ -83,6 +120,8 @@ export function useCloset(address: string) {
 		wornIds,
 		furniture,
 		toggleEquip,
+		look,
+		setLook,
 		done,
 		points,
 		level: levelOf(points),

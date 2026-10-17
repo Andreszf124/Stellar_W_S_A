@@ -1,0 +1,263 @@
+.dialog {
+	width: min(860px, calc(100% - 2rem));
+	max-height: 92vh;
+	padding: 0;
+	border: 1px solid var(--color-border);
+	border-radius: 20px;
+	background: var(--color-bg);
+	color: var(--color-text);
+	box-shadow: 0 20px 60px rgba(60, 30, 10, 0.3);
+	overflow: auto;
+}
+
+.dialog::backdrop {
+	background: rgba(59, 42, 34, 0.55);
+}
+
+.box {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+	gap: 1.5rem;
+	padding: 1.5rem;
+}
+
+.close {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.6rem;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	font-size: 1.5rem;
+	line-height: 1;
+	border-radius: 50%;
+}
+
+.tryon {
+	align-self: start;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	padding: 0.75rem;
+	text-align: center;
+	color: var(--color-text-muted);
+}
+
+.tryon svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 340px;
+}
+
+.body h2 {
+	margin: 0 2rem 0.2rem 0;
+}
+
+.body h3 {
+	margin: 0 0 0.4rem;
+}
+
+.muted {
+	margin: 0.2rem 0;
+	color: var(--color-text-muted);
+	font-size: 0.9rem;
+}
+
+.price {
+	display: flex;
+	align-items: baseline;
+	gap: 0.6rem;
+	margin: 0.6rem 0 0.2rem;
+}
+
+.price strong {
+	font-size: 1.6rem;
+}
+
+.price span {
+	color: var(--color-accent);
+	font-weight: 600;
+}
+
+.methods {
+	border: 0;
+	padding: 0;
+	margin: 1rem 0 0.5rem;
+	display: grid;
+	gap: 0.5rem;
+}
+
+.methods legend {
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--color-text-muted);
+	margin-bottom: 0.4rem;
+}
+
+.method {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.7rem 0.9rem;
+	background: #fff;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+}
+
+.method span:first-of-type {
+	display: grid;
+	flex: 1;
+	min-width: 0;
+}
+
+.method small {
+	color: var(--color-text-muted);
+}
+
+.method input {
+	accent-color: var(--color-accent);
+}
+
+.selected {
+	border-color: var(--color-accent);
+	background: var(--color-surface);
+}
+
+.disabled {
+	opacity: 0.55;
+}
+
+.amount {
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.error {
+	margin: 0.6rem 0;
+	padding: 0.7rem 0.9rem;
+	border: 1px solid var(--color-error);
+	border-radius: var(--radius);
+	background: #fdecea;
+	color: #8a1c15;
+}
+
+.pay {
+	display: inline-block;
+	margin-top: 0.6rem;
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+	color: #fff;
+	font-weight: 700;
+	font-size: 1rem;
+	padding: 0.75rem 1.4rem;
+	border-radius: 999px;
+	text-decoration: none;
+}
+
+.pay:hover:not(:disabled) {
+	background: var(--color-accent);
+	filter: brightness(0.92);
+}
+
+.pay:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.steps {
+	list-style: none;
+	margin: 1rem 0;
+	padding: 0;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.steps li {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	color: var(--color-text-muted);
+}
+
+.icon {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 50%;
+	border: 2px solid var(--color-border);
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+.active {
+	color: var(--color-text);
+	font-weight: 600;
+}
+
+.active .icon {
+	border-color: var(--color-accent);
+	border-top-color: transparent;
+	animation: spin 0.9s linear infinite;
+}
+
+.done {
+	color: var(--color-text);
+}
+
+.done .icon {
+	background: var(--color-success);
+	border-color: var(--color-success);
+	color: #fff;
+}
+
+.receipt {
+	margin-top: 1rem;
+	padding: 1rem;
+	border: 1px solid var(--color-success);
+	border-radius: var(--radius);
+	background: #e8f5ee;
+	color: #0f4d31;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	align-items: center;
+}
+
+.dialog button:focus-visible,
+.dialog a:focus-visible,
+.dialog input:focus-visible {
+	outline: 3px solid var(--color-text);
+	outline-offset: 2px;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.active .icon {
+		animation: none;
+	}
+}
+
+@media (max-width: 700px) {
+	.box {
+		grid-template-columns: 1fr;
+		padding: 1.1rem;
+	}
+
+	.tryon svg {
+		max-height: 220px;
+	}
+}

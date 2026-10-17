@@ -18,6 +18,10 @@ export interface Model {
 	category: CategoryTag
 	slot: Slot
 	color: string
+	/** Reference price in US dollars. It lives in the app, not in the contract. */
+	priceUsd: number
+	/** One short sentence for the shop card. */
+	desc: string
 }
 
 /**
@@ -32,6 +36,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "hat",
 		color: "#ef4444",
+		priceUsd: 24,
+		desc: "Gorra de algodón con visera curva y logo bordado.",
 	},
 	{
 		key: "beanie",
@@ -39,6 +45,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "hat",
 		color: "#14b8a6",
+		priceUsd: 19,
+		desc: "Gorro suave de lana con pompón.",
 	},
 	{
 		key: "shades",
@@ -46,6 +54,8 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "eyes",
 		color: "#0b1020",
+		priceUsd: 45,
+		desc: "Lentes polarizados con montura mate.",
 	},
 	{
 		key: "round",
@@ -53,6 +63,8 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "eyes",
 		color: "#f59e0b",
+		priceUsd: 59,
+		desc: "Montura ligera de titanio con cristales claros.",
 	},
 	{
 		key: "tee",
@@ -60,6 +72,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#1e293b",
+		priceUsd: 29,
+		desc: "Camiseta diaria de cuello redondo con una estrella dorada.",
 	},
 	{
 		key: "hoodie",
@@ -67,6 +81,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#7c3aed",
+		priceUsd: 68,
+		desc: "Sudadera gruesa de algodón orgánico con bolsillo canguro.",
 	},
 	{
 		key: "jacket",
@@ -74,6 +90,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "top",
 		color: "#2563eb",
+		priceUsd: 89,
+		desc: "Chaqueta clásica de mezclilla lavada a la piedra.",
 	},
 	{
 		key: "sneakers",
@@ -81,6 +99,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "feet",
 		color: "#ec4899",
+		priceUsd: 110,
+		desc: "Tenis acolchados para correr, con materiales reciclados.",
 	},
 	{
 		key: "boots",
@@ -88,6 +108,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "feet",
 		color: "#92400e",
+		priceUsd: 125,
+		desc: "Botas de cuero resistentes al agua con suela antideslizante.",
 	},
 	{
 		key: "headphones",
@@ -95,6 +117,8 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "ears",
 		color: "#06b6d4",
+		priceUsd: 149,
+		desc: "Audífonos inalámbricos con cancelación de ruido.",
 	},
 	{
 		key: "chain",
@@ -102,6 +126,8 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "neck",
 		color: "#facc15",
+		priceUsd: 79,
+		desc: "Cadena bañada en oro con un dije de estrella.",
 	},
 	{
 		key: "lamp",
@@ -109,6 +135,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#f59e0b",
+		priceUsd: 35,
+		desc: "Lámpara de mesa de luz cálida para cualquier rincón.",
 	},
 	{
 		key: "chair",
@@ -116,6 +144,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#92400e",
+		priceUsd: 72,
+		desc: "Silla de madera maciza con acabado natural.",
 	},
 	{
 		key: "rug",
@@ -123,6 +153,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#14b8a6",
+		priceUsd: 54,
+		desc: "Tapete tejido a mano que da calor a la sala.",
 	},
 	{
 		key: "pants",
@@ -130,6 +162,8 @@ export const MODELS: Model[] = [
 		category: "Clothing",
 		slot: "legs",
 		color: "#2563eb",
+		priceUsd: 62,
+		desc: "Pantalón de mezclilla de corte recto y uso diario.",
 	},
 	{
 		key: "scarf",
@@ -137,6 +171,8 @@ export const MODELS: Model[] = [
 		category: "Accessory",
 		slot: "neck",
 		color: "#dc2626",
+		priceUsd: 26,
+		desc: "Bufanda larga de lana para los días fríos.",
 	},
 	{
 		key: "table",
@@ -144,6 +180,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#a16207",
+		priceUsd: 96,
+		desc: "Mesa de centro de madera para la sala.",
 	},
 	{
 		key: "plant",
@@ -151,6 +189,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#16a34a",
+		priceUsd: 22,
+		desc: "Planta decorativa en maceta que no necesita riego.",
 	},
 	{
 		key: "frame",
@@ -158,6 +198,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#7c3aed",
+		priceUsd: 41,
+		desc: "Cuadro con marco para decorar la pared.",
 	},
 	{
 		key: "clock",
@@ -165,6 +207,8 @@ export const MODELS: Model[] = [
 		category: "Furniture",
 		slot: "furniture",
 		color: "#0f766e",
+		priceUsd: 38,
+		desc: "Reloj de pared de estilo sencillo y silencioso.",
 	},
 ]
 
@@ -175,3 +219,17 @@ export const CATEGORY_LABEL: Record<CategoryTag, string> = {
 	Accessory: "Accesorio",
 	Furniture: "Mueble",
 }
+
+/** Where each slot sits on the avatar, in the order the closet lists them. */
+export const SLOT_LABEL: Record<Slot, string> = {
+	hat: "Cabeza",
+	eyes: "Ojos",
+	ears: "Orejas",
+	neck: "Cuello",
+	top: "Cuerpo",
+	legs: "Piernas",
+	feet: "Pies",
+	furniture: "Hogar",
+}
+
+export const SLOT_ORDER = Object.keys(SLOT_LABEL) as Slot[]

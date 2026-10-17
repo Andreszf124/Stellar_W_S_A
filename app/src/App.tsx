@@ -8,10 +8,13 @@ import Debug from "./pages/Debug"
 import Escrows from "./pages/Escrows"
 import Explore from "./pages/Explore"
 import Home from "./pages/Home"
+import Orders from "./pages/Orders"
 import Pets from "./pages/Pets"
+import Shop from "./pages/Shop"
 import Store from "./pages/Store"
 import Stores from "./pages/Stores"
 import Tasks from "./pages/Tasks"
+import Wallet from "./pages/Wallet"
 
 function App() {
 	return (
@@ -20,6 +23,9 @@ function App() {
 				<Route path="/" element={<Home />} />
 				<Route path="/closet" element={<Closet />} />
 				<Route path="/mascotas" element={<Pets />} />
+				<Route path="/comprar" element={<Shop />} />
+				<Route path="/pedidos" element={<Orders />} />
+				<Route path="/billetera" element={<Wallet />} />
 				<Route path="/productos" element={<Explore />} />
 				<Route path="/reclamar" element={<Claim />} />
 				<Route path="/tareas" element={<Tasks />} />
@@ -45,6 +51,24 @@ const AppLayout = () => (
 					className={({ isActive }) => (isActive ? styles.active : "")}
 				>
 					Mi clóset
+				</NavLink>
+				<NavLink
+					to="/comprar"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Comprar
+				</NavLink>
+				<NavLink
+					to="/pedidos"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Pedidos
+				</NavLink>
+				<NavLink
+					to="/billetera"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Billetera
 				</NavLink>
 				<NavLink
 					to="/productos"

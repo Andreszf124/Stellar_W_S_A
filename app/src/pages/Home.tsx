@@ -1,8 +1,8 @@
 ﻿import { type ReactNode } from "react"
 import { Link } from "react-router-dom"
-import { CATEGORY_LABEL, MODELS, type Model } from "../closet/catalog"
+import { CATEGORY_LABEL, MODELS } from "../closet/catalog"
 import styles from "../closet/closet.module.css"
-import { Avatar, HomeScene } from "../closet/components"
+import { ModelThumb } from "../closet/components"
 import home from "../closet/home.module.css"
 import { useStats } from "../closet/useStats"
 import { useStores } from "../closet/useStores"
@@ -79,13 +79,6 @@ const FAQ = [
 		a: "Que está en pruebas y puede cambiar. Gracias por probarla.",
 	},
 ]
-
-const Thumb = ({ model }: { model: Model }) =>
-	model.category === "Furniture" ? (
-		<HomeScene furniture={[{ key: model.key, color: model.color }]} />
-	) : (
-		<Avatar wear={[{ slot: model.slot, key: model.key, color: model.color }]} />
-	)
 
 const ICONS = [
 	<g key="icon1">
@@ -186,9 +179,12 @@ const Home = () => {
 
 			<div className={styles.actions}>
 				<Link
-					to="/reclamar"
+					to="/comprar"
 					className={`${styles.linkButton} ${styles.linkButtonPrimary}`}
 				>
+					Comprar con XLM
+				</Link>
+				<Link to="/reclamar" className={styles.linkButton}>
 					Reclamar un ítem
 				</Link>
 				<Link to="/closet" className={styles.linkButton}>
@@ -246,7 +242,7 @@ const Home = () => {
 					{MODELS.map((model) => (
 						<li key={model.key} className={home.card}>
 							<div className={home.thumb}>
-								<Thumb model={model} />
+								<ModelThumb model={model} />
 							</div>
 							<h3>{model.name}</h3>
 							<p>{CATEGORY_LABEL[model.category]}</p>
