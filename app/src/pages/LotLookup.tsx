@@ -6,14 +6,8 @@ import { LotCard } from "../components/LotCard"
 import { StatusMessage } from "../components/StatusMessage"
 import ui from "../components/ui.module.css"
 import { useLot } from "../hooks/useLot"
+import { parseLotId } from "../services/lotId"
 import styles from "./Pages.module.css"
-
-/** Returns a positive integer id or null when the text is not one. */
-const parseLotId = (value: string | undefined): number | null => {
-	if (!value || !/^\d+$/.test(value)) return null
-	const id = Number(value)
-	return Number.isSafeInteger(id) && id > 0 && id <= 4_294_967_295 ? id : null
-}
 
 const LotLookup = () => {
 	const { id: idParam } = useParams()

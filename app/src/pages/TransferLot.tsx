@@ -6,11 +6,9 @@ import { StatusMessage } from "../components/StatusMessage"
 import ui from "../components/ui.module.css"
 import { WalletGate } from "../components/WalletGate"
 import { toFriendlyMessage } from "../services/errors"
+import { parseLotId } from "../services/lotId"
 import { isValidAddress, lotService } from "../services/lotService"
 import styles from "./Pages.module.css"
-
-/** Lot ids are u32 in the contract. */
-const MAX_LOT_ID = 4_294_967_295
 
 type Result =
 	| { status: "idle" }
@@ -27,18 +25,14 @@ const TransferForm = ({ caller }: { caller: string }) => {
 
 	const submit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
-		const id = /^\d+$/.test(lotId.trim()) ? Number(lotId.trim()) : 0
+		const id = parseLotId(lotId.trim())
 		const owner = newOwner.trim()
-		const idMsg =
-			id > 0 && id <= MAX_LOT_ID
-				? undefined
-				: "Ingrese un número de lote válido."
 		const ownerMsg = isValidAddress(owner)
 			? undefined
 			: "La dirección debe empezar con G y tener 56 caracteres."
-		setIdError(idMsg)
+		setIdError(id === null ? "Ingrese un número de lote válido." : undefined)
 		setOwnerError(ownerMsg)
-		if (idMsg || ownerMsg) return
+		if (id === null || ownerMsg) return
 
 		setResult({ status: "loading" })
 		try {
