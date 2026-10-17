@@ -1,17 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Inconsolata:wght@500&display=swap");
 
 :root {
-	--color-bg: #ffffff;
-	--color-surface: #f8f9fa;
-	--color-text: #1a1a2e;
-	--color-text-muted: #6c757d;
-	--color-border: #dee2e6;
-	--color-accent: #7b61ff;
-	--color-success: #198754;
-	--color-error: #dc3545;
-	--color-warning: #f0ad4e;
-	--radius: 6px;
-	--shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	--color-bg: #fffaf3;
+	--color-surface: #fff1e0;
+	--color-text: #3b2a22;
+	--color-text-muted: #6b5548;
+	--color-border: #ecd9c4;
+	--color-accent: #b8431f;
+	--color-success: #146c43;
+	--color-error: #b3261e;
+	--color-warning: #b86e00;
+	--radius: 14px;
+	--shadow: 0 4px 16px rgba(120, 70, 30, 0.1);
 }
 
 *,
@@ -22,6 +22,7 @@
 
 body {
 	margin: 0;
+	overflow-x: hidden;
 	font-family: Inter, system-ui, sans-serif;
 	background: var(--color-bg);
 	color: var(--color-text);
