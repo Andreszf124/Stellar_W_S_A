@@ -27,6 +27,7 @@ default = true
 #   import { reputation } from "@stellar-scaffold/app-lib/clients"
 # The key must be the snake_case version of the crate `name` in its Cargo.toml.
 reputation = { client = true }
+closet = { client = true }
 
 # OpenZeppelin examples that ship with Scaffold: compiled as references but NOT
 # deployed. Scaffold tries to deploy every crate in contracts/, so any contract you
@@ -59,6 +60,7 @@ default = true
 
 [staging.contracts]
 reputation = { client = true }
+closet = { client = true }
 fungible_allowlist_example = { client = false }
 nft_enumerable_example = { client = false }
 
